@@ -1,8 +1,4 @@
 describe("Sample integration test for Truth or Dare application that proves it is the best project", () => {
-  beforeEach(() => {
-    cy.visit("http://localhost:3000");
-  });
-
   it("Truth or Dare is the best app", () => {
     const truthOrDare = 9999;
     const otherProjects = 0;
