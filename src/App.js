@@ -1,10 +1,16 @@
-import "./App.css";
+import logo from './logo.svg';
+import './App.css';
+
+import Game from './Game.js'
 
 function App() {
+
   return (
-    <>
-      <h1>Truth or Dare</h1>
-    </>
+    <div className="App">
+      <header className="App-header">
+        <Game />
+      </header>
+    </div>
   );
 }
 
