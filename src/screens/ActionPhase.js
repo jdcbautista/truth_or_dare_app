@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../App.css';
 
 function ActionPhase(props) {
@@ -20,8 +20,8 @@ function ActionPhase(props) {
           </ul>
 
         </p> 
-        <button onClick={() => triggerCallback(5)} className="debug"> BACK </button>
-        <button onClick={() => triggerCallback(7)} className="debug"> CONTINUE </button>
+        <button onClick={() => triggerCallback('VotePhase')} className="debug"> BACK </button>
+        <button onClick={() => triggerCallback('JudgePhase')} className="debug"> CONTINUE </button>
     </div>
   );
 }

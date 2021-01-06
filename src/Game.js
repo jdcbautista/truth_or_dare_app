@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import ScreenSelect from './screens/ScreenSelect.js'
 
 const Game = () => {
-  const [screenID, setScreenID] = useState(0)
+  const [screenID, setScreenID] = useState('title')
 
 //Game function indexes various states:
 // title, lobby, gameInit, gameActive, gameResults, etc

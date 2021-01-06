@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../App.css';
 
-function Host(props) {
+function Lobby(props) {
   function triggerCallback(value) {
     props.handleCallback(value)
   }
@@ -12,10 +12,10 @@ function Host(props) {
           LOBBY / WAITING ROOM / QUEUE<br></br>
           I will handle the logic that instantiates a new game
         </p> 
-        <button onClick={() => triggerCallback(0)} className="debug"> BACK </button> 
-        <button onClick={() => triggerCallback(3)} className="debug"> START GAME </button>
+        <button onClick={() => triggerCallback('Title')} className="debug"> BACK </button> 
+        <button onClick={() => triggerCallback('GameStart')} className="debug"> START GAME </button>
     </div>
   );
 }
 
-export default Host;
+export default Lobby;
