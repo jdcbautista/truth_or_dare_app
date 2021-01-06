@@ -5,7 +5,8 @@ changelog
 1.5.21
 - Continuous Integration implemented
 - Game/Component Template created
-- Replaced template switch integers with strings for legibility 
+- Replaced template switch integers with strings for legibility
+- Merged "Host" and "Join" components into "Lobby" 
 
 Goals for 1.6.21:
 - Additional component: Stopwatch/Timer
