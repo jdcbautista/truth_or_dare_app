@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import '../App.css';
 
 function RoundStart(props) {
@@ -20,8 +20,8 @@ function RoundStart(props) {
           </ul>
         
         </p> 
-        <button onClick={() => triggerCallback(3)} className="debug"> BACK </button>
-        <button onClick={() => triggerCallback(5)} className="debug"> CONTINUE </button>
+        <button onClick={() => triggerCallback('GameStart')} className="debug"> BACK </button>
+        <button onClick={() => triggerCallback('VotePhase')} className="debug"> CONTINUE </button>
     </div>
   );
 }

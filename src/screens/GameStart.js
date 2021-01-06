@@ -21,8 +21,8 @@ function GameStart(props) {
           </ul>
           Once I finish the above, I will send the player to RoundStart.js and trigger the start of the game
         </p> 
-        <button onClick={() => triggerCallback(2)} className="debug"> BACK </button>
-        <button onClick={() => triggerCallback(4)} className="debug"> CONTINUE </button>
+        <button onClick={() => triggerCallback('Host')} className="debug"> BACK </button>
+        <button onClick={() => triggerCallback('RoundStart')} className="debug"> CONTINUE </button>
     </div>
   );
 }

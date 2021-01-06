@@ -1,7 +1,6 @@
 import React from 'react'
 import Title from './Title.js'
-import Host from './Host.js'
-import Join from './Join.js'
+import Lobby from './Lobby.js'
 import GameStart from './GameStart.js'
 import RoundStart from './RoundStart.js'
 import VotePhase from './VotePhase.js'
@@ -14,64 +13,70 @@ const ScreenSelect = (props) => {
 
   const currentScreen = props.currentScreen;
   switch (currentScreen) {
-    case 0:
+    case 'Title':
       return (
         <div>
         <Title handleCallback={props.handleCallback}/>
         </div>
       );
-    case 1:
+    case 'Host':
       return (
         <div>
-          <Host handleCallback={props.handleCallback} role='host'/>
+          <Lobby handleCallback={props.handleCallback}/>
         </div>
       );  
-    case 2:
+    case 'Join':
       return (
         <div>
-          <Join handleCallback={props.handleCallback} role='join'/>
+          <Lobby handleCallback={props.handleCallback} role='join'/>
         </div>
       );
-    case 3:
+    case 'GameStart':
       return (
         <div>
           <GameStart handleCallback={props.handleCallback}/>
         </div>
       );
-    case 4:
+    case 'RoundStart':
       return (
         <div>
         <RoundStart handleCallback={props.handleCallback}/>
         </div>
       );
-    case 5:
+    case 'VotePhase':
       return (
         <div>
           <VotePhase handleCallback={props.handleCallback}/>
         </div>
       );  
-    case 6:
+    case 'ActionPhase':
       return (
         <div>
           <ActionPhase handleCallback={props.handleCallback}/>
         </div>
       );
-    case 7:
+    case 'JudgePhase':
       return (
         <div>
           <JudgePhase handleCallback={props.handleCallback}/>
         </div>
       );
-    case 8:
+    case 'Results':
       return (
         <div>
           <Results handleCallback={props.handleCallback} gameover="false" />
         </div>
       );
-    case 9:
+    case 'FinalResults':
       return (
         <div>
           <Results handleCallback={props.handleCallback} gameover="true" />
+        </div>
+      );
+    default:
+      return (
+        <div>
+          <Title handleCallback={props.handleCallback} />
         </div>
       );
   }

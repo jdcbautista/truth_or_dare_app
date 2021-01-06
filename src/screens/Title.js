@@ -1,6 +1,6 @@
 // I will show the game title
 // I will display one button for hosting, one button for joining
-import React, { useState } from 'react'
+import React from 'react'
 import logo from '../logo.svg';
 import '../App.css';
 
@@ -18,8 +18,8 @@ class Title extends React.Component {
           <p>
             TRUTH OR DARE
           </p>
-            <button onClick={() => this.triggerCallback(1)} className="debug"> HOST </button>
-            <button onClick={() => this.triggerCallback(2)} className="debug"> JOIN </button>  
+            <button onClick={() => this.triggerCallback('Host')} className="debug"> HOST </button>
+            <button onClick={() => this.triggerCallback('Join')} className="debug"> JOIN </button>  
       </div>
     );
   }
