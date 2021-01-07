@@ -2,6 +2,7 @@ const BASE = "http://localhost:8000/api";
 
 export const getTwilioToken = async (userInfo) => {
   const { identity, room } = userInfo;
+  console.log(identity, room);
 
   return fetch(`${BASE}/token/`, {
     method: "POST",
