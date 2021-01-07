@@ -35,7 +35,16 @@ const Game = () => {
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
+
+      const unsubscribe = FirestoreService.getPlayers('game1')
+      .then(response => response.onSnapshot(gotPlayers => {
+        const players = gotPlayers.docs.map(player => player.data())
+        setPlayers(players)
+      }))
+      .catch(error => console.log(error))
+      return () => unsubscribe()
   }, []);
+
 
   if (loading) {
     return <h1>Loading...</h1>;
@@ -58,14 +67,21 @@ const Game = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    //Disable the input
     setDisabled(true);
-    //Add the player with their anon auth ID and username
-    FirestoreService.addPlayer(username, userId);
-    //Grt the JWT token for twilio audio/video
+    FirestoreService
+    .addPlayer({username, userId}, "game1")
+    .catch(error => console.log(error))
+
     getTwilioToken({ identity: username, room: "game" })
       .then((token) => setToken(token))
       .catch((error) => setError(error));
+  };
+
+  const handleReadyClick = (e) => {
+    e.preventDefault();
+    FirestoreService
+    .readyPlayer(userId, 'game1')
+    .catch(error => console.log(error))
   };
 
   const handleChange = (e) => {
@@ -100,23 +116,23 @@ const Game = () => {
           <p>everyone is ready</p>
         </>
       )}
-      {/* {players?.length &&
+      {players?.length &&
         players.map((Player) => (
           <div key={Player.id}>
-            <h2>{Player.username}</h2>
+            <h2>{Player?.username}</h2>
             {Player?.ready ? <p>ready</p> : <p>not ready</p>}
             <p>{Player.desc}</p>
-            {Player?.username === username && (
+            {Player?.id === userId && (
               <div>
-                <button onClick={() => deletePlayer(Player)}>Leave</button>
+                {/* <button onClick={() => deletePlayer(Player)}>Leave</button> */}
                 <button
                   inputdisabled={Player?.ready}
-                  onClick={() =>
-                    editPlayer({
-                      username,
-                      ready: !Player.ready,
-                      id: Player.id,
-                    })
+                  onClick={handleReadyClick
+                      // {
+                      // username,
+                      // ready: !Player.ready,
+                      // id: Player.id,
+                      // }
                   }
                 >
                   Ready
@@ -124,7 +140,7 @@ const Game = () => {
               </div>
             )}
           </div>
-        ))} */}
+        ))}
     </div>
     // <div className="Game">
     //   {/* <ScreenSelect
