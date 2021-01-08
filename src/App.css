@@ -1,3 +1,11 @@
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  /* background-image: linear-gradient(40deg, #ff6f69 30%, #cc5c59 60%); */
+  background-size: 100vw;
+  background-repeat: no-repeat;
+  height: 100px;
+}
+
 .App {
   text-align: center;
 }
@@ -14,7 +22,6 @@
 }
 
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
