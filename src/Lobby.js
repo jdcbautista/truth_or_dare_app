@@ -1,6 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import ScreenSelect from "./screens/ScreenSelect.js";
-import Lobby from "./screens/Lobby";
 import Room from "./screens/Room";
 import { getTwilioToken } from "./services/twilio";
 import * as FirestoreService from "./firebase";
@@ -59,7 +57,7 @@ const StyledCloseIcon = styled(AiFillCloseCircle)`
   color: #ec625f;
   width: 50px;
 `;
-const Game = () => {
+const Lobby = () => {
   //What the current screen is that is displayed
   const [screenID, setScreenID] = useState("title");
   //The identity and room name of the current user
@@ -251,4 +249,4 @@ const Game = () => {
   );
 };
 
-export default Game;
+export default Lobby;
