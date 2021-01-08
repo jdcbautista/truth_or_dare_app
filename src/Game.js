@@ -105,6 +105,10 @@ const Game = () => {
     return <h1>Loading...</h1>;
   }
 
+  function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+  }
+
   const checkIfReady = () => {
     let readyStatus = false;
     if (players) {
@@ -190,7 +194,9 @@ const Game = () => {
                 >
                   {!token ? (
                     <StyledAvatar
-                      src={`https://robohash.org/${Player.username}/size=100x100?`}
+                      src={`https://robohash.org/${
+                        Player.username
+                      }/size=100x100?set=set${getRandomInt(4)}`}
                       sx={{
                         width: 100,
                         height: 100,
