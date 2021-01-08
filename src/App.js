@@ -1,16 +1,18 @@
-import logo from './logo.svg';
-import './App.css';
-
-import Game from './Game.js'
+import logo from "./logo.svg";
+import "./App.css";
+import { ThemeProvider } from "@emotion/react";
+import theme from "@rebass/preset";
+import Lobby from "./Lobby.js";
 
 function App() {
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <Game />
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className="App">
+        <header className="App-header">
+          <Lobby />
+        </header>
+      </div>
+    </ThemeProvider>
   );
 }
 
