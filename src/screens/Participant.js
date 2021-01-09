@@ -1,4 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Box } from "rebass";
+import styled from "@emotion/styled";
+
+const StyledVideo = styled.video`
+  width: 80px;
+  height: 80px;
+`;
 
 const Participant = ({ participant }) => {
   const [videoTracks, setVideoTracks] = useState([]);
@@ -14,8 +21,8 @@ const Participant = ({ participant }) => {
       .filter((track) => track !== null);
 
   useEffect(() => {
-    setVideoTracks(trackpubsToTracks(participant.videoTracks));
-    setAudioTracks(trackpubsToTracks(participant.audioTracks));
+    setVideoTracks(trackpubsToTracks(participant?.videoTracks));
+    setAudioTracks(trackpubsToTracks(participant?.audioTracks));
 
     const trackSubscribed = (track) => {
       if (track.kind === "video") {
@@ -64,12 +71,15 @@ const Participant = ({ participant }) => {
   }, [audioTracks]);
 
   return (
-    <div className="bottom">
-      <p>{participant.identity}</p>
-      <video className="participant" ref={videoRef} autoPlay={true} />
-      {/* <audio ref={audioRef} autoPlay={true} muted={muted} /> */}
-      <audio ref={audioRef} autoPlay={true} />
-    </div>
+    <>
+      <p>{participant?.username}</p>
+      <StyledVideo ref={videoRef} autoPlay={true} />
+      <button onClick={() => setMuted(!muted)}>
+        {muted ? "unmute" : "mute"}{" "}
+      </button>
+      <audio ref={audioRef} autoPlay={true} muted={muted} />
+      {/* <audio ref={audioRef} autoPlay={true} /> */}
+    </>
   );
 };
 

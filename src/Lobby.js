@@ -6,6 +6,9 @@ import { Card, Image, Heading, Flex, Box, Button } from "rebass";
 import styled from "@emotion/styled";
 import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
 import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+import Video from "twilio-video";
+import Participant from "./screens/Participant";
+
 const StyledCard = styled(Card)`
   color: white;
   font-family: Arial, Helvetica, sans-serif;
@@ -60,26 +63,20 @@ const StyledCloseIcon = styled(AiFillCloseCircle)`
 const Lobby = () => {
   //What the current screen is that is displayed
   const [screenID, setScreenID] = useState("title");
-  //The identity and room name of the current user
-  const [identity, setIdentity] = useState("");
-  const [roomName, setRoomName] = useState("");
-  // The twilio token for audio/video chat
+  // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
+  const [room, setRoom] = useState(null);
+  const [participants, setParticipants] = useState([]);
   //Error handling
   const [error, setError] = useState(null);
   // Keep track of players and current player
   const [players, setPlayers] = useState([]);
-
   const [loading, setLoading] = useState(false);
-  const [username, setUsername] = useState(undefined);
-  const [ready, setReady] = useState(false);
+  const [username, setUsername] = useState(null);
   const [inputDisabled, setInputDisabled] = useState(false);
-
   const [userId, setUserId] = useState(null);
 
-  const handleCallback = (value) => {
-    setScreenID(value);
-  };
+  console.log({ room, token, participants });
 
   useEffect(() => {
     FirestoreService.authenticateAnonymously()
@@ -99,6 +96,53 @@ const Lobby = () => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (userId) {
+      getTwilioToken({ identity: userId, room: "game1" })
+        .then((token) => setToken(token))
+        .catch((error) => setError(error));
+    }
+    const participantConnected = (participant) => {
+      setParticipants((prevParticipants) => [...prevParticipants, participant]);
+    };
+
+    const participantDisconnected = (participant) => {
+      setParticipants((prevParticipants) =>
+        prevParticipants.filter((p) => p !== participant)
+      );
+    };
+
+    if (token) {
+      console.log(token);
+      Video.connect(token, {
+        name: "game1",
+      }).then((room) => {
+        console.log({ room });
+        setRoom(room);
+        room.on("participantConnected", participantConnected);
+        room.on("participantDisconnected", participantDisconnected);
+        room.participants.forEach(participantConnected);
+      });
+    }
+
+    return () => {
+      setRoom((currentRoom) => {
+        if (currentRoom && currentRoom.localParticipant.state === "connected") {
+          currentRoom.localParticipant.tracks.forEach(function (
+            trackPublication
+          ) {
+            trackPublication.track.stop();
+          });
+          currentRoom.disconnect();
+          return null;
+        } else {
+          return currentRoom;
+        }
+      });
+    };
+  }, [userId, token]);
+
+  console.log({ room: room?.localParticipant?.identity, userId: userId });
   if (loading) {
     return <h1>Loading...</h1>;
   }
@@ -129,10 +173,6 @@ const Lobby = () => {
     FirestoreService.addPlayer({ username, userId }, "game1").catch((error) =>
       console.log(error)
     );
-
-    getTwilioToken({ identity: username, room: "game" })
-      .then((token) => setToken(token))
-      .catch((error) => setError(error));
   };
 
   const handleReadyClick = (e) => {
@@ -163,11 +203,6 @@ const Lobby = () => {
               />
             </Box>
           </Flex>
-          <Flex mx={-2} flexWrap="wrap">
-            {/* <Box px={2} ml="auto">
-              <Button>Submit</Button>
-            </Box> */}
-          </Flex>
         </Box>
       )}
 
@@ -190,7 +225,7 @@ const Lobby = () => {
                     boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
                   }}
                 >
-                  {!token ? (
+                  {!room?.localParticipant ? (
                     <StyledAvatar
                       src={`https://robohash.org/${
                         Player.username
@@ -202,7 +237,12 @@ const Lobby = () => {
                       }}
                     />
                   ) : (
-                    <p>audio/video</p>
+                    room?.localParticipant?.identity && (
+                      <Participant
+                        key={room.localParticipant.sid}
+                        participant={room.localParticipant}
+                      />
+                    )
                   )}
                   <StyledHeading>{Player?.username}</StyledHeading>
                   {Player?.ready ? (
