@@ -175,15 +175,15 @@ const Lobby = () => {
         )}
 
         {players &&
-          participants &&
+          !!participants.length &&
           userId &&
-          players
-            .filter((player) => player?.id !== userId)
+          participants
+            .filter((participant) => participant?.identity !== userId)
             .map((player, i) => (
               <LobbyCard
                 playerInfo={player}
-                // twilioUserInfo={getTwilioInfo(player?.id, participants[i])}
-                twilioUserInfo={participants[i]}
+                twilioUserInfo={getTwilioInfo(player?.identity, participants)}
+                // twilioUserInfo={participants[i]}
                 userId={userId}
               />
             ))}
