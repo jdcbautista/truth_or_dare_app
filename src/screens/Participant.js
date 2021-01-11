@@ -2,51 +2,23 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Button } from "rebass";
 import styled from "@emotion/styled";
 import {
+  StyledVideoBox,
+  StyledVideo,
   StyledAvatar,
   StyledAudioOnIcon,
   StyledAudioOffIcon,
   StyledVideoOnIcon,
   StyledVideoOffIcon,
   StyledVideoIconButton,
+  StyledAudioIconButton,
 } from "./Lobby/LobbyStyles";
 import { getRandomInt } from "../helpers";
 
-const StyledVideoBox = styled(Box)`
-  height: 200px;
-  border-radius: 5px;
-  object-fit: cover;
-  -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
-  display: ${(props) => {
-    if (props.nodisplay) return "none";
-    return "block";
-  }};
-`;
-const StyledVideo = styled.video`
-  /* width: 500px;
-  height: 500px;
-  position: absolute;
-  top: -125px;
-  left: -125px; */
-  object-fit: fill;
-
-  width: 300px;
-  display: ${(props) => {
-    if (props.nodisplay) return "none";
-    return "block";
-  }};
-`;
-const StyledBox = styled.video`
-  position: relative;
-  top: 0;
-  display: flex;
-`;
-
-const Participant = ({ participant, userId }) => {
+const Participant = ({ participant, userId, defaultParticipant }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const [muted, setMuted] = useState(true);
-  const [isVideoOn, setIsVideoOn] = useState(true);
-  console.log(participant?.identity, userId);
+  const [isVideoOn, setIsVideoOn] = useState(false);
   const videoRef = useRef();
   const audioRef = useRef();
 
@@ -97,8 +69,10 @@ const Participant = ({ participant, userId }) => {
 
   useEffect(() => {
     const videoTrack = videoTracks[0];
-    if (videoTrack) {
-      isVideoOn ? videoTrack.disable() : videoTrack.enable();
+    if (isVideoOn) {
+      videoTrack?.disable();
+    } else {
+      videoTrack?.enable();
     }
   }, [isVideoOn]);
 
@@ -114,24 +88,23 @@ const Participant = ({ participant, userId }) => {
 
   return (
     <>
-      <p>{participant?.username}</p>
-      <StyledVideoBox nodisplay={isVideoOn}>
-        <StyledVideo nodisplay={isVideoOn} ref={videoRef} autoPlay={true} />
+      <StyledVideoBox displayoff={isVideoOn}>
+        <StyledVideo ref={videoRef} autoPlay={true} />
       </StyledVideoBox>
-      {isVideoOn && (
-        <StyledAvatar
-          src={`https://robohash.org/${participant?.identity}/size=200x300?`}
-          sx={{
-            width: 300,
-            height: 196,
-          }}
-        />
-      )}
+
+      <StyledAvatar
+        displayoff={!isVideoOn}
+        src={`https://robohash.org/${participant?.identity}/size=200x300?`}
+        sx={{
+          height: 310,
+        }}
+      />
+
       {participant?.identity === userId && (
         <Box>
-          <StyledVideoIconButton onClick={() => setMuted(!muted)}>
+          <StyledAudioIconButton onClick={() => setMuted(!muted)}>
             {muted ? <StyledAudioOffIcon /> : <StyledAudioOnIcon />}
-          </StyledVideoIconButton>
+          </StyledAudioIconButton>
           <StyledVideoIconButton onClick={() => setIsVideoOn(!isVideoOn)}>
             {isVideoOn ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
           </StyledVideoIconButton>
