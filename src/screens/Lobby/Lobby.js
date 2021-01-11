@@ -1,3 +1,4 @@
+import { gsap } from "gsap";
 import React, { useState, useEffect, Suspense } from "react";
 import { getTwilioToken } from "../../services/twilio";
 import * as FirestoreService from "../../firebase";
@@ -135,6 +136,13 @@ const Lobby = () => {
 
   const handleStartGame = () => {
     setIsGameStarted(true);
+    //Lobby shrinks to navBar
+    gsap.fromTo(
+      ".LobbyToNav",
+      { height: "100%" },
+      { height: "10%", duration: 1 }
+    );
+    gsap.fromTo(".fadeOutVideo", { opacity: 1 }, { opacity: 0, duration: 1 });
   };
 
   return (
@@ -142,63 +150,66 @@ const Lobby = () => {
       {loading ? (
         <h1>Loading...</h1>
       ) : (
-        <LobbyContainer>
-          <h1>Lobby</h1>
+        //   <LobbyContainer className="LobbyToNav">
+        //     {!localPlayer && (
+        //       <LobbyInput
+        //         handleChange={handleChange}
+        //         handleSubmit={handleSubmit}
+        //       />
+        //     )}
+        //     {checkIfReady(players) && (
+        //       <>
+        //         <button onClick={handleStartGame}>Start Game</button>
+        //       </>
+        //     )}
+        //     <>
+        //       <DebugButton onClick={handleStartGame}>
+        //         Force Start (not a production button!)
+        //       </DebugButton>
+        //     </>
+        //     <StyledFlex className="fadeOutVideo">
+        //       {localPlayer && room?.localParticipant && (
+        //         <Suspense fallback={<div>Loading...</div>}>
+        //           <LobbyCard
+        //             playerInfo={localPlayer}
+        //             twilioUserInfo={room?.localParticipant}
+        //             userId={userId}
+        //             handleReadyClick={(e) => handleReadyClick(e)}
+        //           />
+        //         </Suspense>
+        //       )}
+        //       {createPlaceholders(players)}
 
-          {!localPlayer && (
-            <LobbyInput
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-            />
-          )}
-
-          {checkIfReady(players) && (
-            <>
-              <button onClick={handleStartGame}>Start Game</button>
-            </>
-          )}
-
-          <>
-            <DebugButton onClick={handleStartGame}>
-              Force Start (not a production button!)
-            </DebugButton>
-          </>
-          <StyledFlex>
-            {localPlayer && room?.localParticipant && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <LobbyCard
-                  playerInfo={localPlayer}
-                  twilioUserInfo={room?.localParticipant}
-                  userId={userId}
-                  handleReadyClick={(e) => handleReadyClick(e)}
-                />
-              </Suspense>
-            )}
-            {createPlaceholders(players)}
-
-            {participants &&
-              room &&
-              players &&
-              players
-                .filter((player) => player?.id !== userId)
-                .map((player) => (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <LobbyCard
-                      playerInfo={player}
-                      twilioUserInfo={
-                        participants.filter(
-                          (participant) => participant?.identity === player?.id
-                        )[0]
-                      }
-                      userId={userId}
-                      handleReadyClick={(e) => handleReadyClick(e)}
-                    />
-                  </Suspense>
-                ))}
-          </StyledFlex>
-        </LobbyContainer>
+        //       {participants &&
+        //         room &&
+        //         players &&
+        //         players
+        //           .filter((player) => player?.id !== userId)
+        //           .map((player) => (
+        //             <Suspense fallback={<div>Loading...</div>}>
+        //               <LobbyCard
+        //                 playerInfo={player}
+        //                 twilioUserInfo={
+        //                   participants.filter(
+        //                     (participant) => participant?.identity === player?.id
+        //                   )[0]
+        //                 }
+        //                 userId={userId}
+        //                 handleReadyClick={(e) => handleReadyClick(e)}
+        //               />
+        //             </Suspense>
+        //           ))}
+        //     </StyledFlex>
+        //   </LobbyContainer>
+        // )}
+        // isGameStarted && (
+        <Game
+          players={players}
+          participants={participants}
+          useId={userId}
+          className="gameGSAP"
+        />
       )}
-      {isGameStarted && <Game />}
     </>
   );
 };

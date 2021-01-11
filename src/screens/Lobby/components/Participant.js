@@ -13,7 +13,13 @@ import {
 } from "../LobbyStyles";
 import { getRandomInt } from "../../../helpers";
 
-const Participant = ({ participant, userId, defaultParticipant }) => {
+const Participant = ({
+  participant,
+  userId,
+  defaultParticipant,
+  videoWidth,
+  videoHeight,
+}) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const [muted, setMuted] = useState(true);
@@ -87,15 +93,15 @@ const Participant = ({ participant, userId, defaultParticipant }) => {
 
   return (
     <>
-      <StyledVideoBox displayoff={isVideoOn}>
+      <StyledVideoBox displayoff={isVideoOn} videoHeight={videoHeight}>
         <StyledVideo ref={videoRef} autoPlay={true} />
       </StyledVideoBox>
 
       <StyledAvatar
         displayoff={!isVideoOn}
-        src={`https://robohash.org/${participant?.identity}/size=200x300?`}
+        src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
         sx={{
-          height: 310,
+          height: videoHeight,
         }}
       />
 

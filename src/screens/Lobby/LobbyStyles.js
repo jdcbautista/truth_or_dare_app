@@ -11,7 +11,10 @@ import { FiVideoOff, FiVideo } from "react-icons/fi";
 /* STYLES FOR VIDEO CONTAINER */
 export const StyledVideoBox = styled(Box)`
   height: 400px;
-
+  height: ${(props) => {
+    if (props.videoHeight) return props.videoHeight + "px";
+    return "310px";
+  }};
   overflow: hidden;
   padding-right: 100px;
   object-position: left bottom;
@@ -22,7 +25,10 @@ export const StyledVideoBox = styled(Box)`
   }};
 `;
 export const StyledVideo = styled.video`
-  height: 310px;
+  height: ${(props) => {
+    if (props.videoHeight) return props.videoHeight + "px";
+    return "310px";
+  }};
   margin: 0 auto;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg); /* Safari and Chrome */
@@ -75,7 +81,13 @@ export const DebugButton = styled(Button)`
 `;
 /* STYLES FOR LOBBY */
 
-export const LobbyContainer = styled(Box)``;
+export const LobbyContainer = styled.div`
+  background-color: red;
+  width: 100vw;
+  position: fixed;
+  overflow: hidden;
+  height: 100vh;
+`;
 
 /* STYLES FOR LOBBY CARD */
 

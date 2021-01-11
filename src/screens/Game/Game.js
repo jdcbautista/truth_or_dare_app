@@ -1,7 +1,8 @@
 import Cards from "./components/Cards";
 import Timer from "./components/Timer";
+import Participant from "../Lobby/components/Participant";
 
-const Game = () => {
+const Game = ({ players, participants, userId }) => {
   {
     /* <Cards />
       <Timer /> 
@@ -13,18 +14,8 @@ const Game = () => {
   return (
     <div
       className="sessionInit"
-      style={{ backgroundColor: "gray", padding: "10px" }}
+      style={{ backgroundColor: "gray", padding: "10px", paddingTop: "10%" }}
     >
-      <div
-        style={{
-          backgroundColor: "pink",
-          height: "100px",
-          borderRadius: "15px",
-          textAlign: "center",
-        }}
-      >
-        <p>NavBarComponent</p>
-      </div>
       <div
         style={{
           display: "flex",
@@ -41,8 +32,10 @@ const Game = () => {
           style={{
             backgroundColor: "lightblue",
             margin: "10px",
+            width: "100vw",
             borderRadius: "15px",
             textAlign: "center",
+            justifyContent: "space-between",
           }}
         >
           <p>Player list component</p>
@@ -50,10 +43,11 @@ const Game = () => {
             style={{
               display: "flex",
               flexDirection: "row",
+              width: "100%",
               margin: "10px",
-              justifyContent: "center",
               borderRadius: "15px",
               textAlign: "center",
+              justifyContent: "space-evenly",
             }}
           >
             <div
@@ -61,20 +55,27 @@ const Game = () => {
                 margin: "10px",
                 backgroundColor: "lavender",
                 height: "500px",
-                width: "250px",
                 borderRadius: "15px",
+                justifyContent: "space-between",
                 textAlign: "center",
               }}
             >
+              {/* <p>Child 2</p> */}
               <div
                 style={{
                   backgroundColor: "aquamarine",
+                  justifyContent: "space-evenly",
                   margin: "10px",
+                  width: "250px",
                   borderRadius: "15px",
                   height: "150px",
                 }}
               >
-                <p>Player Component</p>
+                {/* <Participant
+                  userId={userId}
+                  participant={participants[0]}
+                  videoHeight={200}
+                /> */}
               </div>
               <div
                 style={{
