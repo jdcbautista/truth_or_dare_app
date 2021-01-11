@@ -1,6 +1,7 @@
 export const checkIfReady = (players) => {
   let readyStatus = false;
-  if (players) {
+
+  if (players.length > 3) {
     for (let player of players) {
       if (player.ready) {
         readyStatus = true;
