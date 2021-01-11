@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "react-dom";
-import { FormGroup, StyledLabel, StyledInput, Message } from "./LobbyStyles";
+import { FormGroup, StyledLabel, StyledInput, Message } from "../LobbyStyles";
 
 const message = "this is the validation message";
 function LobbyInput({ handleChange, handleSubmit }) {

@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+export const db = firebase.firestore();
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -138,37 +138,37 @@ export const readyPlayer = async (userId, gameId) => {
  * @description dealCard
  * Takes 1 card from relevant card stack, copies to indicated player's hand, deletes card from stack
  * Rev 0: in game1, sends 1 card from dareStack to players.playerID.cards
- * @params playerId - {string} - the id of the player to receive a card 
+ * @params playerId - {string} - the id of the player to receive a card
  */
 export const dealCard = async (playerId) => {
   const cardSnapshot = await db
-  .collection("rooms")
-  .doc("game1")
-  .collection("dareStack")
-  .get();
-  const cards = await cardSnapshot.docs.map(async card => card.data())
+    .collection("rooms")
+    .doc("game1")
+    .collection("dareStack")
+    .get();
+  const cards = await cardSnapshot.docs.map(async (card) => card.data());
   let cardToSet = await cards[0];
   const cardSetSnapshot = await db
-  .collection("rooms")
-  .doc("game1")
-  .collection("players")
-  .doc(playerId)
-  .collection("cards")
-  .doc(`${cardToSet.id}`)
-  .set({
-    id: cardToSet.id,
-    text: cardToSet.text
-  });
-  await console.log('card set')
+    .collection("rooms")
+    .doc("game1")
+    .collection("players")
+    .doc(playerId)
+    .collection("cards")
+    .doc(`${cardToSet.id}`)
+    .set({
+      id: cardToSet.id,
+      text: cardToSet.text,
+    });
+  await console.log("card set");
   const cardDeleteSnapshot = await db
-  .collection("rooms")
-  .doc("game1")
-  .collection("dareStack")
-  .where("id", "==", cardToSet.id)
-  .get();
-  const cardDelete = await cardDeleteSnapshot.docs.map(async doc => {
+    .collection("rooms")
+    .doc("game1")
+    .collection("dareStack")
+    .where("id", "==", cardToSet.id)
+    .get();
+  const cardDelete = await cardDeleteSnapshot.docs.map(async (doc) => {
     await doc.ref.delete();
-    await console.log('card deleted');
-    })
-  return cardDelete
-}
+    await console.log("card deleted");
+  });
+  return cardDelete;
+};

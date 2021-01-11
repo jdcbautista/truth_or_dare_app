@@ -10,8 +10,8 @@ import {
   StyledVideoOffIcon,
   StyledVideoIconButton,
   StyledAudioIconButton,
-} from "./Lobby/LobbyStyles";
-import { getRandomInt } from "../helpers";
+} from "../LobbyStyles";
+import { getRandomInt } from "../../../helpers";
 
 const Participant = ({ participant, userId, defaultParticipant }) => {
   const [videoTracks, setVideoTracks] = useState([]);

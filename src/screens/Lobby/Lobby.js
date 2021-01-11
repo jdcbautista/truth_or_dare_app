@@ -2,11 +2,12 @@ import React, { useState, useEffect, Suspense } from "react";
 import { getTwilioToken } from "../../services/twilio";
 import * as FirestoreService from "../../firebase";
 import Video from "twilio-video";
-import LobbyCard from "./LobbyCard";
-import LobbyInput from "./LobbyInput";
+import LobbyCard from "./components/LobbyCard";
+import Game from "../Game/Game";
+import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
-import { StyledFlex } from "./LobbyStyles";
+import { StyledFlex, DebugButton } from "./LobbyStyles";
 const Lobby = () => {
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
@@ -20,6 +21,8 @@ const Lobby = () => {
   const [players, setPlayers] = useState([]);
   const [username, setUsername] = useState(null);
   const [userId, setUserId] = useState(null);
+  // Start the game when all players are ready and start button is clicked
+  const [isGameStarted, setIsGameStarted] = useState(false);
 
   // This effect runs on page load and uses firebase auth
   // to annonymously authenticate a user. It provides a unique
@@ -106,12 +109,6 @@ const Lobby = () => {
     }
   }, [players, userId]);
 
-  const getTwilioInfo = (playerId, participants) => {
-    console.log({ playerId, participants });
-    const participant = participants.filter((participant) => participant);
-    console.log({ participant });
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     FirestoreService.addPlayer({ username, userId }, "game1").catch((error) =>
@@ -136,6 +133,10 @@ const Lobby = () => {
     ).map((element) => <LobbyCard defaultCard />);
   };
 
+  const handleStartGame = () => {
+    setIsGameStarted(true);
+  };
+
   return (
     <>
       {loading ? (
@@ -153,16 +154,14 @@ const Lobby = () => {
 
           {checkIfReady(players) && (
             <>
-              <button onClick={() => console.log("starting game")}>
-                Start Game
-              </button>
+              <button onClick={handleStartGame}>Start Game</button>
             </>
           )}
 
           <>
-            <button onClick={() => console.log("starting game")}>
+            <DebugButton onClick={handleStartGame}>
               Force Start (not a production button!)
-            </button>
+            </DebugButton>
           </>
           <StyledFlex>
             {localPlayer && room?.localParticipant && (
@@ -199,6 +198,7 @@ const Lobby = () => {
           </StyledFlex>
         </LobbyContainer>
       )}
+      {isGameStarted && <Game />}
     </>
   );
 };

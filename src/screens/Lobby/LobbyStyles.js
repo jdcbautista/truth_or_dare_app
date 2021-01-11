@@ -11,6 +11,7 @@ import { FiVideoOff, FiVideo } from "react-icons/fi";
 /* STYLES FOR VIDEO CONTAINER */
 export const StyledVideoBox = styled(Box)`
   height: 400px;
+
   overflow: hidden;
   padding-right: 100px;
   object-position: left bottom;
@@ -63,6 +64,15 @@ export const Message = styled.label`
   display: block;
 `;
 
+/* STYLE FOR DEBUG BUTTON */
+export const DebugButton = styled(Button)`
+  opacity: 0.5;
+  color: white;
+  background-color: red;
+  &:hover {
+    opacity: 1;
+  }
+`;
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled(Box)``;

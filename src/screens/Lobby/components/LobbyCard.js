@@ -1,6 +1,5 @@
 import React from "react";
-import Participant from "../Participant";
-import { getRandomInt } from "../../helpers";
+import Participant from "./Participant";
 import {
   StyledCard,
   StyledHeading,
@@ -10,7 +9,7 @@ import {
   StyledAvatar,
   StyledCheckIcon,
   StyledCloseIcon,
-} from "./LobbyStyles";
+} from "../LobbyStyles";
 import { Box } from "rebass";
 
 function LobbyCard({
