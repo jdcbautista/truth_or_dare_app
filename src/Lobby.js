@@ -81,7 +81,8 @@ const Lobby = () => {
     setScreenID(value);
   };
 
-  useEffect(() => {
+  useEffect(
+    () => {
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
         setUserId(userCredential.user.uid);
@@ -97,7 +98,8 @@ const Lobby = () => {
       )
       .catch((error) => console.log(error));
     return () => unsubscribe();
-  }, []);
+  }, []
+  );
 
   if (loading) {
     return <h1>Loading...</h1>;
@@ -142,6 +144,14 @@ const Lobby = () => {
     );
   };
 
+  const handleCardDeal = (e) => {
+    console.log(e.target.value);
+    e.preventDefault();
+    FirestoreService.dealCard(e.target.value).catch((error) =>
+      console.log(error)
+    );
+  };
+
   const handleChange = (e) => {
     setUsername(e.target.value);
   };
@@ -182,6 +192,9 @@ const Lobby = () => {
         {players?.length &&
           players.map((Player) => (
             <div key={Player.id}>
+              <button value={Player.id} onClick={handleCardDeal} >
+                Deal Card
+              </button>
               <Box p={3} width={1 / 4} color="white" bg="primary">
                 <StyledCard
                   width={256}
