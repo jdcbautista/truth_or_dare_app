@@ -1,10 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Box, Button } from "rebass";
+import {
+  StyledVideoBox,
+  StyledVideo,
+  StyledAvatar,
+  StyledAudioOnIcon,
+  StyledAudioOffIcon,
+  StyledVideoOnIcon,
+  StyledVideoOffIcon,
+  StyledVideoIconButton,
+  StyledAudioIconButton,
+} from "../LobbyStyles";
+import { getRandomInt } from "../../../helpers";
 
-const Participant = ({ participant }) => {
+const Participant = ({ participant, userId, defaultParticipant }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const [muted, setMuted] = useState(true);
-
+  const [isVideoOn, setIsVideoOn] = useState(false);
   const videoRef = useRef();
   const audioRef = useRef();
 
@@ -14,8 +27,8 @@ const Participant = ({ participant }) => {
       .filter((track) => track !== null);
 
   useEffect(() => {
-    setVideoTracks(trackpubsToTracks(participant.videoTracks));
-    setAudioTracks(trackpubsToTracks(participant.audioTracks));
+    setVideoTracks(trackpubsToTracks(participant?.videoTracks));
+    setAudioTracks(trackpubsToTracks(participant?.audioTracks));
 
     const trackSubscribed = (track) => {
       if (track.kind === "video") {
@@ -54,6 +67,15 @@ const Participant = ({ participant }) => {
   }, [videoTracks]);
 
   useEffect(() => {
+    const videoTrack = videoTracks[0];
+    if (isVideoOn) {
+      videoTrack?.disable();
+    } else {
+      videoTrack?.enable();
+    }
+  }, [isVideoOn]);
+
+  useEffect(() => {
     const audioTrack = audioTracks[0];
     if (audioTrack) {
       audioTrack.attach(audioRef.current);
@@ -64,12 +86,31 @@ const Participant = ({ participant }) => {
   }, [audioTracks]);
 
   return (
-    <div className="bottom">
-      <p>{participant.identity}</p>
-      <video className="participant" ref={videoRef} autoPlay={true} />
-      {/* <audio ref={audioRef} autoPlay={true} muted={muted} /> */}
-      <audio ref={audioRef} autoPlay={true} />
-    </div>
+    <>
+      <StyledVideoBox displayoff={isVideoOn}>
+        <StyledVideo ref={videoRef} autoPlay={true} />
+      </StyledVideoBox>
+
+      <StyledAvatar
+        displayoff={!isVideoOn}
+        src={`https://robohash.org/${participant?.identity}/size=200x300?`}
+        sx={{
+          height: 310,
+        }}
+      />
+
+      {participant?.identity === userId && (
+        <Box>
+          <StyledAudioIconButton onClick={() => setMuted(!muted)}>
+            {muted ? <StyledAudioOffIcon /> : <StyledAudioOnIcon />}
+          </StyledAudioIconButton>
+          <StyledVideoIconButton onClick={() => setIsVideoOn(!isVideoOn)}>
+            {isVideoOn ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
+          </StyledVideoIconButton>
+        </Box>
+      )}
+      <audio ref={audioRef} muted={muted} />
+    </>
   );
 };
 

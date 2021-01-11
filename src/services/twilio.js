@@ -1,9 +1,8 @@
 const BASE = "http://localhost:8000/api";
+const LIVE = "https://kind-bulldog-61.loca.lt/api";
 
 export const getTwilioToken = async (userInfo) => {
   const { identity, room } = userInfo;
-  console.log(identity, room);
-
   return fetch(`${BASE}/token/`, {
     method: "POST",
     body: JSON.stringify({
