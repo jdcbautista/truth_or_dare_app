@@ -158,6 +158,12 @@ const Lobby = () => {
               </button>
             </>
           )}
+
+          <>
+            <button onClick={() => console.log("starting game")}>
+              Force Start (not a production button!)
+            </button>
+          </>
           <StyledFlex>
             {localPlayer && room?.localParticipant && (
               <Suspense fallback={<div>Loading...</div>}>

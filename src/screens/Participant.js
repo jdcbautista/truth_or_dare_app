@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Button } from "rebass";
-import styled from "@emotion/styled";
 import {
   StyledVideoBox,
   StyledVideo,
@@ -110,7 +109,7 @@ const Participant = ({ participant, userId, defaultParticipant }) => {
           </StyledVideoIconButton>
         </Box>
       )}
-      <audio ref={audioRef} autoPlay={true} muted={muted} />
+      <audio ref={audioRef} muted={muted} />
     </>
   );
 };
