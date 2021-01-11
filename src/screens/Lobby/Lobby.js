@@ -1,12 +1,12 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { getTwilioToken } from "../../services/twilio";
 import * as FirestoreService from "../../firebase";
 import Video from "twilio-video";
 import LobbyCard from "./LobbyCard";
+import LobbyInput from "./LobbyInput";
 import { checkIfReady } from "../../helpers";
-import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
+import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex } from "./LobbyStyles";
-import { Box, Flex } from "rebass";
 const Lobby = () => {
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
@@ -19,11 +19,7 @@ const Lobby = () => {
   const [localPlayer, setLocalPlayer] = useState({});
   const [players, setPlayers] = useState([]);
   const [username, setUsername] = useState(null);
-  const [inputDisabled, setInputDisabled] = useState(false);
   const [userId, setUserId] = useState(null);
-
-  console.log({ room, token, participants });
-  console.log({ players, localPlayer, userId });
 
   // This effect runs on page load and uses firebase auth
   // to annonymously authenticate a user. It provides a unique
@@ -31,6 +27,7 @@ const Lobby = () => {
   // state. It also gets all of our players from a game (default is "game1")
   // and sets the local state with those players
   useEffect(() => {
+    setLoading(true);
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
         setUserId(userCredential.user.uid);
@@ -42,6 +39,7 @@ const Lobby = () => {
         response.onSnapshot((gotPlayers) => {
           const players = gotPlayers.docs.map((player) => player.data());
           setPlayers(players);
+          setLoading(false);
         })
       )
       .catch((error) => console.log(error));
@@ -70,9 +68,6 @@ const Lobby = () => {
       setParticipants((prevParticipants) =>
         prevParticipants.filter((p) => p !== participant)
       );
-      // setPlayers((prevPlayers) =>
-      //   prevPlayers.filter((p) => p?.id !== participant?.identity)
-      // );
     };
 
     if (token) {
@@ -119,76 +114,86 @@ const Lobby = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setInputDisabled(true);
     FirestoreService.addPlayer({ username, userId }, "game1").catch((error) =>
-      console.log(error)
+      setError(error)
     );
   };
 
   const handleReadyClick = (e) => {
     e.preventDefault();
     FirestoreService.readyPlayer(userId, "game1").catch((error) =>
-      console.log(error)
+      setError(error)
     );
   };
-
-  // extract to a helpers function
 
   const handleChange = (e) => {
     setUsername(e.target.value);
   };
 
+  const createPlaceholders = (numberOfPlayersInGame) => {
+    return Array.from(
+      Array(4 - numberOfPlayersInGame.length)
+    ).map((element) => <LobbyCard defaultCard />);
+  };
+
   return (
-    <div className="App">
-      <h1>Lobby</h1>
+    <>
+      {loading ? (
+        <h1>Loading...</h1>
+      ) : (
+        <LobbyContainer>
+          <h1>Lobby</h1>
 
-      {!inputDisabled && (
-        <Box as="form" onSubmit={handleSubmit} py={3}>
-          <Flex mx={-2} mb={3}>
-            <Box width={1} px={2}>
-              <Label htmlFor="name">Enter your name</Label>
-              <Input
-                id="name"
-                name="name"
-                onChange={handleChange}
-                defaultValue="Jane Doe"
-              />
-            </Box>
-          </Flex>
-        </Box>
+          {!localPlayer && (
+            <LobbyInput
+              handleChange={handleChange}
+              handleSubmit={handleSubmit}
+            />
+          )}
+
+          {checkIfReady(players) && (
+            <>
+              <button onClick={() => console.log("starting game")}>
+                Start Game
+              </button>
+            </>
+          )}
+          <StyledFlex>
+            {localPlayer && room?.localParticipant && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <LobbyCard
+                  playerInfo={localPlayer}
+                  twilioUserInfo={room?.localParticipant}
+                  userId={userId}
+                  handleReadyClick={(e) => handleReadyClick(e)}
+                />
+              </Suspense>
+            )}
+            {createPlaceholders(players)}
+
+            {participants &&
+              room &&
+              players &&
+              players
+                .filter((player) => player?.id !== userId)
+                .map((player) => (
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <LobbyCard
+                      playerInfo={player}
+                      twilioUserInfo={
+                        participants.filter(
+                          (participant) => participant?.identity === player?.id
+                        )[0]
+                      }
+                      userId={userId}
+                      handleReadyClick={(e) => handleReadyClick(e)}
+                    />
+                  </Suspense>
+                ))}
+          </StyledFlex>
+        </LobbyContainer>
       )}
-
-      {checkIfReady() && (
-        <>
-          <button onClick={() => console.log("starting game")}>
-            Start Game
-          </button>
-        </>
-      )}
-      <StyledFlex>
-        {localPlayer && room?.localParticipant && (
-          <LobbyCard
-            playerInfo={localPlayer}
-            twilioUserInfo={room?.localParticipant}
-            userId={userId}
-          />
-        )}
-
-        {players &&
-          !!participants.length &&
-          userId &&
-          participants
-            .filter((participant) => participant?.identity !== userId)
-            .map((player, i) => (
-              <LobbyCard
-                playerInfo={player}
-                twilioUserInfo={getTwilioInfo(player?.identity, participants)}
-                // twilioUserInfo={participants[i]}
-                userId={userId}
-              />
-            ))}
-      </StyledFlex>
-    </div>
+    </>
   );
 };
 
