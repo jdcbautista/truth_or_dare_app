@@ -82,7 +82,7 @@ export const DebugButton = styled(Button)`
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled.div`
-  background-color: red;
+  background-color: #222222;
   width: 100vw;
   position: fixed;
   overflow: hidden;

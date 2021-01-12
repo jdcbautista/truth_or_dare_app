@@ -2,6 +2,77 @@ import Cards from "./components/Cards";
 import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
 import CardRender from "./components/cardRender"
+import { gsap } from "gsap";
+import React, { useState, useEffect, Suspense } from "react";
+import { getTwilioToken } from "../../services/twilio";
+import * as FirestoreService from "../../firebase";
+import Video from "twilio-video";
+import LobbyCard from "../Lobby/components/LobbyCard";
+import LobbyInput from "../Lobby/components/LobbyInput";
+import { checkIfReady } from "../../helpers";
+import { LobbyContainer } from "../Lobby/LobbyStyles";
+import { StyledFlex, DebugButton } from "../Lobby/LobbyStyles";
+import { Card, Image, Heading, Flex, Box, Button } from "rebass";
+import styled from "@emotion/styled";
+import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
+import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+import { getRandomInt } from "../../helpers";
+
+
+//Temp styling from Emma & Jarrett's Lobby.js
+const StyledCard = styled(Card)`
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 16px;
+  height: 320px;
+  text-align: center;
+  background-color: #525252;
+`;
+
+const StyledAvatar = styled(Image)`
+  background-color: #313131;
+`;
+
+const StyledHeading = styled(Heading)`
+  font-family: sans-serif;
+`;
+
+const StyledBox = styled(Box)`
+  position: relative;
+  top: 110px;
+`;
+
+const StyledButtonContainer = styled(Box)`
+  margin: 0 auto;
+  margin-top: 50px;
+`;
+
+const StyledButton = styled(Button)`
+  position: relative;
+  top: 30px;
+  background-color: #525252;
+  color: #ffffff;
+`;
+
+const StyledBadge = styled(Box)`
+  background-color: #313131;
+  border-radius: 2px;
+  position: relative;
+  top: 105px;
+  font-size: 10px;
+`;
+
+const StyledCheckIcon = styled(AiFillCheckCircle)`
+  color: #96bb7c;
+  width: 50px;
+`;
+
+const StyledCloseIcon = styled(AiFillCloseCircle)`
+  color: #ec625f;
+  width: 50px;
+`;
+
+
 
 const Game = ({ players, participants, userId }) => {
   {
@@ -12,6 +83,32 @@ const Game = ({ players, participants, userId }) => {
       <judgePanel />
       <hotSeatContainer /> */
   }
+
+// JARRETT & EMMA:
+//deals card (see dealCard in firebase.js) set to button in lobby.js
+const handleCardDeal = async (e) => {
+  e.preventDefault();
+  await FirestoreService.addCardsToAllPlayers('game1', 3)
+  }
+
+//console.log's player hand (see firebase.js for getHand), used in onclick on button in render
+const handleGetHand = async (e) => {
+  e.preventDefault();
+  const playerHand = await FirestoreService.getHand(e.target.value, 'game1')
+  console.log(playerHand)
+}
+
+//reloads the game's truthStack collection with cards from resources/Deck1/Cards collection set to button in lobby.js
+const handleLoadDeck = async (e) => {
+  e.preventDefault();
+  await FirestoreService.loadDeckFromResources().catch((error) =>
+    console.log(error)
+  );
+};
+
+
+
+
   return (
     <div
       className="sessionInit"
@@ -168,6 +265,7 @@ const Game = ({ players, participants, userId }) => {
             }}
           >
             <p>Player Component</p>
+            
             <div
               style={{
                 backgroundColor: "white",
@@ -239,6 +337,24 @@ const Game = ({ players, participants, userId }) => {
           </div>
         </div>
       </div>
+      <Flex>
+        {players?.length &&
+          players.map((Player) => (
+            <div key={Player.id}>
+              {/* test button for dealing deck */}
+              <button value={Player.id} onClick={(e) => handleCardDeal(e)} >
+                Deal Card
+              </button>
+              {/* test button for printing player hand */}
+              <button value={Player.id} onClick={(e) => handleGetHand(e)} >
+                Print Hand
+              </button>
+              <Box p={3} width={1 / 4} color="white" bg="primary">
+                
+              </Box>
+            </div>
+          ))}
+      </Flex>
     </div>
   );
 };
