@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
+import { useState } from 'react';
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -66,10 +67,10 @@ export const addPlayer = async (newPlayer, gameId) => {
  * @params gameId - {string} - the id of the targeted game
  */
 export const getPlayers = async (gameId) => {
-  const snapshot = await db
-    .collection("rooms")
-    .doc(gameId)
-    .collection("players");
+  const snapshot = db
+  .collection("rooms")
+  .doc(gameId)
+  .collection("players")
 
   return snapshot;
   // return snapshot.docs.map(doc => doc.data())
@@ -135,40 +136,64 @@ export const readyPlayer = async (userId, gameId) => {
 // };
 
 /**
+ * @description addCardsToAllPlayers
+ * Collects list of all players in game, calls dealCard to move N cards from game deck to each player
+ * @params gameID - {string} - the id of the game where all player will be dealt card(s)
+ * @params numCardsToAdd - {integer} - number of cards to deal to each player from gameDeck
+ * 
  * @description dealCard
- * Takes 1 card from relevant card stack, copies to indicated player's hand, deletes card from stack
- * Rev 0: in game1, sends 1 card from dareStack to players.playerID.cards
- * @params playerId - {string} - the id of the player to receive a card
+ * Use to transfer deck from resources into gameDeck collection in the gamestate
+ * @params none
+ * 
+ * @description loadGameDeck
+ * Called in getTruthDeck async/await func. Takes deck loaded from resources and adds it to gameDeck collection * in firestore
+ * @params deck - {array of Firestore document.data() objects} - array that contains the data of the cards in resources collection that will be copied to game collection
+ * 
  */
-export const dealCard = async (playerId) => {
-  const cardSnapshot = await db
-    .collection("rooms")
-    .doc("game1")
-    .collection("dareStack")
-    .get();
-  const cards = await cardSnapshot.docs.map(async (card) => card.data());
-  let cardToSet = await cards[0];
-  const cardSetSnapshot = await db
-    .collection("rooms")
-    .doc("game1")
-    .collection("players")
-    .doc(playerId)
-    .collection("cards")
-    .doc(`${cardToSet.id}`)
-    .set({
-      id: cardToSet.id,
-      text: cardToSet.text,
-    });
-  await console.log("card set");
-  const cardDeleteSnapshot = await db
-    .collection("rooms")
-    .doc("game1")
-    .collection("dareStack")
-    .where("id", "==", cardToSet.id)
-    .get();
-  const cardDelete = await cardDeleteSnapshot.docs.map(async (doc) => {
-    await doc.ref.delete();
-    await console.log("card deleted");
-  });
-  return cardDelete;
-};
+
+const loadGameDeck = async (deck) => {
+  const gameDeck = db.collection('rooms').doc('game1').collection('gameDeck')
+  const checkEmpty = await gameDeck.limit(1).get()
+  console.log(checkEmpty.docs.length)
+  if (!checkEmpty.docs.length) {
+    console.log('loading deck')
+    await deck.forEach(async (card) => {
+        await gameDeck.add({
+          id: card.id,
+          text: card.text,
+          type: card.type,
+          votes: card.votes
+        })
+    })
+    return deck
+  } else {
+    console.log('did not load deck')
+  }
+}
+
+export const loadDeckFromResources = async () => {
+  let deckArr = []
+  const loadDeck = db.collection('resources').doc('Deck1').collection('cards')
+  let deck = await loadDeck.get()
+  for (let card of deck.docs) {
+    deckArr.push(card.data())
+  }
+  await loadGameDeck(deckArr)
+  return ('success')
+}
+
+/**
+ * @description getHand
+ * returns target players hand
+ * @params playerID - player id (auto-generated hash in firestore collection)
+ * @params gameID - the game id (hardcode 'game1' when calling function)
+ */
+export const getHand = async (playerId, gameID) => {
+  let handArr = []
+  const loadDeck = db.collection('rooms').doc(gameID).collection('players').doc(playerId).collection("cards")
+  let deck = await loadDeck.get()
+  for (let card of deck.docs) {
+    handArr.push(card.data())
+  }
+  return handArr
+}
