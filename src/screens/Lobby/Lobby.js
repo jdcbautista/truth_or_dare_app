@@ -9,7 +9,23 @@ import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex, DebugButton } from "./LobbyStyles";
+import { Card, Image, Heading, Flex, Box, Button } from "rebass";
+import styled from "@emotion/styled";
+import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
+import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+
 const Lobby = () => {
+  // Jarrett & Emma
+  //What the current screen is that is displayed
+  const [screenID, setScreenID] = useState("title");
+  //The identity and room name of the current user
+  const [identity, setIdentity] = useState("");
+  const [roomName, setRoomName] = useState("");
+  //
+  const [ready, setReady] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(false);
+
+  // Michael
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
@@ -21,6 +37,7 @@ const Lobby = () => {
   const [localPlayer, setLocalPlayer] = useState({});
   const [players, setPlayers] = useState([]);
   const [username, setUsername] = useState(null);
+
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -202,12 +219,15 @@ const Lobby = () => {
           </StyledFlex>
         </LobbyContainer>
       )}
-      {isGameStarted && room && (
+      {isGameStarted && (
         <Game
           players={players}
           participants={participants}
           useId={userId}
           className="gameGSAP"
+          mockHand="I dare you"
+          token={token}
+          handleReadyClick={handleReadyClick}
         />
       )}
     </>
