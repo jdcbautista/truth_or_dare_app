@@ -49,7 +49,7 @@ function Cards() {
           id: card.id,
           text: card.text,
           type: card.type,
-          votes: card.votes,
+          pointValue: Math.floor(Math.random() * 10),
         });
     });
   };
@@ -117,10 +117,9 @@ function Cards() {
     ];
   };
 
-const cardRender = (cardprops) => {
-  //I take in card ID and render the card
-  
-}
+  const cardRender = (cardprops) => {
+    //I take in card ID and render the card
+  };
 
   return (
     <div className="CARDS">

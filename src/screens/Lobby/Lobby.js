@@ -164,7 +164,7 @@ const Lobby = () => {
 
   return (
     <>
-      {loading ? (
+      {/* {loading ? (
         <h1>Loading...</h1>
       ) : (
         <LobbyContainer className="LobbyToNav">
@@ -218,9 +218,11 @@ const Lobby = () => {
                 ))}
           </StyledFlex>
         </LobbyContainer>
-      )}
-      {isGameStarted && (
+      )} */}
+      {/* {isGameStarted && room && ( */}
+      {room && (
         <Game
+          room={room}
           players={players}
           participants={participants}
           useId={userId}
