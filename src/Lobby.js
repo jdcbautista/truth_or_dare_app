@@ -143,11 +143,24 @@ const Lobby = () => {
       console.log(error)
     );
   };
-
-  const handleCardDeal = (e) => {
-    console.log(e.target.value);
+  
+  //deals card (see dealCard in firebase.js) set to button in lobby.js
+  const handleCardDeal = async (e) => {
     e.preventDefault();
-    FirestoreService.dealCard(e.target.value).catch((error) =>
+    await FirestoreService.addCardsToAllPlayers('game1', 3)
+    }
+
+  //console.log's player hand (see firebase.js for getHand), used in onclick on button in render
+  const handleGetHand = async (e) => {
+    e.preventDefault();
+    const playerHand = await FirestoreService.getHand(e.target.value, 'game1')
+    console.log(playerHand)
+  }
+  
+  //reloads the game's truthStack collection with cards from resources/Deck1/Cards collection set to button in lobby.js
+  const handleLoadDeck = async (e) => {
+    e.preventDefault();
+    await FirestoreService.loadDeckFromResources().catch((error) =>
       console.log(error)
     );
   };
@@ -156,9 +169,14 @@ const Lobby = () => {
     setUsername(e.target.value);
   };
   console.log(username);
+
   return (
     <div className="App">
       <h1>Lobby</h1>
+      {/* test button for loading deck */}
+      <button onClick={(e) => handleLoadDeck(e)} >
+        Load Truth Deck
+      </button>
 
       {!inputDisabled && (
         <Box as="form" onSubmit={handleSubmit} py={3}>
@@ -192,8 +210,13 @@ const Lobby = () => {
         {players?.length &&
           players.map((Player) => (
             <div key={Player.id}>
-              <button value={Player.id} onClick={handleCardDeal} >
+              {/* test button for dealing deck */}
+              <button value={Player.id} onClick={(e) => handleCardDeal(e)} >
                 Deal Card
+              </button>
+              {/* test button for printing player hand */}
+              <button value={Player.id} onClick={(e) => handleGetHand(e)} >
+                Print Hand
               </button>
               <Box p={3} width={1 / 4} color="white" bg="primary">
                 <StyledCard
