@@ -1,6 +1,7 @@
 import Cards from "./components/Cards";
 import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
+import CardRender from "./components/cardRender"
 
 const Game = ({ players, participants, userId }) => {
   {
@@ -97,7 +98,7 @@ const Game = ({ players, participants, userId }) => {
                 borderRadius: "15px",
                 textAlign: "center",
               }}
-            >
+            ><p> test </p> 
               <div
                 style={{
                   backgroundColor: "aquamarine",
@@ -108,16 +109,7 @@ const Game = ({ players, participants, userId }) => {
               >
                 <p>Player Component</p>
               </div>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  margin: "20px 10px 10px 10px",
-                  borderRadius: "15px",
-                  height: "300px",
-                }}
-              >
-                <p>Card component</p>
-              </div>
+              <CardRender cardID="1" text="I dare you to..."/>
             </div>
             <div
               style={{

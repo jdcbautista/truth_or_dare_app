@@ -117,6 +117,11 @@ function Cards() {
     ];
   };
 
+const cardRender = (cardprops) => {
+  //I take in card ID and render the card
+  
+}
+
   return (
     <div className="CARDS">
       <h1>CARDS</h1>

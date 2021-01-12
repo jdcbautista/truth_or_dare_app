@@ -208,6 +208,7 @@ const Lobby = () => {
           participants={participants}
           useId={userId}
           className="gameGSAP"
+          mockHand='I dare you'
         />
       )}
     </>
