@@ -9,8 +9,19 @@ import {
 import { FiVideoOff, FiVideo } from "react-icons/fi";
 
 /* STYLES FOR VIDEO CONTAINER */
+
+export const StyledGameVideoBox = styled(Box)``;
+
+export const StyledGameVideo = styled.video`
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+`;
+
 export const StyledVideoBox = styled(Box)`
-  height: 400px;
   height: ${(props) => {
     if (props.videoHeight) return props.videoHeight + "px";
     return "310px";
@@ -82,10 +93,8 @@ export const DebugButton = styled(Button)`
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled.div`
-  background-color: red;
   width: 100vw;
   position: fixed;
-  overflow: hidden;
   height: 100vh;
 `;
 
