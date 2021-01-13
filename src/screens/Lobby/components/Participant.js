@@ -121,12 +121,24 @@ const Participant = ({
 
   const handleToggleVideo = async () => {
     await FirestoreService.videoToggle(userId, "game1");
-    console.log(user?.video);
+    console.log(user.video);
   };
 
   return (
     <div style={{ position: "relative" }}>
-      {isGameVideo ? (
+      <>
+          <StyledVideoBox displayoff={user?.video} videoHeight={videoHeight}>
+            <StyledVideo ref={videoRef} autoPlay={true} />
+          </StyledVideoBox>
+          <StyledAvatar
+            displayoff={!user?.video}
+            src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
+            sx={{
+              height: "100%",
+            }}
+          />
+        </>
+      {/* {isGameVideo ? (
         <StyledGameVideoBox displayoff={user?.video} videoHeight={videoHeight}>
           <StyledGameVideo ref={videoRef} autoPlay={true} />
         </StyledGameVideoBox>
@@ -143,7 +155,7 @@ const Participant = ({
             }}
           />
         </>
-      )}
+      )} */}
       <>
         {/* {participant?.identity === userId && ( */}
         <Box>

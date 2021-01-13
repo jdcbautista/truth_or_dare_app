@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Cards from "./components/Cards";
 import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
@@ -16,7 +16,7 @@ import * as FirestoreService from "../../firebase";
 import GamePlayingCard from "./components/GamePlayingCard";
 import LobbyCard from "../Lobby/components/LobbyCard";
 
-const Game = ({ players, participants, userId, user, room }) => {
+const Game = ({ players, participants, userId, localPlayer, room, localParticipant }) => {
   const [selectedCards, setSelectedCards] = useState([]);
   const [playerCards, setPlayerCards] = useState([]);
   console.log({ playerCards });
@@ -58,17 +58,47 @@ const Game = ({ players, participants, userId, user, room }) => {
   return (
     <GameContainer className="gameContainerFadeIn">
       <Flex>
-        {participants.map((participant) => (
           <PlayerCard width={[1, 1 / 5]}>
             <GameVideoBox>
-              <Participant
+            
+            {localPlayer && localParticipant && (
+              <Suspense fallback={<div>Loading...</div>}>
+                <LobbyCard
+                  playerInfo={localPlayer}
+                  twilioUserInfo={room?.localParticipant}
+                  userId={userId}
+                  user={localPlayer}
+                />
+              </Suspense>
+            )}
+
+            {participants &&
+              room &&
+              players &&
+              players
+                .filter((player) => player?.id !== userId)
+                .map((player) => (
+                  <Suspense fallback={<div>Loading...</div>}>
+                    <LobbyCard
+                      playerInfo={player}
+                      twilioUserInfo={
+                        participants.filter(
+                          (participant) => participant?.identity === player?.id
+                        )[0]
+                      }
+                      userId={userId}
+                      user={player}
+                    />
+                  </Suspense>
+                ))}  
+              {/* <Participant
                 isGameVideo
                 userId={userId}
                 user={user}
                 participant={participant || room?.localParticipant}
                 videoHeight={200}
                 videoWidth={200}
-              />
+              /> */}
             </GameVideoBox>
             <GameCardBox>
               {/*
@@ -91,14 +121,14 @@ const Game = ({ players, participants, userId, user, room }) => {
               {/* {/* <CARD COMPONENT GOES HERE></CARD> */}
             </GameCardBox>
           </PlayerCard>
-        ))}
+        
 
         <HotseatCard width={[1, 2 / 5]} p={3}>
           <GameHotseatVideoBox className="fadeInHotseatVideo">
             <Participant
               isGameVideo
               userId={userId}
-              user={user}
+              user={localParticipant}
               participant={room && room?.localParticipant}
               videoHeight={200}
               videoWidth={200}

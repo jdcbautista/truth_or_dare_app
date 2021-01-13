@@ -236,6 +236,8 @@ const Lobby = () => {
           userId={userId}
           user={localPlayer}
           className="gameGSAP"
+          localPlayer={localPlayer}
+          localParticipant={room?.localParticipant}
           mockHand="I dare you"
           token={token}
           handleReadyClick={handleReadyClick}
