@@ -10,7 +10,12 @@ import { FiVideoOff, FiVideo } from "react-icons/fi";
 
 /* STYLES FOR VIDEO CONTAINER */
 
-export const StyledGameVideoBox = styled(Box)``;
+export const StyledGameVideoBox = styled(Box)`
+  display: ${(props) => {
+    if (props.displayoff) return "none";
+    return "block";
+  }};
+`;
 
 export const StyledGameVideo = styled.video`
   width: 100%;

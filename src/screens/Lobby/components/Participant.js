@@ -13,7 +13,7 @@ import {
   StyledGameVideo,
   StyledGameVideoBox,
 } from "../LobbyStyles";
-import * as Firestore from "../../../firebase";
+import * as FirestoreService from "../../../firebase";
 import { getRandomInt } from "../../../helpers";
 
 const Participant = ({
@@ -32,7 +32,9 @@ const Participant = ({
   const videoRef = useRef();
   const audioRef = useRef();
 
-  console.log({ user });
+  if (user) {
+    console.log("in the game screen", { user, userId, participant });
+  }
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
@@ -50,7 +52,6 @@ const Participant = ({
           setAudioTracks((audioTracks) => [...audioTracks, track]);
         }
       };
-
       const trackUnsubscribed = (track) => {
         if (track.kind === "video") {
           setVideoTracks((videoTracks) =>
@@ -86,16 +87,16 @@ const Participant = ({
     }
   }, [videoTracks]);
 
-  useEffect(() => {
-    if (!defaultParticipant) {
-      const videoTrack = videoTracks[0];
-      if (isVideoOn) {
-        videoTrack?.disable();
-      } else {
-        videoTrack?.enable();
-      }
-    }
-  }, [isVideoOn]);
+  // useEffect(() => {
+  //   if (!defaultParticipant) {
+  //     const videoTrack = videoTracks[0];
+  //     if (isVideoOn) {
+  //       videoTrack?.disable();
+  //     } else {
+  //       videoTrack?.enable();
+  //     }
+  //   }
+  // }, [isVideoOn]);
 
   useEffect(() => {
     if (!defaultParticipant) {
@@ -109,23 +110,33 @@ const Participant = ({
     }
   }, [audioTracks]);
 
-  const handleToggleVideo = () => {
-    setIsVideoOn(!isVideoOn);
-    Firestore.videoToggle(userId, "game1", isVideoOn);
+  // useEffect(() => {
+  //   if (userId) {
+  //     FirestoreService.getVideoToggleStatus(userId, "game1").then((player) =>
+  //       setIsVideoOn(player?.video)
+  //     );
+  //   }
+  // }, [isVideoOn]);
+  // // isVideoOn might work?
+
+  const handleToggleVideo = async () => {
+    await FirestoreService.videoToggle(userId, "game1");
+    console.log(user?.video);
   };
+
   return (
     <div style={{ position: "relative" }}>
       {isGameVideo ? (
-        <StyledGameVideoBox displayoff={isVideoOn} videoHeight={videoHeight}>
+        <StyledGameVideoBox displayoff={user?.video} videoHeight={videoHeight}>
           <StyledGameVideo ref={videoRef} autoPlay={true} />
         </StyledGameVideoBox>
       ) : (
         <>
-          <StyledVideoBox displayoff={isVideoOn} videoHeight={videoHeight}>
+          <StyledVideoBox displayoff={user?.video} videoHeight={videoHeight}>
             <StyledVideo ref={videoRef} autoPlay={true} />
           </StyledVideoBox>
           <StyledAvatar
-            displayoff={!isVideoOn}
+            displayoff={!user?.video}
             src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
             sx={{
               height: "100%",

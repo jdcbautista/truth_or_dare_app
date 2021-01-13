@@ -113,24 +113,44 @@ export const trackHotseatPlayer = async (playerID, gameID) => {
  * @params gameId - {string} - the id of the targeted game
  * @params currentVideoStatus - {bool} - true/false value of video status
  */
-export const videoToggle = async (userId, gameId, currentVideoStatus) => {
+export const videoToggle = async (userId, gameId) => {
+  const currentVideoStatus = await getVideoToggleStatus(userId, gameId);
+  console.log(userId);
+  // const {userId} = updatedPlayer
   const snapshot = db
     .collection("rooms")
     .doc(gameId)
     .collection("players")
-    .doc(userId);
-
-  if (currentVideoStatus) {
-    await snapshot.update({
-      video: false,
+    .doc(userId)
+    .update({
+      video: !currentVideoStatus,
     });
-  } else {
-    await snapshot.update({
-      video: true,
-    });
-  }
   return snapshot;
 };
+
+export const getVideoToggleStatus = async (userId, gameId) => {
+  const player = await getPlayerObject(userId, gameId);
+
+  console.log(player.video);
+  return player.video;
+};
+//   const snapshot = db
+//     .collection("rooms")
+//     .doc(gameId)
+//     .collection("players")
+//     .doc(userId);
+
+//   if (currentVideoStatus) {
+//     await snapshot.update({
+//       video: false,
+//     });
+//   } else {
+//     await snapshot.update({
+//       video: true,
+//     });
+//   }
+//   return snapshot;
+// };
 
 /**
  * @description readyPlayer

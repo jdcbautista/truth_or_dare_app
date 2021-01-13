@@ -16,7 +16,7 @@ import * as FirestoreService from "../../firebase";
 import GamePlayingCard from "./components/GamePlayingCard";
 import LobbyCard from "../Lobby/components/LobbyCard";
 
-const Game = ({ players, participants, userId, room }) => {
+const Game = ({ players, participants, userId, user, room }) => {
   const [selectedCards, setSelectedCards] = useState([]);
   const [playerCards, setPlayerCards] = useState([]);
   console.log({ playerCards });
@@ -64,6 +64,7 @@ const Game = ({ players, participants, userId, room }) => {
               <Participant
                 isGameVideo
                 userId={userId}
+                user={user}
                 participant={participant || room?.localParticipant}
                 videoHeight={200}
                 videoWidth={200}
@@ -97,6 +98,7 @@ const Game = ({ players, participants, userId, room }) => {
             <Participant
               isGameVideo
               userId={userId}
+              user={user}
               participant={room && room?.localParticipant}
               videoHeight={200}
               videoWidth={200}

@@ -48,6 +48,7 @@ const Lobby = () => {
   // state. It also gets all of our players from a game (default is "game1")
   // and sets the local state with those players
   useEffect(() => {
+    console.log("AUTH ANON RAN");
     setLoading(true);
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
@@ -227,12 +228,13 @@ const Lobby = () => {
           </StyledFlex>
         </LobbyContainer>
       )}
-      {isGameStarted && room && (
+      {isGameStarted && room && players && (
         <Game
           room={room}
           players={players}
           participants={participants}
-          useId={userId}
+          userId={userId}
+          user={localPlayer}
           className="gameGSAP"
           mockHand="I dare you"
           token={token}
