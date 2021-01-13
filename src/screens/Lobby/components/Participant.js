@@ -13,11 +13,13 @@ import {
   StyledGameVideo,
   StyledGameVideoBox,
 } from "../LobbyStyles";
+import * as Firestore from "../../../firebase";
 import { getRandomInt } from "../../../helpers";
 
 const Participant = ({
   participant,
   userId,
+  user,
   defaultParticipant,
   videoWidth,
   videoHeight,
@@ -30,6 +32,7 @@ const Participant = ({
   const videoRef = useRef();
   const audioRef = useRef();
 
+  console.log({ user });
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
@@ -106,6 +109,10 @@ const Participant = ({
     }
   }, [audioTracks]);
 
+  const handleToggleVideo = () => {
+    setIsVideoOn(!isVideoOn);
+    Firestore.videoToggle(userId, "game1", isVideoOn);
+  };
   return (
     <div style={{ position: "relative" }}>
       {isGameVideo ? (
@@ -132,8 +139,9 @@ const Participant = ({
           <StyledAudioIconButton onClick={() => setMuted(!muted)}>
             {muted ? <StyledAudioOffIcon /> : <StyledAudioOnIcon />}
           </StyledAudioIconButton>
-          <StyledVideoIconButton onClick={() => setIsVideoOn(!isVideoOn)}>
-            {isVideoOn ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
+          <StyledVideoIconButton onClick={handleToggleVideo}>
+            {/* <StyledVideoIconButton onClick={() => setIsVideoOn(!isVideoOn)}> */}
+            {user?.video ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
           </StyledVideoIconButton>
         </Box>
         {/* )} */}

@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
-import { useState } from "react";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -14,7 +13,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-export const db = firebase.firestore();
+const db = firebase.firestore();
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -56,6 +55,8 @@ export const addPlayer = async (newPlayer, gameId) => {
       id: userId,
       username: username,
       ready: false,
+      video: false,
+      audio: false,
       score: 0,
     });
   return snapshot;
@@ -70,7 +71,65 @@ export const getPlayers = async (gameId) => {
   const snapshot = db.collection("rooms").doc(gameId).collection("players");
 
   return snapshot;
-  // return snapshot.docs.map(doc => doc.data())
+};
+
+/**
+ * @description getPlayerObject
+ * Queries all players and returns data object for selected playerID
+ * @params gameId - {string} - the id of the targeted game
+ * @params playerId - {string} - the id of the targeted player
+ */
+
+export const getPlayerObject = async (playerID, gameID) => {
+  const player = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("players")
+    .where("id", "==", playerID);
+  const fetchPlayer = await player.get();
+  const playerData = fetchPlayer.docs[0].data();
+  return playerData;
+};
+
+/**
+ * @description trackHotseatPlayer
+ * Sets the identified player as the Hotseat player for the identified game
+ * @params gameId - {string} - the id of the targeted game
+ * @params playerId - {string} - the id of the targeted player
+ */
+
+export const trackHotseatPlayer = async (playerID, gameID) => {
+  const setHotseatPlayer = await db.collection("rooms").doc(gameID).update({
+    hotseatPlayer: playerID,
+  });
+  return setHotseatPlayer;
+};
+
+/**
+ * @description videoToggle
+ * toggles player video status
+ * (note: assumes the front end call of this function can pass the current video on/off status (to reduce db reads); can be refactored to query db for this status if needed)
+ * @params userID - {string} - the player object id
+ * @params gameId - {string} - the id of the targeted game
+ * @params currentVideoStatus - {bool} - true/false value of video status
+ */
+export const videoToggle = async (userId, gameId, currentVideoStatus) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameId)
+    .collection("players")
+    .doc(userId);
+
+  if (currentVideoStatus) {
+    await snapshot.update({
+      video: false,
+    });
+  } else {
+    await snapshot.update({
+      video: true,
+    });
+  }
+  return snapshot;
 };
 
 /**
@@ -92,45 +151,6 @@ export const readyPlayer = async (userId, gameId) => {
     });
   return snapshot;
 };
-
-// export const editPlayer = (updatedPlayer) => {
-//   setLoading();
-//   ref
-//     .doc(updatedPlayer.id)
-//     .update(updatedPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
-
-// export const addPlayer = (newPlayer) => {
-//   ref
-//     .doc(newPlayer.id)
-//     .set(newPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
-
-// export const deletePlayer = (Player) => {
-//   ref
-//     .doc(Player.id)
-//     .delete()
-//     .catch((err) => {
-//       console.log(err);
-//     });
-//   setDisabled(false);
-// };
-
-// export const editPlayer = (updatedPlayer) => {
-//   setLoading();
-//   ref
-//     .doc(updatedPlayer.id)
-//     .update(updatedPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
 
 /**
  * @description addCardsToAllPlayers
@@ -161,6 +181,9 @@ export const dealCard = async (gameID, playerID, numCardsToAdd) => {
       .set({
         id: startingCard.data().id,
         text: startingCard.data().text,
+        type: startingCard.data().type,
+        points: startingCard.data().points,
+        playedBy: playerID,
       });
     // eslint-disable-next-line
     let deleteCard = await startingCard.ref.delete();
@@ -200,7 +223,7 @@ const loadGameDeck = async (deck) => {
         id: card.id,
         text: card.text,
         type: card.type,
-        votes: card.votes,
+        points: card.votes,
       });
     });
     return deck;
@@ -237,8 +260,91 @@ export const getHand = async (playerId, gameID) => {
   let deck = await loadDeck.get();
   for (let card of deck.docs) {
     handArr.push(card.data());
+    console.log("card doc id", card.id);
   }
   return handArr;
 };
 
-//
+/**
+ * @description toBool
+ * changes string input into boolean output
+ * @params string - string to be converted to bool
+ */
+export function toBool(string) {
+  if (string === "true") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * @description advancePhase
+ * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
+ * @params gameID - the game id (hardcode 'game1' when calling function)
+ */
+export const advancePhase = async (gameID) => {
+  const snapshot = await db.collection("rooms").doc(gameID);
+  const snapshotDoc = await snapshot.get();
+  const currentPhase = await snapshotDoc.data().phase;
+
+  const phases = [
+    "setup",
+    "playCard",
+    "completeDare",
+    "voteCompleteDare",
+    "cleanup",
+  ];
+  let phaseIndex = phases.indexOf(currentPhase);
+  // console.log(phaseIndex)
+  if (phaseIndex === phases.length - 1) {
+    await snapshot.update({
+      phase: phases[0],
+    });
+  } else {
+    await snapshot.update({
+      phase: phases[phaseIndex + 1],
+    });
+  }
+  return phaseIndex;
+};
+
+/**
+ *
+ * @description playCard
+ * takes card from players hand and moves it to the field
+ *
+ * (note: maybe we don't need to pull the card out of a hand with an ID depending on if we only have hash or if we have the whole object)
+ * @params gameID - {string} - the id of the game where the player will be dealt card(s)
+ * @params playerId - {string} - the id of the player to receive a card
+ * @params cardID - {} - the id of the being card played
+ */
+
+export const playCard = async (gameID, playerID, cardID) => {
+  const cardInHand = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("players")
+    .doc(playerID)
+    .collection("cards")
+    .doc(cardID);
+  const cardToPlay = await cardInHand.get();
+  const cardData = cardToPlay.data();
+  // eslint-disable-next-line
+  let playerCards = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field")
+    .doc(cardID)
+    .set({
+      id: cardData.id,
+      text: cardData.text,
+      type: cardData.type,
+      points: cardData.points,
+      playedBy: playerID,
+    });
+  // eslint-disable-next-line
+  let deleteCard = await cardInHand.delete();
+  // console.log('card played')
+  return "success";
+};

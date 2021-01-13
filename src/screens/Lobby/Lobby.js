@@ -153,6 +153,12 @@ const Lobby = () => {
 
   const handleStartGame = () => {
     setIsGameStarted(true);
+
+    FirestoreService.addCardsToAllPlayers("game1", 3)
+      .then((response) => {
+        setIsGameStarted(true);
+      })
+      .catch((error) => console.log(error));
     //Lobby shrinks to navBar
     gsap.fromTo(
       ".LobbyToNav",
@@ -164,7 +170,7 @@ const Lobby = () => {
 
   return (
     <>
-      {/* {loading ? (
+      {loading ? (
         <h1>Loading...</h1>
       ) : (
         <LobbyContainer className="LobbyToNav">
@@ -191,6 +197,7 @@ const Lobby = () => {
                   playerInfo={localPlayer}
                   twilioUserInfo={room?.localParticipant}
                   userId={userId}
+                  user={localPlayer}
                   handleReadyClick={(e) => handleReadyClick(e)}
                 />
               </Suspense>
@@ -212,15 +219,15 @@ const Lobby = () => {
                         )[0]
                       }
                       userId={userId}
+                      user={player}
                       handleReadyClick={(e) => handleReadyClick(e)}
                     />
                   </Suspense>
                 ))}
           </StyledFlex>
         </LobbyContainer>
-      )} */}
-      {/* {isGameStarted && room && ( */}
-      {room && (
+      )}
+      {isGameStarted && room && (
         <Game
           room={room}
           players={players}

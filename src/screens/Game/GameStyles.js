@@ -5,13 +5,13 @@ export const GameContainer = styled.div`
   padding-top: 10%;
 `;
 export const PlayerCard = styled(Box)`
-  background-color: red;
-  height: 700px;
-  border-radius: 10px;
-  border: 2px solid white;
+  /* background-color: red; */
+  height: 600px;
+  border-radius: 50px;
+  margin: 5px;
 `;
 export const HotseatCard = styled(Box)`
-  background-color: orange;
+  /* background-color: orange; */
   border-radius: 10px;
   height: 700px;
   border: 2px solid white;
@@ -29,7 +29,6 @@ export const GameCardBox = styled(Box)`
   display: flex;
   border-radius: 10px;
   height: 55%;
-  border: 2px solid black;
   padding: 2px;
   margin: 20px;
 `;
@@ -39,9 +38,11 @@ export const GameHotseatVideoBox = styled(Box)`
   justify-content: center;
   align-items: center;
   width: 80%auto;
+  justify-content: center;
+  align-self: center;
   border-radius: 10px;
   height: 90%;
-  border: 2px solid black;
+  /* border: 2px solid black; */
   padding: 30px;
   margin: 20px;
 `;
@@ -57,8 +58,8 @@ export const GamePlayingCardContainer = styled.h3`
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.type === "Truth") return "#3297f0";
-      return "#F04931";
+      if (props.type === "Truth") return "#64c0fa";
+      return "#FB5156";
     }};
   text-align: left;
   justify-content: center;
@@ -81,8 +82,8 @@ export const GamePlayingCardText = styled.h2`
     return "1em";
   }};
   color: ${(props) => {
-    if (props.type === "Truth") return "#3297f0";
-    else if (props.type == "Dare") return "#F04931";
+    if (props.type === "Truth") return "#64c0fa";
+    else if (props.type == "Dare") return "#FB5156";
     return "#111111";
   }};
   justify-content: center;

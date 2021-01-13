@@ -16,6 +16,7 @@ function LobbyCard({
   playerInfo,
   twilioUserInfo,
   userId,
+  user,
   handleReadyClick,
   cardWidth = 256,
   cardHeight = 310,
@@ -52,11 +53,12 @@ function LobbyCard({
               boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
             }}
           >
-            {twilioUserInfo && userId && (
+            {twilioUserInfo && userId && user && (
               <Participant
                 key={twilioUserInfo?.sid}
                 participant={twilioUserInfo}
                 userId={userId}
+                user={user}
               />
             )}
 

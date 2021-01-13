@@ -48,21 +48,23 @@ const Game = ({ players, participants, userId, room }) => {
   };
 
   const handleDeal = () => {
-    FirestoreService.getHand(userId, "game1").then((response) => {
-      console.log(response);
-      setPlayerCards(response);
-    });
+    FirestoreService.getHand("kYGX7QmQOFZwWZm5lJCZBkXoRvm2", "game1").then(
+      (response) => {
+        console.log(response);
+        setPlayerCards(response);
+      }
+    );
   };
   return (
     <GameContainer className="gameContainerFadeIn">
       <Flex>
-        {players.map((participant) => (
+        {participants.map((participant) => (
           <PlayerCard width={[1, 1 / 5]}>
             <GameVideoBox>
               <Participant
                 isGameVideo
                 userId={userId}
-                participant={room?.localParticipant}
+                participant={participant || room?.localParticipant}
                 videoHeight={200}
                 videoWidth={200}
               />
@@ -118,39 +120,6 @@ const Game = ({ players, participants, userId, room }) => {
               onClick={() => console.log("toggle [selectedCard] state")}
             />
           ))}
-          {/* <GamePlayingCard
-            id="12345"
-            // selected={isSelected}
-            type="Truth"
-            text="mock card #1"
-            points={Math.floor(Math.random() * 10) + "pts"}
-            onClick={() => console.log("toggle [selectedCard] state")}
-          />
-          <GamePlayingCard
-            id="67890"
-            // selected={isSelected}
-            type="Dare"
-            text="mock card #2"
-            points={Math.floor(Math.random() * 10) + "pts"}
-            onClick={() => console.log("pass cardID to array")}
-          />
-          <GamePlayingCard
-            id="12345"
-            // selected={isSelected}
-            type="Truth"
-            text="mock card #3"
-            points={Math.floor(Math.random() * 10) + "pts"}
-            onClick={handleSelectCard}
-          />
-          <GamePlayingCard
-            id="67890"
-            // selected={isSelected}
-            type="Dare"
-            text="mock card #4"
-            points={Math.floor(Math.random() * 10) + "pts"}
-            onClick={() => console.log("animate this card")}
-          /> */}
-          {/* <MAYBE A BOTTOM FOOTER/>HAND HERE?></MAYBE> */}
         </GameCardBox>
       </div>
     </GameContainer>
