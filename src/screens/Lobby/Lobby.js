@@ -5,6 +5,7 @@ import * as FirestoreService from "../../firebase";
 import Video from "twilio-video";
 import LobbyCard from "./components/LobbyCard";
 import Game from "../Game/Game";
+import Hand from "../Hand/Hand";
 import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
@@ -155,23 +156,36 @@ const Lobby = () => {
   const handleStartGame = () => {
     setIsGameStarted(true);
 
-    FirestoreService.addCardsToAllPlayers("game1", 3)
-      .then((response) => {
-        setIsGameStarted(true);
-      })
-      .catch((error) => console.log(error));
+    // FirestoreService.addCardsToAllPlayers("game1", 3)
+    //   .then((response) => {
+    //     setIsGameStarted(true);
+    //   })
+    //   .catch((error) => console.log(error));
     //Lobby shrinks to navBar
-    // gsap.fromTo(
-    //   ".LobbyToNav",
-    //   { height: "100%" },
-    //   { height: "10%", duration: 1 }
-    // );
-    // gsap.fromTo(".fadeOutVideo", { opacity: 1 }, { opacity: 0, duration: 1 });
+    gsap
+      .timeline()
+
+      .fromTo(
+        ".gameContainerFadeIn",
+        { filter: "blur(0px)" },
+        { filter: "blur(10px)", duration: 2 }
+      )
+      .fromTo(
+        ".handContainerFadeIn",
+        { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          transform: "translateY(0px)",
+          duration: 0.8,
+        }
+      );
   };
   const handleLoadDeck = async (e) => {
-    e.preventDefault()
-    await FirestoreService.loadDeckFromResources()
-  }
+    e.preventDefault();
+    await FirestoreService.loadDeckFromResources();
+  };
 
   return (
     <>
@@ -179,82 +193,93 @@ const Lobby = () => {
         <h1>Loading...</h1>
       ) : (
         <>
-        {checkIfReady(players) && (
-          <div>
-            <button onClick={handleStartGame}>Start Game</button>
-            <button onclick={(e) => handleLoadDeck()}>Load</button>
-          </div>
-            
-        )}
-       
+          {checkIfReady(players) && (
+            <div>
+              <button onClick={handleStartGame}>Start Game</button>
+              <button onclick={(e) => handleLoadDeck()}>Load</button>
+            </div>
+          )}
+
           <DebugButton onClick={handleStartGame}>
             Force Start (not a production button!)
           </DebugButton>
-          <DebugButton onClick={handleLoad}>
-            Load (not a production button!)
-          </DebugButton>
-        
+          <DebugButton>Load (not a production button!)</DebugButton>
 
-        <LobbyContainer className="LobbyToNav">
-          {!localPlayer && (
-            <LobbyInput
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-            />
-          )}
-        
-          <StyledFlex className="fadeOutVideo">
-            {localPlayer && room?.localParticipant && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <LobbyCard
-                  playerInfo={localPlayer}
-                  twilioUserInfo={room?.localParticipant}
-                  userId={userId}
-                  user={localPlayer}
-                  handleReadyClick={(e) => handleReadyClick(e)}
-                />
-              </Suspense>
+          <LobbyContainer className="LobbyToNav">
+            {!localPlayer && (
+              <LobbyInput
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+              />
             )}
-            {createPlaceholders(players)}
 
-            {participants &&
-              room &&
-              players &&
-              players
-                .filter((player) => player?.id !== userId)
-                .map((player) => (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <LobbyCard
-                      playerInfo={player}
-                      twilioUserInfo={
-                        participants.filter(
-                          (participant) => participant?.identity === player?.id
-                        )[0]
-                      }
-                      userId={userId}
-                      user={player}
-                      handleReadyClick={(e) => handleReadyClick(e)}
-                    />
-                  </Suspense>
-                ))}
-          </StyledFlex>
-        </LobbyContainer>
+            <StyledFlex className="fadeOutVideo">
+              {localPlayer && room?.localParticipant && (
+                <Suspense fallback={<div>Loading...</div>}>
+                  <LobbyCard
+                    playerInfo={localPlayer}
+                    twilioUserInfo={room?.localParticipant}
+                    userId={userId}
+                    user={localPlayer}
+                    handleReadyClick={(e) => handleReadyClick(e)}
+                  />
+                </Suspense>
+              )}
+              {createPlaceholders(players)}
+
+              {participants &&
+                room &&
+                players &&
+                players
+                  .filter((player) => player?.id !== userId)
+                  .map((player) => (
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <LobbyCard
+                        playerInfo={player}
+                        twilioUserInfo={
+                          participants.filter(
+                            (participant) =>
+                              participant?.identity === player?.id
+                          )[0]
+                        }
+                        userId={userId}
+                        user={player}
+                        handleReadyClick={(e) => handleReadyClick(e)}
+                      />
+                    </Suspense>
+                  ))}
+            </StyledFlex>
+            <Game
+              room={room}
+              players={players}
+              participants={participants}
+              userId={userId}
+              user={localPlayer}
+              className="gameGSAP"
+              localPlayer={localPlayer}
+              localParticipant={room?.localParticipant}
+              mockHand="I dare you"
+              token={token}
+              handleReadyClick={handleReadyClick}
+            />
+
+            {isGameStarted && room && players && (
+              <Hand
+                room={room}
+                players={players}
+                participants={participants}
+                userId={userId}
+                user={localPlayer}
+                className="gameGSAP"
+                localPlayer={localPlayer}
+                localParticipant={room?.localParticipant}
+                mockHand="I dare you"
+                token={token}
+                handleReadyClick={handleReadyClick}
+              />
+            )}
+          </LobbyContainer>
         </>
-      )}
-      {isGameStarted && room && players && (
-        <Game
-          room={room}
-          players={players}
-          participants={participants}
-          userId={userId}
-          user={localPlayer}
-          className="gameGSAP"
-          localPlayer={localPlayer}
-          localParticipant={room?.localParticipant}
-          mockHand="I dare you"
-          token={token}
-          handleReadyClick={handleReadyClick}
-        />
       )}
     </>
   );

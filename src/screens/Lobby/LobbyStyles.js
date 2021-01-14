@@ -34,11 +34,11 @@ export const StyledVideoBox = styled(Box)`
     return "320px";
   }};
   overflow: hidden;
-  border: ${props => { 
-    if (props.hotseat) return "10px solid #FFF689"
+  border: ${(props) => {
+    if (props.hotseat) return "10px solid #FFF689";
     if (props.ready) return "10px solid #52AA5E";
     if (!props.ready) return "10px solid #FB5156";
-    return "none"
+    return "none";
   }};
   padding-right: 100px;
   object-position: left bottom;
@@ -103,15 +103,15 @@ export const DebugButton = styled(Button)`
     opacity: 1;
   }
 `;
+
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled.div`
   width: 100vw;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  padding-top: 100px;
   position: fixed;
-  height: 100vh;
 `;
 
 /* STYLES FOR LOBBY CARD */
@@ -126,14 +126,17 @@ export const StyledCard = styled(Card)`
 `;
 
 export const StyledFlex = styled(Flex)`
-  justify-content: "center";
+  justify-content: space-evenly;
 `;
-export const StyledAvatar = styled(Image)`
+export const StyledAvatar = styled.img`
   display: ${(props) => {
     if (props.displayoff) return "none";
     return "block";
   }};
+  background-size: contain;
+  background-position: center;
   background-color: #fff;
+  height: 320px;
   background-size: 100px;
 `;
 export const StyledHeading = styled.div`

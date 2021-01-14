@@ -3,25 +3,25 @@ import { Card } from "rebass";
 import { db } from "../../../firebase";
 import {
   StandardPlayingCardContainer,
-  GamePlayingCardText,
+  HandPlayingCardText,
   WildPlayingCardContainer,
-} from "../GameStyles.js";
+} from "../HandStyles.js";
 
-const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
+const HandPlayingCard = ({ id, type, text, points, onClick, selected }) => {
   return (
     <>
       {type === "Wild" ? (
         <WildPlayingCardContainer onClick={onClick} selected={selected}>
-          <GamePlayingCardText type={type} bold={600}>
+          <HandPlayingCardText type={type} bold={600}>
             {type}
-          </GamePlayingCardText>
+          </HandPlayingCardText>
           <br></br>
-          <GamePlayingCardText>
+          <HandPlayingCardText>
             <input></input>
-          </GamePlayingCardText>
-          <GamePlayingCardText type={type}>
+          </HandPlayingCardText>
+          <HandPlayingCardText type={type}>
             {Math.floor(Math.random() * 10)} pts
-          </GamePlayingCardText>
+          </HandPlayingCardText>
         </WildPlayingCardContainer>
       ) : (
         <StandardPlayingCardContainer
@@ -29,16 +29,16 @@ const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
           onClick={onClick}
           selected={selected}
         >
-          <GamePlayingCardText type={type} bold={600}>
+          <HandPlayingCardText type={type} bold={600}>
             {type}
-          </GamePlayingCardText>
+          </HandPlayingCardText>
           <br></br>
-          <GamePlayingCardText>{text}</GamePlayingCardText>
-          <GamePlayingCardText type={type}>{points}</GamePlayingCardText>
+          <HandPlayingCardText>{text}</HandPlayingCardText>
+          <HandPlayingCardText type={type}>{points}</HandPlayingCardText>
         </StandardPlayingCardContainer>
       )}
     </>
   );
 };
 
-export default GamePlayingCard;
+export default HandPlayingCard;

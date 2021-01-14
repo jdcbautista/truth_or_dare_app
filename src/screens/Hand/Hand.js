@@ -1,25 +1,23 @@
 import React, { useEffect, useState, Suspense } from "react";
-import Cards from "./components/Cards";
-import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
 import { gsap } from "gsap";
 import { Flex, Box } from "reflexbox";
 import {
-  GameContainer,
+  HandContainer,
   PlayerCard,
   HotseatCard,
-  GameVideoBox,
-  GameCardBox,
-  GameHotseatVideoBox,
+  HandVideoBox,
+  HandCardBox,
+  HandHotseatVideoBox,
   Rotate,
-} from "./GameStyles";
+} from "./HandStyles";
 import { StyledFlex } from "../Lobby/LobbyStyles";
 import { generateRandomNumber } from "../../helpers";
 import * as FirestoreService from "../../firebase";
-import GamePlayingCard from "./components/GamePlayingCard";
+import HandPlayingCard from "./components/HandPlayingCard";
 import LobbyCard from "../Lobby/components/LobbyCard";
 
-const Game = ({
+const Hand = ({
   players,
   participants,
   userId,
@@ -48,19 +46,25 @@ const Game = ({
   );
 
   console.log({ playerCards });
-  // useEffect(() => {
-  //   gsap.timeline().add().fromTo(
-  //     ".gameContainerFadeIn",
-  //     { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+  useEffect(() => {
+    gsap.timeline().add().fromTo(
+      ".handContainerFadeIn",
+      { opacity: 0, bottom: 0 },
 
-  //     {
-  //       opacity: 1,
-  //       filter: "blur(0px)",
-  //       transform: "translateY(0px)",
-  //       duration: 0.8,
-  //     }
-  //   );
-  // }, []);
+      {
+        opacity: 1,
+        filter: "blur(0px)",
+        bottom: -100,
+        duration: 0.8,
+      }
+    );
+
+    // .fromTo(
+    //   ".gameContainerFadeIn",
+    //   { filter: "blur(40px)" },
+    //   { filter: "blur(0px)", duration: 2 }
+    // );
+  }, []);
   console.log(isSelected);
 
   const handleDeal = () => {
@@ -73,7 +77,7 @@ const Game = ({
   };
 
   return (
-    <GameContainer className="gameContainerFadeIn">
+    <HandContainer className="handContainerFadeIn">
       <StyledFlex>
         {fieldCards.map((card) => (
           <Box p={3} width={1 / 4} color="white" bg="primary">
@@ -87,7 +91,7 @@ const Game = ({
               When GamePlayingCard is called in Game.js, it needs to be passed props from the card selected in the Hand component 
              */}
 
-              <GamePlayingCard
+              <HandPlayingCard
                 id={card?.id}
                 // selected={isSelected}
                 type={card?.type}
@@ -133,10 +137,10 @@ const Game = ({
           ))} */}
       {/* </GameCardBox>
       </div> */}
-    </GameContainer>
+    </HandContainer>
   );
 };
-export default Game;
+export default Hand;
 
 //background
 // Set 3 second timer

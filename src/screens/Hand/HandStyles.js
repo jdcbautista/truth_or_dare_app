@@ -9,10 +9,12 @@ export const rotate = keyframes`
 	}
   `;
 
-export const GameContainer = styled.div`
+export const HandContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100vw;
+  bottom: -500;
+  position: absolute;
 `;
 export const PlayerCard = styled.div`
   /* background-color: red; */
@@ -27,11 +29,11 @@ export const HotseatCard = styled(Box)`
   border: 2px solid white;
 `;
 
-export const GameVideoBox = styled(Box)`
+export const HandVideoBox = styled(Box)`
   margin: 20px;
 `;
 
-export const GameCardBox = styled(Box)`
+export const HandCardBox = styled(Box)`
   text-align: center;
   justify-content: center;
   align-items: center;
@@ -43,7 +45,7 @@ export const GameCardBox = styled(Box)`
   margin: 20px;
 `;
 
-export const GameHotseatVideoBox = styled(Box)`
+export const HandHotseatVideoBox = styled(Box)`
   text-align: center;
   justify-content: center;
   align-items: center;
@@ -121,7 +123,7 @@ export const WildPlayingCardContainer = styled(Card)`
   }
 `;
 
-export const GamePlayingCardText = styled.h2`
+export const HandPlayingCardText = styled.h2`
   font-family: "Open Sans", sans-serif;
   font-weight: ${(props) => {
     if (props.bold) return props.bold;
