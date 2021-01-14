@@ -13,6 +13,8 @@ export const GameContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100vw;
+  height: 400px;
+  border: 2px solid black;
 `;
 export const PlayerCard = styled.div`
   /* background-color: red; */
@@ -67,7 +69,7 @@ export const StandardPlayingCardContainer = styled(Card)`
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.type === "Truth") return "#64c0fa";
+      if (props.type === "truth") return "#64c0fa";
       return "#FB5156";
     }};
   text-align: left;
@@ -86,6 +88,9 @@ export const WildPlayingCardContainer = styled(Card)`
   height: 320px;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
+  border-radius: 10px;
+  border: 8px solid black;
+  color: white;
   padding: 30px 20px;
   border-radius: 25px;
   overflow: hidden;
@@ -105,7 +110,7 @@ export const WildPlayingCardContainer = styled(Card)`
     background-image: linear-gradient(#399953, #399953),
       linear-gradient(#fbb300, #fbb300), linear-gradient(#d53e33, #d53e33),
       linear-gradient(#377af5, #377af5);
-    animation: ${rotate} 6s linear infinite;
+    animation: ${rotate} 15s linear infinite;
   }
 
   &:after {
@@ -114,9 +119,8 @@ export const WildPlayingCardContainer = styled(Card)`
     z-index: -1;
     left: 8px;
     top: 8px;
-    width: calc(100% - 15px);
-    height: calc(100% - 16px);
-    background: white;
+    filter: blur(3px);
+    background: black;
     border-radius: 20px;
   }
 `;
@@ -132,9 +136,9 @@ export const GamePlayingCardText = styled.h2`
     return "em";
   }};
   color: ${(props) => {
-    if (props.type === "Truth") return "#64c0fa";
-    else if (props.type == "Dare") return "#FB5156";
-    return "#111111";
+    if (props.type === "truth") return "#64c0fa";
+    else if (props.type == "dare") return "#FB5156";
+    return "#ffffff";
   }};
   justify-content: center;
   align-items: center;

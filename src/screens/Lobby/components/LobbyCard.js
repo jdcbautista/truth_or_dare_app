@@ -64,27 +64,11 @@ function LobbyCard({
 
             <StyledHeading>{playerInfo?.username}</StyledHeading>
 
-            {/* {playerInfo?.ready ? (
-              <StyledBox>
-                <StyledCheckIcon />
-              </StyledBox>
-            ) : (
-              <StyledBox>
-                <StyledCloseIcon />
-              </StyledBox>
-            )} */}
-
             {twilioUserInfo && !playerInfo?.ready && (
               <StyledReadyButton onClick={handleReadyClick}>
                 I'm Ready!
               </StyledReadyButton>
             )}
-
-            {/* <StyledBadge sx={{ mx: "auto" }}>
-              {playerInfo?.ready
-                ? `${playerInfo?.username} ready!`
-                : `${playerInfo?.username} not ready!`}
-            </StyledBadge> */}
           </StyledCard>
         </Box>
       )}

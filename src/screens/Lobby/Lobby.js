@@ -38,7 +38,9 @@ const Lobby = () => {
   const [localPlayer, setLocalPlayer] = useState({});
   const [players, setPlayers] = useState([]);
   const [username, setUsername] = useState(null);
-
+  // For game states
+  const [isHandOpen, setIsHandOpen] = useState(null);
+  // Auth
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -153,15 +155,13 @@ const Lobby = () => {
     ).map((element) => <LobbyCard defaultCard />);
   };
 
+  const handleViewHand = () => {
+    setIsHandOpen(!isHandOpen);
+  };
+
   const handleStartGame = () => {
     setIsGameStarted(true);
 
-    // FirestoreService.addCardsToAllPlayers("game1", 3)
-    //   .then((response) => {
-    //     setIsGameStarted(true);
-    //   })
-    //   .catch((error) => console.log(error));
-    //Lobby shrinks to navBar
     gsap
       .timeline()
 
@@ -202,6 +202,9 @@ const Lobby = () => {
 
           <DebugButton onClick={handleStartGame}>
             Force Start (not a production button!)
+          </DebugButton>
+          <DebugButton onClick={handleViewHand}>
+            {isHandOpen ? "Close Hand" : "Open Hand"}
           </DebugButton>
           <DebugButton>Load (not a production button!)</DebugButton>
 
@@ -263,7 +266,7 @@ const Lobby = () => {
               handleReadyClick={handleReadyClick}
             />
 
-            {isGameStarted && room && players && (
+            {isHandOpen && (
               <Hand
                 room={room}
                 players={players}

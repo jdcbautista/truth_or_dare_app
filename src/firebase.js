@@ -113,44 +113,24 @@ export const trackHotseatPlayer = async (playerID, gameID) => {
  * @params gameId - {string} - the id of the targeted game
  * @params currentVideoStatus - {bool} - true/false value of video status
  */
-export const videoToggle = async (userId, gameId) => {
-  const currentVideoStatus = await getVideoToggleStatus(userId, gameId);
-  console.log(userId);
-  // const {userId} = updatedPlayer
+export const videoToggle = async (userId, gameId, currentVideoStatus) => {
   const snapshot = db
     .collection("rooms")
     .doc(gameId)
     .collection("players")
-    .doc(userId)
-    .update({
-      video: !currentVideoStatus,
+    .doc(userId);
+
+  if (currentVideoStatus) {
+    await snapshot.update({
+      video: false,
     });
+  } else {
+    await snapshot.update({
+      video: true,
+    });
+  }
   return snapshot;
 };
-
-export const getVideoToggleStatus = async (userId, gameId) => {
-  const player = await getPlayerObject(userId, gameId);
-
-  console.log(player.video);
-  return player.video;
-};
-//   const snapshot = db
-//     .collection("rooms")
-//     .doc(gameId)
-//     .collection("players")
-//     .doc(userId);
-
-//   if (currentVideoStatus) {
-//     await snapshot.update({
-//       video: false,
-//     });
-//   } else {
-//     await snapshot.update({
-//       video: true,
-//     });
-//   }
-//   return snapshot;
-// };
 
 /**
  * @description readyPlayer
@@ -186,29 +166,39 @@ export const readyPlayer = async (userId, gameId) => {
  */
 
 export const dealCard = async (gameID, playerID, numCardsToAdd) => {
-  const allCards = db.collection("rooms").doc(gameID).collection("gameDeck");
-  const startingHands = await allCards.limit(numCardsToAdd).get();
-  for (let startingCard of startingHands.docs) {
-    console.log(startingCard.id);
-    // eslint-disable-next-line
-    let playerCards = await db
-      .collection("rooms")
-      .doc(gameID)
-      .collection("players")
-      .doc(playerID)
-      .collection("cards")
-      .doc(`${startingCard.id}`)
-      .set({
-        id: startingCard.data().id,
-        text: startingCard.data().text,
-        type: startingCard.data().type,
-        points: startingCard.data().points,
-        playedBy: playerID,
-      });
-    // eslint-disable-next-line
-    let deleteCard = await startingCard.ref.delete();
+  const handLimit = 6;
+  const playerCards = await getHand(playerID, gameID);
+  const remCapacity = handLimit - playerCards.length;
+  const cardsToDeal =
+    remCapacity >= numCardsToAdd ? numCardsToAdd : remCapacity;
+  if (playerCards.length < handLimit) {
+    const allCards = db.collection("rooms").doc(gameID).collection("gameDeck");
+    const startingHands = await allCards.limit(cardsToDeal).get();
+    for (let startingCard of startingHands.docs) {
+      console.log(startingCard.id);
+      // eslint-disable-next-line
+      let playerCards = await db
+        .collection("rooms")
+        .doc(gameID)
+        .collection("players")
+        .doc(playerID)
+        .collection("cards")
+        .doc(`${startingCard.id}`)
+        .set({
+          hashId: startingCard.id,
+          id: startingCard.data().id,
+          text: startingCard.data().text,
+          type: startingCard.data().type,
+          points: startingCard.data().points,
+          playedBy: playerID,
+        });
+      // eslint-disable-next-line
+      let deleteCard = await startingCard.ref.delete();
+    }
+    return "success";
+  } else {
+    return "player hand full";
   }
-  return "success";
 };
 
 export const addCardsToAllPlayers = async (gameID, numCardsToAdd) => {
@@ -279,10 +269,57 @@ export const getHand = async (playerId, gameID) => {
     .collection("cards");
   let deck = await loadDeck.get();
   for (let card of deck.docs) {
-    handArr.push(card.data());
+    let cardToPush = card.data();
+    //add automated document title hash value to object with key 'hashId'
+    cardToPush["hashId"] = card.id;
+    handArr.push(cardToPush);
     console.log("card doc id", card.id);
   }
   return handArr;
+};
+
+/**
+ * @description readFieldCard
+ * Returns simple object containing data from player's first card currently in game's Field
+ * @params playerID - player id (auto-generated hash in firestore collection)
+ * @params gameID - the game id (hardcode 'game1' when calling function)
+ */
+export const readFieldCard = async (playerID, gameID) => {
+  const loadField = db.collection("rooms").doc(gameID).collection("field");
+
+  let loadCard = await loadField
+    .where("playedBy", "==", playerID)
+    .limit(1)
+    .get();
+
+  const selectedCard = loadCard.docs[0].data();
+  //add automated document title hash value to object with key 'hashId'
+  selectedCard["hashId"] = loadCard.docs[0].id;
+
+  console.log(selectedCard);
+  return selectedCard;
+};
+
+/**
+ * @description getAllFieldCards
+ * TODO
+ * @params TODO
+ * @params TODO
+ */
+export const getAllFieldCards = async (gameID) => {
+  const allCards = [];
+
+  const loadField = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field");
+  return loadField;
+  // let fieldCards = await loadField.get();
+  // for (let card of fieldCards.docs) {
+  //   let cardToPush = card.data();
+  //   allCards.push(cardToPush);
+  // }
+  // return allCards;
 };
 
 /**
@@ -341,30 +378,85 @@ export const advancePhase = async (gameID) => {
  */
 
 export const playCard = async (gameID, playerID, cardID) => {
-  const cardInHand = db
-    .collection("rooms")
-    .doc(gameID)
-    .collection("players")
-    .doc(playerID)
-    .collection("cards")
-    .doc(cardID);
-  const cardToPlay = await cardInHand.get();
-  const cardData = cardToPlay.data();
-  // eslint-disable-next-line
-  let playerCards = await db
+  console.log(gameID, playerID, cardID);
+  const fieldLimit = 3;
+  const fieldCards = await db
     .collection("rooms")
     .doc(gameID)
     .collection("field")
-    .doc(cardID)
-    .set({
-      id: cardData.id,
-      text: cardData.text,
-      type: cardData.type,
-      points: cardData.points,
-      playedBy: playerID,
-    });
-  // eslint-disable-next-line
-  let deleteCard = await cardInHand.delete();
-  // console.log('card played')
-  return "success";
+    .get();
+  console.log(fieldCards);
+  const remCapacity = (await fieldLimit) - fieldCards.docs.length;
+  if (remCapacity > 0) {
+    const cardInHand = await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("players")
+      .doc(playerID)
+      .collection("cards")
+      .doc(cardID);
+    const cardToPlay = await cardInHand.get();
+    const cardData = cardToPlay.data();
+    // eslint-disable-next-line
+    let playerCards = await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("field")
+      .doc(cardID)
+      .set({
+        hashId: cardData.hashId,
+        id: cardData.id,
+        text: cardData.text,
+        type: cardData.type,
+        points: cardData.points,
+        playedBy: playerID,
+      });
+    // eslint-disable-next-line
+    let deleteCard = await cardInHand.delete();
+    // console.log('card played')
+    return "success";
+  } else {
+    return "field is full";
+  }
+};
+
+export const unsetHotseatPlayer = async (gameID) => {
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  for (let i = 0; i < players.docs.length; i++) {
+    const player = players.docs[i];
+    const hotseat = player.data().hotseat;
+    if (hotseat) {
+      console.log("pass hotseat check");
+      // unset hotseat player and
+      // return i
+      await playerCollection.doc(player.data().id).update({
+        hotseat: !hotseat,
+      });
+      if (i === players.docs.length - 1) {
+        return -1;
+      } else {
+        return i;
+      }
+    }
+  }
+  return -1;
+};
+
+export const setHotseatPlayer = async (gameID) => {
+  const previousHotseatIndex = await unsetHotseatPlayer(gameID);
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  for (let i = 0; i < players.docs.length; i++) {
+    const player = players.docs[i];
+    if (i == previousHotseatIndex + 1) {
+      console.log(player.data());
+      // unset hotseat player and
+      // return i
+      await playerCollection.doc(player.data().id).update({
+        hotseat: true,
+      });
+      return player.data().id;
+    }
+  }
 };

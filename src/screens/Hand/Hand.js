@@ -28,24 +28,23 @@ const Hand = ({
   // const [selectedCards, setSelectedCards] = useState([]);
   const [isSelected, setIsSelected] = useState(false);
   const [playerCards, setPlayerCards] = useState([]);
-  const [fieldCards, setFieldCards] = useState(
-    [1, 2, 3, 4].map((el) => {
-      return {
-        id: el,
-        type:
-          generateRandomNumber() < 3
-            ? "Truth"
-            : generateRandomNumber() < 6
-            ? "Dare"
-            : "Wild",
 
-        text: "this is the selected card",
-        points: 5,
-      };
-    })
-  );
+  useEffect(() => {
+    (async () => {
+      await FirestoreService.loadDeckFromResources();
+      if (userId) {
+        handleGetHand();
+        console.log("seeing if player has a current hand ");
+      }
 
-  console.log({ playerCards });
+      if (playerCards.length < 5 && userId) {
+        console.log("running handle deal cards");
+        handleSingleDeal(3);
+        handleGetHand();
+      }
+    })();
+  }, []);
+
   useEffect(() => {
     gsap.timeline().add().fromTo(
       ".handContainerFadeIn",
@@ -58,28 +57,79 @@ const Hand = ({
         duration: 0.8,
       }
     );
-
-    // .fromTo(
-    //   ".gameContainerFadeIn",
-    //   { filter: "blur(40px)" },
-    //   { filter: "blur(0px)", duration: 2 }
-    // );
   }, []);
-  console.log(isSelected);
+
+  //deal single card from gameDeck to user in db only
+  const handleSingleDeal = async (numOfCards) => {
+    try {
+      await FirestoreService.dealCard("game1", userId, numOfCards);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleGetHand = async () => {
+    try {
+      const snapshot = await FirestoreService.getHand(userId, "game1");
+      const setCards = await setPlayerCards(snapshot);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleDeal = () => {
-    FirestoreService.getHand("kYGX7QmQOFZwWZm5lJCZBkXoRvm2", "game1").then(
-      (response) => {
+    try {
+      FirestoreService.getHand(userId, "game1").then((response) => {
         console.log(response);
         setPlayerCards(response);
-      }
-    );
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //read player's (top/first submitted) field card from db into state
+  const handleField = async () => {
+    console.log("setFieldToState");
+    const snapshot = await FirestoreService.readFieldCard(userId, "game1");
+  };
+
+  const handlePlayCard = async (cardID) => {
+    // const cardToPlay = await event.target.id
+    console.log(cardID);
+    console.log(userId);
+    try {
+      const playCard = await FirestoreService.playCard("game1", userId, cardID);
+      const fieldUpdate = await handleField();
+      const handUpdate = await handleDeal();
+
+      gsap
+        .timeline()
+        .fromTo(
+          ".handContainerFadeIn",
+          { opacity: 0, transform: "translateY(0px)" },
+
+          {
+            opacity: 1,
+            transform: "translateY(400px)",
+            duration: 0.5,
+          }
+        )
+
+        .fromTo(
+          ".gameContainerFadeIn",
+          { filter: "blur(10px)" },
+          { filter: "blur(0px)", duration: 1 }
+        );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
     <HandContainer className="handContainerFadeIn">
       <StyledFlex>
-        {fieldCards.map((card) => (
+        {playerCards.map((card) => (
           <Box p={3} width={1 / 4} color="white" bg="primary">
             <PlayerCard>
               {/*
@@ -98,45 +148,13 @@ const Hand = ({
                 selected={isSelected}
                 text={card?.text}
                 points={card?.points}
-                onClick={() => setIsSelected(!isSelected)}
+                onClick={() => handlePlayCard(card?.hashId)}
               />
               {/* {/* <CARD COMPONENT GOES HERE></CARD> */}
             </PlayerCard>
           </Box>
         ))}
       </StyledFlex>
-
-      {/* <HotseatCard width={[1, 2 / 5]} p={3}>
-        {/* <GameHotseatVideoBox className="fadeInHotseatVideo">
-            <Participant
-              isGameVideo
-              userId={userId}
-              user={localParticipant}
-              participant={room && room?.localParticipant}
-              videoHeight={200}
-              videoWidth={200}
-            />
-          </GameHotseatVideoBox> */}
-      {/* </HotseatCard> */}
-
-      {/* <div>
-        <GameCardBox> */}
-      {/* handComponent holds selectedCard state property and renders cards in hand */}
-      {/* <Hand cardList=[] */}
-      {/* <button onClick={handleDeal}>Deal cards</button> */}
-
-      {/* {playerCards.map((card) => (
-            <GamePlayingCard
-              id={card?.id}
-              // selected={isSelected}
-              type={card?.type}
-              text={card?.text}
-              points={Math.floor(Math.random() * 10) + "pts"}
-              onClick={() => console.log("toggle [selectedCard] state")}
-            />
-          ))} */}
-      {/* </GameCardBox>
-      </div> */}
     </HandContainer>
   );
 };

@@ -1,5 +1,4 @@
 import { Card, Image, Flex, Box, Button } from "rebass";
-
 import styled, { keyframes, css } from "styled-components";
 import { fadeIn, bounce } from "react-animations";
 
@@ -13,7 +12,7 @@ export const HandContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100vw;
-  bottom: -500;
+  bottom: -1000;
   position: absolute;
 `;
 export const PlayerCard = styled.div`
@@ -69,7 +68,7 @@ export const StandardPlayingCardContainer = styled(Card)`
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.type === "Truth") return "#64c0fa";
+      if (props.type === "truth") return "#64c0fa";
       return "#FB5156";
     }};
   text-align: left;
@@ -79,18 +78,28 @@ export const StandardPlayingCardContainer = styled(Card)`
   width: 256px;
   padding: 30px 20px;
   border-radius: 25px;
+  &:hover {
+    transform: translate(0px, -20px);
+    transition: all 150ms;
+    margin-left: 5px;
+  }
 `;
 
 /* FOR PLAYING CARD STYLING */
 export const WildPlayingCardContainer = styled(Card)`
   position: relative;
-  z-index: 0;
+  z-index: 1;
   height: 320px;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
   padding: 30px 20px;
   border-radius: 25px;
   overflow: hidden;
+  &:hover {
+    transform: translate(0px, -20px);
+    transition: all 150ms;
+    margin-left: 5px;
+  }
 
   &:before {
     content: "";
@@ -116,9 +125,8 @@ export const WildPlayingCardContainer = styled(Card)`
     z-index: -1;
     left: 8px;
     top: 8px;
-    width: calc(100% - 15px);
-    height: calc(100% - 16px);
-    background: white;
+    filter: blur(3px);
+    background: black;
     border-radius: 20px;
   }
 `;
@@ -134,8 +142,8 @@ export const HandPlayingCardText = styled.h2`
     return "em";
   }};
   color: ${(props) => {
-    if (props.type === "Truth") return "#64c0fa";
-    else if (props.type == "Dare") return "#FB5156";
+    if (props.type === "truth") return "#64c0fa";
+    else if (props.type === "dare") return "#FB5156";
     return "#111111";
   }};
   justify-content: center;

@@ -10,7 +10,7 @@ import {
 const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
   return (
     <>
-      {type === "Wild" ? (
+      {type === "wild" ? (
         <WildPlayingCardContainer onClick={onClick} selected={selected}>
           <GamePlayingCardText type={type} bold={600}>
             {type}

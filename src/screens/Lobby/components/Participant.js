@@ -120,7 +120,7 @@ const Participant = ({
   // // isVideoOn might work?
 
   const handleToggleVideo = async () => {
-    await FirestoreService.videoToggle(userId, "game1");
+    await FirestoreService.videoToggle(userId, "game1", user.video);
     console.log(user.video);
   };
 
