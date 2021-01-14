@@ -161,19 +161,40 @@ const Lobby = () => {
       })
       .catch((error) => console.log(error));
     //Lobby shrinks to navBar
-    gsap.fromTo(
-      ".LobbyToNav",
-      { height: "100%" },
-      { height: "10%", duration: 1 }
-    );
-    gsap.fromTo(".fadeOutVideo", { opacity: 1 }, { opacity: 0, duration: 1 });
+    // gsap.fromTo(
+    //   ".LobbyToNav",
+    //   { height: "100%" },
+    //   { height: "10%", duration: 1 }
+    // );
+    // gsap.fromTo(".fadeOutVideo", { opacity: 1 }, { opacity: 0, duration: 1 });
   };
+  const handleLoadDeck = async (e) => {
+    e.preventDefault()
+    await FirestoreService.loadDeckFromResources()
+  }
 
   return (
     <>
       {loading ? (
         <h1>Loading...</h1>
       ) : (
+        <>
+        {checkIfReady(players) && (
+          <div>
+            <button onClick={handleStartGame}>Start Game</button>
+            <button onclick={(e) => handleLoadDeck()}>Load</button>
+          </div>
+            
+        )}
+       
+          <DebugButton onClick={handleStartGame}>
+            Force Start (not a production button!)
+          </DebugButton>
+          <DebugButton onClick={handleLoad}>
+            Load (not a production button!)
+          </DebugButton>
+        
+
         <LobbyContainer className="LobbyToNav">
           {!localPlayer && (
             <LobbyInput
@@ -181,16 +202,7 @@ const Lobby = () => {
               handleSubmit={handleSubmit}
             />
           )}
-          {checkIfReady(players) && (
-            <>
-              <button onClick={handleStartGame}>Start Game</button>
-            </>
-          )}
-          <>
-            <DebugButton onClick={handleStartGame}>
-              Force Start (not a production button!)
-            </DebugButton>
-          </>
+        
           <StyledFlex className="fadeOutVideo">
             {localPlayer && room?.localParticipant && (
               <Suspense fallback={<div>Loading...</div>}>
@@ -227,6 +239,7 @@ const Lobby = () => {
                 ))}
           </StyledFlex>
         </LobbyContainer>
+        </>
       )}
       {isGameStarted && room && players && (
         <Game

@@ -3,7 +3,7 @@ import Participant from "./Participant";
 import {
   StyledCard,
   StyledHeading,
-  StyledBox,
+  // StyledBox,
   StyledReadyButton,
   StyledBadge,
   StyledAvatar,
@@ -64,7 +64,7 @@ function LobbyCard({
 
             <StyledHeading>{playerInfo?.username}</StyledHeading>
 
-            {playerInfo?.ready ? (
+            {/* {playerInfo?.ready ? (
               <StyledBox>
                 <StyledCheckIcon />
               </StyledBox>
@@ -72,7 +72,7 @@ function LobbyCard({
               <StyledBox>
                 <StyledCloseIcon />
               </StyledBox>
-            )}
+            )} */}
 
             {twilioUserInfo && !playerInfo?.ready && (
               <StyledReadyButton onClick={handleReadyClick}>
@@ -80,11 +80,11 @@ function LobbyCard({
               </StyledReadyButton>
             )}
 
-            <StyledBadge sx={{ mx: "auto" }}>
+            {/* <StyledBadge sx={{ mx: "auto" }}>
               {playerInfo?.ready
                 ? `${playerInfo?.username} ready!`
                 : `${playerInfo?.username} not ready!`}
-            </StyledBadge>
+            </StyledBadge> */}
           </StyledCard>
         </Box>
       )}

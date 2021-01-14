@@ -165,7 +165,7 @@ const Lobby = () => {
     );
   };
 
-  const handleChange = (e) => {
+  const handleLoadDeck = (e) => {
     setUsername(e.target.value);
   };
   console.log(username);
@@ -173,10 +173,6 @@ const Lobby = () => {
   return (
     <div className="App">
       <h1>Lobby</h1>
-      {/* test button for loading deck */}
-      <button onClick={(e) => handleLoadDeck(e)} >
-        Load Truth Deck
-      </button>
 
       {!inputDisabled && (
         <Box as="form" onSubmit={handleSubmit} py={3}>

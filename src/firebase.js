@@ -243,7 +243,7 @@ const loadGameDeck = async (deck) => {
         id: card.id,
         text: card.text,
         type: card.type,
-        points: card.votes,
+        points: card.points,
       });
     });
     return deck;

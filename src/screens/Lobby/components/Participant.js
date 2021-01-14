@@ -127,7 +127,7 @@ const Participant = ({
   return (
     <div style={{ position: "relative" }}>
       <>
-          <StyledVideoBox displayoff={user?.video} videoHeight={videoHeight}>
+          <StyledVideoBox displayoff={user?.video} videoHeight={videoHeight} ready={user?.ready} hotseat={user?.hotseat}>
             <StyledVideo ref={videoRef} autoPlay={true} />
           </StyledVideoBox>
           <StyledAvatar

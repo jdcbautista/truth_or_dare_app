@@ -15,11 +15,13 @@ export const StyledGameVideoBox = styled(Box)`
     if (props.displayoff) return "none";
     return "block";
   }};
+  border: 10px solid red;
 `;
 
 export const StyledGameVideo = styled.video`
   width: 100%;
   height: 100%;
+  border: 10px solid red;
   border-radius: 10px;
   object-fit: cover;
   display: inline-block;
@@ -29,9 +31,15 @@ export const StyledGameVideo = styled.video`
 export const StyledVideoBox = styled(Box)`
   height: ${(props) => {
     if (props.videoHeight) return props.videoHeight + "px";
-    return "310px";
+    return "320px";
   }};
   overflow: hidden;
+  border: ${props => { 
+    if (props.hotseat) return "10px solid #FFF689"
+    if (props.ready) return "10px solid #52AA5E";
+    if (!props.ready) return "10px solid #FB5156";
+    return "none"
+  }};
   padding-right: 100px;
   object-position: left bottom;
   border-radius: 5px;
@@ -43,7 +51,7 @@ export const StyledVideoBox = styled(Box)`
 export const StyledVideo = styled.video`
   height: ${(props) => {
     if (props.videoHeight) return props.videoHeight + "px";
-    return "310px";
+    return "320px";
   }};
   margin: 0 auto;
   transform: rotateY(180deg);
@@ -98,8 +106,10 @@ export const DebugButton = styled(Button)`
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled.div`
-  background-color: #222222;
   width: 100vw;
+  display: flex;
+  justify-content: center;
+  padding-top: 100px;
   position: fixed;
   height: 100vh;
 `;
@@ -139,13 +149,13 @@ export const StyledHeading = styled.div`
   justify-content: center;
   align-self: center;
 `;
-export const StyledBox = styled.div`
-  position: absolute;
-  top: 3px;
-  font-size: 20px;
-  opacity: 80%;
-  right: -13px;
-`;
+// export const StyledBox = styled.div`
+//   position: absolute;
+//   top: 3px;
+//   font-size: 40px;
+//   opacity: 80%;
+//   right: 0;
+// `;
 
 export const StyledButtonContainer = styled(Box)`
   margin: 0 auto;
@@ -187,7 +197,7 @@ export const StyledVideoIconButton = styled.div`
   align-items: center;
   width: 30px;
   height: 30px;
-  left: 10px;
+  left: 12px;
   &:hover {
     background-color: #313131;
     border-radius: 100%;

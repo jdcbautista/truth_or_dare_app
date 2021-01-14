@@ -55,13 +55,15 @@ const Game = ({ players, participants, userId, localPlayer, room, localParticipa
       }
     );
   };
+
+
+
   return (
     <GameContainer className="gameContainerFadeIn">
-      <Flex>
           <PlayerCard width={[1, 1 / 5]}>
             <GameVideoBox>
             
-            {localPlayer && localParticipant && (
+            {/* {localPlayer && localParticipant && (
               <Suspense fallback={<div>Loading...</div>}>
                 <LobbyCard
                   playerInfo={localPlayer}
@@ -70,14 +72,15 @@ const Game = ({ players, participants, userId, localPlayer, room, localParticipa
                   user={localPlayer}
                 />
               </Suspense>
-            )}
+            )} */}
 
-            {participants &&
+            {/* {participants &&
               room &&
               players &&
               players
                 .filter((player) => player?.id !== userId)
                 .map((player) => (
+                  <PlayerCard width={[1, 1 / 5]}>
                   <Suspense fallback={<div>Loading...</div>}>
                     <LobbyCard
                       playerInfo={player}
@@ -90,7 +93,8 @@ const Game = ({ players, participants, userId, localPlayer, room, localParticipa
                       user={player}
                     />
                   </Suspense>
-                ))}  
+                  </PlayerCard>
+                ))}   */}
               {/* <Participant
                 isGameVideo
                 userId={userId}
@@ -124,7 +128,7 @@ const Game = ({ players, participants, userId, localPlayer, room, localParticipa
         
 
         <HotseatCard width={[1, 2 / 5]} p={3}>
-          <GameHotseatVideoBox className="fadeInHotseatVideo">
+          {/* <GameHotseatVideoBox className="fadeInHotseatVideo">
             <Participant
               isGameVideo
               userId={userId}
@@ -133,14 +137,15 @@ const Game = ({ players, participants, userId, localPlayer, room, localParticipa
               videoHeight={200}
               videoWidth={200}
             />
-          </GameHotseatVideoBox>
+          </GameHotseatVideoBox> */}
         </HotseatCard>
-      </Flex>
+   
       <div>
         <GameCardBox>
           {/* handComponent holds selectedCard state property and renders cards in hand */}
           {/* <Hand cardList=[] */}
           <button onClick={handleDeal}>Deal cards</button>
+
 
           {playerCards.map((card) => (
             <GamePlayingCard
