@@ -1,3 +1,5 @@
+Truth or Dare API doc (updated 13 Jan 2021) https://docs.google.com/document/d/16naFewTAf8MyW7ZNd8EbTIE4uHBmZ-G521qpNC9gthU/edit
+
 # truth_or_dare_frontend
 
 changelog
