@@ -7,6 +7,7 @@ import {
   StyledReadyButton,
   StyledBadge,
   StyledAvatar,
+  StyledScoreContainer,
   StyledCheckIcon,
   StyledCloseIcon,
 } from "../LobbyStyles";
@@ -14,6 +15,7 @@ import { Box } from "rebass";
 
 function LobbyCard({
   playerInfo,
+  gamePhase,
   twilioUserInfo,
   userId,
   user,
@@ -56,6 +58,7 @@ function LobbyCard({
             {twilioUserInfo && userId && user && (
               <Participant
                 key={twilioUserInfo?.sid}
+                gamePhase={gamePhase}
                 participant={twilioUserInfo}
                 userId={userId}
                 user={user}
@@ -63,6 +66,12 @@ function LobbyCard({
             )}
 
             <StyledHeading>{playerInfo?.username}</StyledHeading>
+
+            {gamePhase.phase !== "setup" && (
+              <StyledScoreContainer>
+                score: {playerInfo?.score}
+              </StyledScoreContainer>
+            )}
 
             {twilioUserInfo && !playerInfo?.ready && (
               <StyledReadyButton onClick={handleReadyClick}>

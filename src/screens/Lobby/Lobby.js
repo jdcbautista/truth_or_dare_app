@@ -37,6 +37,7 @@ const Lobby = () => {
   const [username, setUsername] = useState(null);
   // For game states
   const [isHandOpen, setIsHandOpen] = useState(null);
+  const [gamePhase, setGamePhase] = useState({ phase: "setup" });
   // Auth
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
@@ -120,6 +121,20 @@ const Lobby = () => {
     };
   }, [userId, token]);
 
+  // This effect subscribes to the game phase and passes it to all the components
+  // of the lobby, game, and nav that need access to it
+  useEffect(() => {
+    const unsubscribe = FirestoreService.getGamePhase(FirestoreService.GAMEROOM)
+      .then((response) =>
+        response.onSnapshot((gotGamePhase) => {
+          const gamePhase = gotGamePhase.docs.map((doc) => doc.data())[0];
+          setGamePhase(gamePhase);
+        })
+      )
+      .catch((error) => console.log(error));
+    return () => unsubscribe();
+  }, []);
+
   // This effect runs when there is both an authenticated user
   // and players and compares ids to find and set local player
   useEffect(() => {
@@ -193,18 +208,30 @@ const Lobby = () => {
   };
 
   const handleDeleteField = async (e) => {
-    await FirestoreService.deleteField(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    await FirestoreService.deleteField(FirestoreService.GAMEROOM).catch((err) =>
+      console.log(err)
+    );
     console.log("deleting field");
   };
 
   const handleAdvancePhase = async (e) => {
-    await FirestoreService.advancePhase(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    await FirestoreService.advancePhase(
+      FirestoreService.GAMEROOM
+    ).catch((err) => console.log(err));
     console.log("advancing phase");
   };
 
   const handleAddPoints = async (e) => {
-    await FirestoreService.addPointsToPlayer(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    await FirestoreService.addPointsToPlayer(
+      FirestoreService.GAMEROOM
+    ).catch((err) => console.log(err));
     console.log("advancing phase");
+  };
+
+  const handleAdvanceHotseat = async () => {
+    FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM).catch((err) =>
+      setError(err)
+    );
   };
 
   return (
@@ -225,6 +252,7 @@ const Lobby = () => {
             loadDeck={handleLoadDeck}
             deleteField={handleDeleteField}
             advancePhase={handleAdvancePhase}
+            advanceHotseat={handleAdvanceHotseat}
             addPoints={handleAddPoints}
           />
 
@@ -241,6 +269,7 @@ const Lobby = () => {
                 <Suspense fallback={<div>Loading...</div>}>
                   <LobbyCard
                     playerInfo={localPlayer}
+                    gamePhase={gamePhase}
                     twilioUserInfo={room?.localParticipant}
                     userId={userId}
                     user={localPlayer}
@@ -259,6 +288,7 @@ const Lobby = () => {
                     <Suspense fallback={<div>Loading...</div>}>
                       <LobbyCard
                         playerInfo={player}
+                        gamePhase={gamePhase}
                         twilioUserInfo={
                           participants.filter(
                             (participant) =>

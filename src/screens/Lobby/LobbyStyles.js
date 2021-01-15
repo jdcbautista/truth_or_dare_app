@@ -35,9 +35,11 @@ export const StyledVideoBox = styled(Box)`
   }};
   overflow: hidden;
   border: ${(props) => {
-    if (props.hotseat) return "10px solid #FFF689";
-    if (props.ready) return "10px solid #52AA5E";
-    if (!props.ready) return "10px solid #FB5156";
+    if (props.hotseat && props.gamePhase !== "setup")
+      return "10px solid #FFF689";
+    if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
+    if (!props.ready && props.gamePhase === "setup")
+      return "10px solid #FB5156";
     return "none";
   }};
   padding-right: 100px;
@@ -134,10 +136,18 @@ export const StyledAvatar = styled.img`
     if (props.displayoff) return "none";
     return "block";
   }};
-  background-size: contain;
+  border: ${(props) => {
+    if (props.hotseat && props.gamePhase !== "setup")
+      return "10px solid #FFF689";
+    if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
+    if (!props.ready && props.gamePhase === "setup")
+      return "10px solid #FB5156";
+    return "none";
+  }};
   background-position: center;
   background-color: #fff;
   height: 320px;
+  width: 100%;
   background-size: 100px;
 `;
 export const StyledHeading = styled.div`
@@ -153,14 +163,20 @@ export const StyledHeading = styled.div`
   justify-content: center;
   align-self: center;
 `;
-// export const StyledBox = styled.div`
-//   position: absolute;
-//   top: 3px;
-//   font-size: 40px;
-//   opacity: 80%;
-//   right: 0;
-// `;
 
+export const StyledScoreContainer = styled.div`
+  font-family: sans-serif;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  background-color: #00000050;
+  padding: 3px;
+  border-radius: 5px;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-self: center;
+`;
 export const StyledButtonContainer = styled(Box)`
   margin: 0 auto;
   position: relative;

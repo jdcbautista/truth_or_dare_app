@@ -1,5 +1,4 @@
 import React, { useEffect, useState, Suspense } from "react";
-import Cards from "./components/Cards";
 import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
 import { gsap } from "gsap";
@@ -91,10 +90,14 @@ const Game = ({
     const setCards = setPlayerCards(snapshot);
   };
 
-  const handleSelectCard = async (cardID)=>{
-   await FirestoreService.cardSelectByHotseat(FirestoreService.GAMEROOM, cardID, userId)
-   console.log("card selected")
-  }
+  const handleSelectCard = async (cardID) => {
+    await FirestoreService.cardSelectByHotseat(
+      FirestoreService.GAMEROOM,
+      cardID,
+      userId
+    );
+    console.log("card selected");
+  };
 
   return (
     <GameContainer className="gameContainerFadeIn">
