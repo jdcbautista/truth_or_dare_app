@@ -36,6 +36,7 @@ const Hand = ({
         if (playerCards.length < FirestoreService.HANDLIMIT) {
           console.log("dealing if max hand not reached");
           await handleSingleDeal(FirestoreService.HANDLIMIT - playerCards.length);
+          await handleGetHand();
         }
         console.log('getting hand with useEffect')
       }
