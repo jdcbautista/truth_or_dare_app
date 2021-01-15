@@ -16,6 +16,8 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 export const GAMEROOM = "game3";
+export const HANDLIMIT = 6;
+export const FIELDLIMIT = 3;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -169,12 +171,11 @@ export const readyPlayer = async (userId, gameId) => {
  */
 
 export const dealCard = async (gameID, playerID, numCardsToAdd) => {
-  const handLimit = 6;
   const playerCards = await getHand(playerID, gameID);
-  const remCapacity = handLimit - playerCards.length;
+  const remCapacity = HANDLIMIT - playerCards.length;
   const cardsToDeal =
     remCapacity >= numCardsToAdd ? numCardsToAdd : remCapacity;
-  if (playerCards.length < handLimit) {
+  if (playerCards.length < HANDLIMIT) {
     const allCards = db.collection("rooms").doc(gameID).collection("gameDeck");
     const startingHands = await allCards.limit(cardsToDeal).get();
     for (let startingCard of startingHands.docs) {
@@ -386,14 +387,13 @@ export const advancePhase = async (gameID) => {
 
 export const playCard = async (gameID, playerID, cardID) => {
   console.log(gameID, playerID, cardID);
-  const fieldLimit = 3;
   const fieldCards = await db
     .collection("rooms")
     .doc(gameID)
     .collection("field")
     .get();
   console.log(fieldCards);
-  const remCapacity = (await fieldLimit) - fieldCards.docs.length;
+  const remCapacity = FIELDLIMIT - fieldCards.docs.length;
   if (remCapacity > 0) {
     const cardInHand = await db
       .collection("rooms")
