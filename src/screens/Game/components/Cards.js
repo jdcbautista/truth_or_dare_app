@@ -24,7 +24,7 @@
 //   const readStack = async () => {
 //     const snapshot = await db
 //       .collection("rooms")
-//       .doc("game1")
+//       .doc(FirestoreService.GAMEROOM)
 //       .collection("truthStack")
 //       .get();
 //     // const snapshot = await db
@@ -42,7 +42,7 @@
 //     cardsToCopy.map(async (card) => {
 //       const snapshot = await db
 //         .collection("rooms")
-//         .doc("game1")
+//         .doc(FirestoreService.GAMEROOM)
 //         .collection("truthDeck")
 //         .doc("truth" + `${card.id}`)
 //         .set({

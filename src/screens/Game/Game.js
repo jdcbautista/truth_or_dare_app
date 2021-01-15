@@ -34,9 +34,12 @@ const Game = ({
    * players see the same cards within the field (Game) component
    */
   useEffect(() => {
-    const unsubscribe = FirestoreService.getAllFieldCards("game1")
+    const unsubscribe = FirestoreService.getAllFieldCards(
+      FirestoreService.GAMEROOM
+    )
       .then((response) =>
         response.onSnapshot((gotCards) => {
+          console.log("getting field cards");
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
         })
@@ -70,14 +73,22 @@ const Game = ({
   //deal single card from gameDeck to user in db only
   const handleSingleDeal = async (numOfCards) => {
     // await e.preventDefault();
-    await FirestoreService.dealCard("game1", userId, numOfCards);
+    await FirestoreService.dealCard(
+      FirestoreService.GAMEROOM,
+      userId,
+      numOfCards
+    );
     console.log("deal single card");
     console.log(userId);
   };
 
   const handleGetHand = async () => {
-    const snapshot = await FirestoreService.getHand(userId, "game1");
-    const setCards = await setPlayerCards(snapshot);
+    const snapshot = await FirestoreService.getHand(
+      userId,
+      FirestoreService.GAMEROOM
+    );
+    console.log("getting hand");
+    const setCards = setPlayerCards(snapshot);
   };
 
   return (

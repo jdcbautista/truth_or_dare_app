@@ -15,6 +15,8 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+export const GAMEROOM = "game3";
+
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
 };
@@ -58,6 +60,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       video: false,
       audio: false,
       score: 0,
+      hotseat: 0,
     });
   return snapshot;
 };
@@ -223,7 +226,7 @@ export const addCardsToAllPlayers = async (gameID, numCardsToAdd) => {
  */
 
 const loadGameDeck = async (deck) => {
-  const gameDeck = db.collection("rooms").doc("game1").collection("gameDeck");
+  const gameDeck = db.collection("rooms").doc(GAMEROOM).collection("gameDeck");
   const checkEmpty = await gameDeck.limit(1).get();
   console.log(checkEmpty.docs.length);
   if (!checkEmpty.docs.length) {
@@ -257,7 +260,7 @@ export const loadDeckFromResources = async () => {
  * @description getHand
  * returns target players hand
  * @params playerID - player id (auto-generated hash in firestore collection)
- * @params gameID - the game id (hardcode 'game1' when calling function)
+ * @params gameID - the game id
  */
 export const getHand = async (playerId, gameID) => {
   let handArr = [];
@@ -282,7 +285,7 @@ export const getHand = async (playerId, gameID) => {
  * @description readFieldCard
  * Returns simple object containing data from player's first card currently in game's Field
  * @params playerID - player id (auto-generated hash in firestore collection)
- * @params gameID - the game id (hardcode 'game1' when calling function)
+ * @params gameID - the game id
  */
 export const readFieldCard = async (playerID, gameID) => {
   const loadField = db.collection("rooms").doc(gameID).collection("field");
@@ -338,10 +341,14 @@ export function toBool(string) {
 /**
  * @description advancePhase
  * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
- * @params gameID - the game id (hardcode 'game1' when calling function)
+ * @params gameID - the game id
  */
 export const advancePhase = async (gameID) => {
-  const snapshot = await db.collection("rooms").doc(gameID);
+  const snapshot = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
   const snapshotDoc = await snapshot.get();
   const currentPhase = await snapshotDoc.data().phase;
 

@@ -12,7 +12,6 @@ import {
   Rotate,
 } from "./HandStyles";
 import { StyledFlex } from "../Lobby/LobbyStyles";
-import { generateRandomNumber } from "../../helpers";
 import * as FirestoreService from "../../firebase";
 import HandPlayingCard from "./components/HandPlayingCard";
 import LobbyCard from "../Lobby/components/LobbyCard";
@@ -62,7 +61,12 @@ const Hand = ({
   //deal single card from gameDeck to user in db only
   const handleSingleDeal = async (numOfCards) => {
     try {
-      await FirestoreService.dealCard("game1", userId, numOfCards);
+      await FirestoreService.dealCard(
+        FirestoreService.GAMEROOM,
+        userId,
+        numOfCards
+      );
+      console.log("dealing cards");
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +74,11 @@ const Hand = ({
 
   const handleGetHand = async () => {
     try {
-      const snapshot = await FirestoreService.getHand(userId, "game1");
+      const snapshot = await FirestoreService.getHand(
+        userId,
+        FirestoreService.GAMEROOM
+      );
+      console.log("getting hand");
       const setCards = await setPlayerCards(snapshot);
     } catch (error) {
       console.log(error);
@@ -79,28 +87,39 @@ const Hand = ({
 
   const handleDeal = () => {
     try {
-      FirestoreService.getHand(userId, "game1").then((response) => {
-        console.log(response);
-        setPlayerCards(response);
-      });
+      FirestoreService.getHand(userId, FirestoreService.GAMEROOM).then(
+        (response) => {
+          console.log("getting hand in handleDeal");
+          setPlayerCards(response);
+        }
+      );
     } catch (error) {
       console.log(error);
     }
   };
 
   //read player's (top/first submitted) field card from db into state
-  const handleField = async () => {
-    console.log("setFieldToState");
-    const snapshot = await FirestoreService.readFieldCard(userId, "game1");
-  };
+  // JS - removed 1/14
+  // const handleField = async () => {
+  //   console.log("setFieldToState");
+  //   const snapshot = await FirestoreService.readFieldCard(
+  //     userId,
+  //     FirestoreService.GAMEROOM
+  //   );
+  //   console.log('')
+  // };
 
   const handlePlayCard = async (cardID) => {
-    // const cardToPlay = await event.target.id
     console.log(cardID);
     console.log(userId);
     try {
-      const playCard = await FirestoreService.playCard("game1", userId, cardID);
-      const fieldUpdate = await handleField();
+      const playCard = await FirestoreService.playCard(
+        FirestoreService.GAMEROOM,
+        userId,
+        cardID
+      );
+      console.log("playing card");
+      // const fieldUpdate = await handleField();
       const handUpdate = await handleDeal();
 
       gsap

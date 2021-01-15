@@ -112,7 +112,7 @@ const Participant = ({
 
   // useEffect(() => {
   //   if (userId) {
-  //     FirestoreService.getVideoToggleStatus(userId, "game1").then((player) =>
+  //     FirestoreService.getVideoToggleStatus(userId, FirestoreService.GAMEROOM).then((player) =>
   //       setIsVideoOn(player?.video)
   //     );
   //   }
@@ -120,7 +120,11 @@ const Participant = ({
   // // isVideoOn might work?
 
   const handleToggleVideo = async () => {
-    await FirestoreService.videoToggle(userId, "game1", user.video);
+    await FirestoreService.videoToggle(
+      userId,
+      FirestoreService.GAMEROOM,
+      user.video
+    );
     console.log(user.video);
   };
 

@@ -10,10 +10,7 @@ import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex, DebugButton } from "./LobbyStyles";
-import { Card, Image, Heading, Flex, Box, Button } from "rebass";
-import styled from "@emotion/styled";
-import { Label, Input, Select, Textarea, Radio, Checkbox } from "@rebass/forms";
-import { AiFillCheckCircle, AiFillCloseCircle } from "react-icons/ai";
+import Navbar from "./components/Navbar";
 
 const Lobby = () => {
   // Jarrett & Emma
@@ -48,21 +45,21 @@ const Lobby = () => {
   // This effect runs on page load and uses firebase auth
   // to annonymously authenticate a user. It provides a unique
   // id that is associated with the users machine and stores in into
-  // state. It also gets all of our players from a game (default is "game1")
+  // state. It also gets all of our players from a game
   // and sets the local state with those players
   useEffect(() => {
-    console.log("AUTH ANON RAN");
-    setLoading(true);
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
+        console.log("authenticating");
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
 
-    const unsubscribe = FirestoreService.getPlayers("game1")
+    const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
       .then((response) =>
         response.onSnapshot((gotPlayers) => {
           const players = gotPlayers.docs.map((player) => player.data());
+          console.log("player checking");
           setPlayers(players);
           setLoading(false);
         })
@@ -77,7 +74,7 @@ const Lobby = () => {
   // It finally updates the room state to acknowledge all players.
   useEffect(() => {
     if (userId) {
-      getTwilioToken({ identity: userId, room: "game1" })
+      getTwilioToken({ identity: userId, room: FirestoreService.GAMEROOM })
         .then((token) => {
           setToken(token);
         })
@@ -97,7 +94,7 @@ const Lobby = () => {
 
     if (token) {
       Video.connect(token, {
-        name: "game1",
+        name: FirestoreService.GAMEROOM,
       }).then((room) => {
         setRoom(room);
         room.on("participantConnected", participantConnected);
@@ -133,16 +130,20 @@ const Lobby = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    FirestoreService.addPlayer({ username, userId }, "game1").catch((error) =>
-      setError(error)
-    );
+    console.log("adding player");
+    FirestoreService.addPlayer(
+      { username, userId },
+      FirestoreService.GAMEROOM
+    ).catch((error) => setError(error));
   };
 
   const handleReadyClick = (e) => {
     e.preventDefault();
-    FirestoreService.readyPlayer(userId, "game1").catch((error) =>
-      setError(error)
-    );
+    console.log("player ready");
+    FirestoreService.readyPlayer(
+      userId,
+      FirestoreService.GAMEROOM
+    ).catch((error) => setError(error));
   };
 
   const handleChange = (e) => {
@@ -159,10 +160,12 @@ const Lobby = () => {
     setIsHandOpen(!isHandOpen);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
+    await FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM);
+    console.log("starting game");
     setIsGameStarted(true);
 
-    gsap
+    await gsap
       .timeline()
 
       .fromTo(
@@ -185,6 +188,7 @@ const Lobby = () => {
   const handleLoadDeck = async (e) => {
     e.preventDefault();
     await FirestoreService.loadDeckFromResources();
+    console.log("loading deck");
   };
 
   return (
@@ -193,20 +197,17 @@ const Lobby = () => {
         <h1>Loading...</h1>
       ) : (
         <>
-          {checkIfReady(players) && (
+          {/* {checkIfReady(players) && (
             <div>
               <button onClick={handleStartGame}>Start Game</button>
               <button onclick={(e) => handleLoadDeck()}>Load</button>
             </div>
-          )}
-
-          <DebugButton onClick={handleStartGame}>
-            Force Start (not a production button!)
-          </DebugButton>
-          <DebugButton onClick={handleViewHand}>
-            {isHandOpen ? "Close Hand" : "Open Hand"}
-          </DebugButton>
-          <DebugButton>Load (not a production button!)</DebugButton>
+          )} */}
+          <Navbar
+            showHand={handleViewHand}
+            startGame={handleStartGame}
+            loadDeck={handleLoadDeck}
+          />
 
           <LobbyContainer className="LobbyToNav">
             {!localPlayer && (

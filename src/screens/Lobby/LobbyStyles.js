@@ -98,6 +98,7 @@ export const Message = styled.label`
 export const DebugButton = styled(Button)`
   opacity: 0.5;
   color: white;
+  margin: 10px;
   background-color: red;
   &:hover {
     opacity: 1;
