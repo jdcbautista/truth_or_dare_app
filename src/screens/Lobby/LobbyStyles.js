@@ -9,10 +9,37 @@ import {
 import { FiVideoOff, FiVideo } from "react-icons/fi";
 
 /* STYLES FOR VIDEO CONTAINER */
-export const StyledVideoBox = styled(Box)`
-  height: 400px;
 
+export const StyledGameVideoBox = styled(Box)`
+  display: ${(props) => {
+    if (props.displayoff) return "none";
+    return "block";
+  }};
+  border: 10px solid red;
+`;
+
+export const StyledGameVideo = styled.video`
+  width: 100%;
+  height: 100%;
+  border: 10px solid red;
+  border-radius: 10px;
+  object-fit: cover;
+  display: inline-block;
+  vertical-align: middle;
+`;
+
+export const StyledVideoBox = styled(Box)`
+  height: ${(props) => {
+    if (props.videoHeight) return props.videoHeight + "px";
+    return "320px";
+  }};
   overflow: hidden;
+  border: ${(props) => {
+    if (props.hotseat) return "10px solid #FFF689";
+    if (props.ready) return "10px solid #52AA5E";
+    if (!props.ready) return "10px solid #FB5156";
+    return "none";
+  }};
   padding-right: 100px;
   object-position: left bottom;
   border-radius: 5px;
@@ -22,7 +49,10 @@ export const StyledVideoBox = styled(Box)`
   }};
 `;
 export const StyledVideo = styled.video`
-  height: 310px;
+  height: ${(props) => {
+    if (props.videoHeight) return props.videoHeight + "px";
+    return "320px";
+  }};
   margin: 0 auto;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg); /* Safari and Chrome */
@@ -68,14 +98,22 @@ export const Message = styled.label`
 export const DebugButton = styled(Button)`
   opacity: 0.5;
   color: white;
+  margin: 10px;
   background-color: red;
   &:hover {
     opacity: 1;
   }
 `;
+
 /* STYLES FOR LOBBY */
 
-export const LobbyContainer = styled(Box)``;
+export const LobbyContainer = styled.div`
+  width: 100vw;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: fixed;
+`;
 
 /* STYLES FOR LOBBY CARD */
 
@@ -89,14 +127,17 @@ export const StyledCard = styled(Card)`
 `;
 
 export const StyledFlex = styled(Flex)`
-  justify-content: "center";
+  justify-content: space-evenly;
 `;
-export const StyledAvatar = styled(Image)`
+export const StyledAvatar = styled.img`
   display: ${(props) => {
     if (props.displayoff) return "none";
     return "block";
   }};
+  background-size: contain;
+  background-position: center;
   background-color: #fff;
+  height: 320px;
   background-size: 100px;
 `;
 export const StyledHeading = styled.div`
@@ -112,13 +153,13 @@ export const StyledHeading = styled.div`
   justify-content: center;
   align-self: center;
 `;
-export const StyledBox = styled.div`
-  position: absolute;
-  top: 3px;
-  font-size: 20px;
-  opacity: 80%;
-  right: -13px;
-`;
+// export const StyledBox = styled.div`
+//   position: absolute;
+//   top: 3px;
+//   font-size: 40px;
+//   opacity: 80%;
+//   right: 0;
+// `;
 
 export const StyledButtonContainer = styled(Box)`
   margin: 0 auto;
@@ -160,7 +201,7 @@ export const StyledVideoIconButton = styled.div`
   align-items: center;
   width: 30px;
   height: 30px;
-  left: 10px;
+  left: 12px;
   &:hover {
     background-color: #313131;
     border-radius: 100%;

@@ -1,274 +1,116 @@
+import React, { useEffect, useState, Suspense } from "react";
 import Cards from "./components/Cards";
 import Timer from "./components/Timer";
+import Participant from "../Lobby/components/Participant";
+import { gsap } from "gsap";
+import { Flex, Box } from "reflexbox";
+import {
+  GameContainer,
+  PlayerCard,
+  HotseatCard,
+  GameVideoBox,
+  GameCardBox,
+  GameHotseatVideoBox,
+  Rotate,
+} from "./GameStyles";
+import { StyledFlex } from "../Lobby/LobbyStyles";
+import * as FirestoreService from "../../firebase";
+import GamePlayingCard from "./components/GamePlayingCard";
 
-const Game = () => {
-  {
-    /* <Cards />
-      <Timer /> 
-      <PlayerList />
-      
-      <judgePanel />
-      <hotSeatContainer /> */
-  }
+const Game = ({
+  players,
+  participants,
+  userId,
+  localPlayer,
+  room,
+  localParticipant,
+}) => {
+  const [selectedCards, setSelectedCards] = useState({});
+  const [playerCards, setPlayerCards] = useState([]);
+  const [fieldCards, setFieldCards] = useState([]);
+
+  /**
+   * This effect subscribes us to the field of the game so that all
+   * players see the same cards within the field (Game) component
+   */
+  useEffect(() => {
+    const unsubscribe = FirestoreService.getAllFieldCards(
+      FirestoreService.GAMEROOM
+    )
+      .then((response) =>
+        response.onSnapshot((gotCards) => {
+          console.log("getting field cards");
+          const cards = gotCards.docs.map((card) => card.data());
+          setFieldCards(cards);
+        })
+      )
+      .catch((error) => console.log(error));
+    return () => unsubscribe;
+  }, []);
+
+  /**
+   * This effect tries to load a deck from resources if there is none and deals cards
+   * which will replenish automatically. It aso calls handleGetHand which will keep the players
+   * hand up to date with what is in the DB
+   */
+  useEffect(() => {
+    (async () => {
+      // Load a deck
+      await FirestoreService.loadDeckFromResources();
+      if (userId) {
+        handleGetHand();
+        console.log("seeing if player has a current hand ");
+      }
+
+      if (playerCards.length < 5 && userId) {
+        console.log("running handle deal cards");
+        handleSingleDeal(8);
+        handleGetHand();
+      }
+    })();
+  }, []);
+
+  //deal single card from gameDeck to user in db only
+  const handleSingleDeal = async (numOfCards) => {
+    // await e.preventDefault();
+    await FirestoreService.dealCard(
+      FirestoreService.GAMEROOM,
+      userId,
+      numOfCards
+    );
+    console.log("deal single card");
+    console.log(userId);
+  };
+
+  const handleGetHand = async () => {
+    const snapshot = await FirestoreService.getHand(
+      userId,
+      FirestoreService.GAMEROOM
+    );
+    console.log("getting hand");
+    const setCards = setPlayerCards(snapshot);
+  };
+
   return (
-    <div
-      className="sessionInit"
-      style={{ backgroundColor: "gray", padding: "10px" }}
-    >
-      <div
-        style={{
-          backgroundColor: "pink",
-          height: "100px",
-          borderRadius: "15px",
-          textAlign: "center",
-        }}
-      >
-        <p>NavBarComponent</p>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          margin: "10px",
-          backgroundColor: "pink",
-          justifyContent: "center",
-          height: "600px",
-          borderRadius: "15px",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "lightblue",
-            margin: "10px",
-            borderRadius: "15px",
-            textAlign: "center",
-          }}
-        >
-          <p>Player list component</p>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              margin: "10px",
-              justifyContent: "center",
-              borderRadius: "15px",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                margin: "10px",
-                backgroundColor: "lavender",
-                height: "500px",
-                width: "250px",
-                borderRadius: "15px",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "aquamarine",
-                  margin: "10px",
-                  borderRadius: "15px",
-                  height: "150px",
-                }}
-              >
-                <p>Player Component</p>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  margin: "20px 10px 10px 10px",
-                  borderRadius: "15px",
-                  height: "300px",
-                }}
-              >
-                <p>Card component</p>
-              </div>
-            </div>
-            <div
-              style={{
-                margin: "10px",
-                backgroundColor: "lavender",
-                height: "500px",
-                width: "250px",
-                borderRadius: "15px",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "aquamarine",
-                  margin: "10px",
-                  borderRadius: "15px",
-                  height: "150px",
-                }}
-              >
-                <p>Player Component</p>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  margin: "20px 10px 10px 10px",
-                  borderRadius: "15px",
-                  height: "300px",
-                }}
-              >
-                <p>Card component</p>
-              </div>
-            </div>
-            <div
-              style={{
-                margin: "10px",
-                backgroundColor: "lavender",
-                height: "500px",
-                width: "250px",
-                borderRadius: "15px",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "aquamarine",
-                  margin: "10px",
-                  borderRadius: "15px",
-                  height: "150px",
-                }}
-              >
-                <p>Player Component</p>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "white",
-                  margin: "20px 10px 10px 10px",
-                  borderRadius: "15px",
-                  height: "300px",
-                }}
-              >
-                <p>Card component</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          style={{
-            margin: "10px",
-            backgroundColor: "lightblue",
-            width: "400px",
-            borderRadius: "15px",
-            textAlign: "center",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <p>hotseat player component</p>
-          <div
-            style={{
-              margin: "10px",
-              backgroundColor: "lavender",
-              height: "500px",
-              width: "250px",
-              borderRadius: "15px",
-              textAlign: "center",
-            }}
-          >
-            <p>Player Component</p>
-            <div
-              style={{
-                backgroundColor: "white",
-                margin: "20px 10px 10px 10px",
-                borderRadius: "15px",
-                height: "410px",
-              }}
-            >
-              <p>Twilio component</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          backgroundColor: "pink",
-          borderRadius: "15px",
-          textAlign: "center",
-          height: "150px",
-        }}
-      >
-        <p>hand component</p>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              margin: "20px 10px 10px 10px",
-              borderRadius: "15px",
-              height: "50px",
-            }}
-          >
-            <p>Card component</p>
-          </div>
-          <div
-            style={{
-              backgroundColor: "white",
-              margin: "20px 10px 10px 10px",
-              borderRadius: "15px",
-              height: "50px",
-            }}
-          >
-            <p>Card component</p>
-          </div>
-          <div
-            style={{
-              backgroundColor: "white",
-              margin: "20px 10px 10px 10px",
-              borderRadius: "15px",
-              height: "50px",
-            }}
-          >
-            <p>Card component</p>
-          </div>
-          <div
-            style={{
-              backgroundColor: "white",
-              margin: "20px 10px 10px 10px",
-              borderRadius: "15px",
-              height: "50px",
-            }}
-          >
-            <p>Card component</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <GameContainer className="gameContainerFadeIn">
+      <StyledFlex>
+        {fieldCards.map((card) => (
+          <Box p={3} width={1 / 4} color="white" bg="primary">
+            <PlayerCard>
+              <GamePlayingCard
+                id={card?.id}
+                // selected={isSelected}
+                type={card?.type}
+                // selected={isSelected}
+                text={card?.text}
+                points={card?.points}
+                // onClick={() => setIsSelected(!isSelected)}
+              />
+            </PlayerCard>
+          </Box>
+        ))}
+      </StyledFlex>
+    </GameContainer>
   );
 };
-
 export default Game;
-
-//background
-// Set 3 second timer
-// Lobby to game animation transition
-// Draw random cards into hand
-// Load playingField
-
-//playingField has containers
-//  judgePanel contains judgePlayer1 - judgePlayer3
-//  hotSeat container contains player
-//  handHandler
-
-// Make callback or change firestore state,
-// Change lobby's gameState from sessionInit to... roundStart
-
-//roundStart
-//
-
-//roundEnd : game logic checks if game ends or returns to roundStart
-
-//gameEnd : Winners stand triumphantly over losers

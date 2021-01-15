@@ -1,5 +1,4 @@
 import { Card, Image, Flex, Box, Button } from "rebass";
-
 import styled, { keyframes, css } from "styled-components";
 import { fadeIn, bounce } from "react-animations";
 
@@ -9,12 +8,12 @@ export const rotate = keyframes`
 	}
   `;
 
-export const GameContainer = styled.div`
+export const HandContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100vw;
-  height: 400px;
-  border: 2px solid black;
+  bottom: -1000;
+  position: absolute;
 `;
 export const PlayerCard = styled.div`
   /* background-color: red; */
@@ -29,11 +28,11 @@ export const HotseatCard = styled(Box)`
   border: 2px solid white;
 `;
 
-export const GameVideoBox = styled(Box)`
+export const HandVideoBox = styled(Box)`
   margin: 20px;
 `;
 
-export const GameCardBox = styled(Box)`
+export const HandCardBox = styled(Box)`
   text-align: center;
   justify-content: center;
   align-items: center;
@@ -45,7 +44,7 @@ export const GameCardBox = styled(Box)`
   margin: 20px;
 `;
 
-export const GameHotseatVideoBox = styled(Box)`
+export const HandHotseatVideoBox = styled(Box)`
   text-align: center;
   justify-content: center;
   align-items: center;
@@ -79,21 +78,28 @@ export const StandardPlayingCardContainer = styled(Card)`
   width: 256px;
   padding: 30px 20px;
   border-radius: 25px;
+  &:hover {
+    transform: translate(0px, -20px);
+    transition: all 150ms;
+    margin-left: 5px;
+  }
 `;
 
 /* FOR PLAYING CARD STYLING */
 export const WildPlayingCardContainer = styled(Card)`
   position: relative;
-  z-index: 0;
+  z-index: 1;
   height: 320px;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
-  border-radius: 10px;
-  border: 8px solid black;
-  color: white;
   padding: 30px 20px;
   border-radius: 25px;
   overflow: hidden;
+  &:hover {
+    transform: translate(0px, -20px);
+    transition: all 150ms;
+    margin-left: 5px;
+  }
 
   &:before {
     content: "";
@@ -110,7 +116,7 @@ export const WildPlayingCardContainer = styled(Card)`
     background-image: linear-gradient(#399953, #399953),
       linear-gradient(#fbb300, #fbb300), linear-gradient(#d53e33, #d53e33),
       linear-gradient(#377af5, #377af5);
-    animation: ${rotate} 15s linear infinite;
+    animation: ${rotate} 6s linear infinite;
   }
 
   &:after {
@@ -125,7 +131,7 @@ export const WildPlayingCardContainer = styled(Card)`
   }
 `;
 
-export const GamePlayingCardText = styled.h2`
+export const HandPlayingCardText = styled.h2`
   font-family: "Open Sans", sans-serif;
   font-weight: ${(props) => {
     if (props.bold) return props.bold;
@@ -137,8 +143,8 @@ export const GamePlayingCardText = styled.h2`
   }};
   color: ${(props) => {
     if (props.type === "truth") return "#64c0fa";
-    else if (props.type == "dare") return "#FB5156";
-    return "#ffffff";
+    else if (props.type === "dare") return "#FB5156";
+    return "#111111";
   }};
   justify-content: center;
   align-items: center;

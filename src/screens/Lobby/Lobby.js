@@ -1,14 +1,29 @@
+import { gsap } from "gsap";
 import React, { useState, useEffect, Suspense } from "react";
 import { getTwilioToken } from "../../services/twilio";
 import * as FirestoreService from "../../firebase";
 import Video from "twilio-video";
 import LobbyCard from "./components/LobbyCard";
 import Game from "../Game/Game";
+import Hand from "../Hand/Hand";
 import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex, DebugButton } from "./LobbyStyles";
+import Navbar from "./components/Navbar";
+
 const Lobby = () => {
+  // Jarrett & Emma
+  //What the current screen is that is displayed
+  const [screenID, setScreenID] = useState("title");
+  //The identity and room name of the current user
+  const [identity, setIdentity] = useState("");
+  const [roomName, setRoomName] = useState("");
+  //
+  const [ready, setReady] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(false);
+
+  // Michael
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
@@ -20,6 +35,9 @@ const Lobby = () => {
   const [localPlayer, setLocalPlayer] = useState({});
   const [players, setPlayers] = useState([]);
   const [username, setUsername] = useState(null);
+  // For game states
+  const [isHandOpen, setIsHandOpen] = useState(null);
+  // Auth
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
   const [isGameStarted, setIsGameStarted] = useState(false);
@@ -27,20 +45,21 @@ const Lobby = () => {
   // This effect runs on page load and uses firebase auth
   // to annonymously authenticate a user. It provides a unique
   // id that is associated with the users machine and stores in into
-  // state. It also gets all of our players from a game (default is "game1")
+  // state. It also gets all of our players from a game
   // and sets the local state with those players
   useEffect(() => {
-    setLoading(true);
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
+        console.log("authenticating");
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
 
-    const unsubscribe = FirestoreService.getPlayers("game1")
+    const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
       .then((response) =>
         response.onSnapshot((gotPlayers) => {
           const players = gotPlayers.docs.map((player) => player.data());
+          console.log("player checking");
           setPlayers(players);
           setLoading(false);
         })
@@ -55,7 +74,7 @@ const Lobby = () => {
   // It finally updates the room state to acknowledge all players.
   useEffect(() => {
     if (userId) {
-      getTwilioToken({ identity: userId, room: "game1" })
+      getTwilioToken({ identity: userId, room: FirestoreService.GAMEROOM })
         .then((token) => {
           setToken(token);
         })
@@ -75,7 +94,7 @@ const Lobby = () => {
 
     if (token) {
       Video.connect(token, {
-        name: "game1",
+        name: FirestoreService.GAMEROOM,
       }).then((room) => {
         setRoom(room);
         room.on("participantConnected", participantConnected);
@@ -111,16 +130,20 @@ const Lobby = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    FirestoreService.addPlayer({ username, userId }, "game1").catch((error) =>
-      setError(error)
-    );
+    console.log("adding player");
+    FirestoreService.addPlayer(
+      { username, userId },
+      FirestoreService.GAMEROOM
+    ).catch((error) => setError(error));
   };
 
   const handleReadyClick = (e) => {
     e.preventDefault();
-    FirestoreService.readyPlayer(userId, "game1").catch((error) =>
-      setError(error)
-    );
+    console.log("player ready");
+    FirestoreService.readyPlayer(
+      userId,
+      FirestoreService.GAMEROOM
+    ).catch((error) => setError(error));
   };
 
   const handleChange = (e) => {
@@ -133,8 +156,39 @@ const Lobby = () => {
     ).map((element) => <LobbyCard defaultCard />);
   };
 
-  const handleStartGame = () => {
+  const handleViewHand = () => {
+    setIsHandOpen(!isHandOpen);
+  };
+
+  const handleStartGame = async () => {
+    await FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM);
+    console.log("starting game");
     setIsGameStarted(true);
+
+    await gsap
+      .timeline()
+
+      .fromTo(
+        ".gameContainerFadeIn",
+        { filter: "blur(0px)" },
+        { filter: "blur(10px)", duration: 2 }
+      )
+      .fromTo(
+        ".handContainerFadeIn",
+        { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+
+        {
+          opacity: 1,
+          filter: "blur(0px)",
+          transform: "translateY(0px)",
+          duration: 0.8,
+        }
+      );
+  };
+  const handleLoadDeck = async (e) => {
+    e.preventDefault();
+    await FirestoreService.loadDeckFromResources();
+    console.log("loading deck");
   };
 
   return (
@@ -142,63 +196,95 @@ const Lobby = () => {
       {loading ? (
         <h1>Loading...</h1>
       ) : (
-        <LobbyContainer>
-          <h1>Lobby</h1>
-
-          {!localPlayer && (
-            <LobbyInput
-              handleChange={handleChange}
-              handleSubmit={handleSubmit}
-            />
-          )}
-
-          {checkIfReady(players) && (
-            <>
+        <>
+          {/* {checkIfReady(players) && (
+            <div>
               <button onClick={handleStartGame}>Start Game</button>
-            </>
-          )}
+              <button onclick={(e) => handleLoadDeck()}>Load</button>
+            </div>
+          )} */}
+          <Navbar
+            showHand={handleViewHand}
+            startGame={handleStartGame}
+            loadDeck={handleLoadDeck}
+          />
 
-          <>
-            <DebugButton onClick={handleStartGame}>
-              Force Start (not a production button!)
-            </DebugButton>
-          </>
-          <StyledFlex>
-            {localPlayer && room?.localParticipant && (
-              <Suspense fallback={<div>Loading...</div>}>
-                <LobbyCard
-                  playerInfo={localPlayer}
-                  twilioUserInfo={room?.localParticipant}
-                  userId={userId}
-                  handleReadyClick={(e) => handleReadyClick(e)}
-                />
-              </Suspense>
+          <LobbyContainer className="LobbyToNav">
+            {!localPlayer && (
+              <LobbyInput
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+              />
             )}
-            {createPlaceholders(players)}
 
-            {participants &&
-              room &&
-              players &&
-              players
-                .filter((player) => player?.id !== userId)
-                .map((player) => (
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <LobbyCard
-                      playerInfo={player}
-                      twilioUserInfo={
-                        participants.filter(
-                          (participant) => participant?.identity === player?.id
-                        )[0]
-                      }
-                      userId={userId}
-                      handleReadyClick={(e) => handleReadyClick(e)}
-                    />
-                  </Suspense>
-                ))}
-          </StyledFlex>
-        </LobbyContainer>
+            <StyledFlex className="fadeOutVideo">
+              {localPlayer && room?.localParticipant && (
+                <Suspense fallback={<div>Loading...</div>}>
+                  <LobbyCard
+                    playerInfo={localPlayer}
+                    twilioUserInfo={room?.localParticipant}
+                    userId={userId}
+                    user={localPlayer}
+                    handleReadyClick={(e) => handleReadyClick(e)}
+                  />
+                </Suspense>
+              )}
+              {createPlaceholders(players)}
+
+              {participants &&
+                room &&
+                players &&
+                players
+                  .filter((player) => player?.id !== userId)
+                  .map((player) => (
+                    <Suspense fallback={<div>Loading...</div>}>
+                      <LobbyCard
+                        playerInfo={player}
+                        twilioUserInfo={
+                          participants.filter(
+                            (participant) =>
+                              participant?.identity === player?.id
+                          )[0]
+                        }
+                        userId={userId}
+                        user={player}
+                        handleReadyClick={(e) => handleReadyClick(e)}
+                      />
+                    </Suspense>
+                  ))}
+            </StyledFlex>
+            <Game
+              room={room}
+              players={players}
+              participants={participants}
+              userId={userId}
+              user={localPlayer}
+              className="gameGSAP"
+              localPlayer={localPlayer}
+              localParticipant={room?.localParticipant}
+              mockHand="I dare you"
+              token={token}
+              handleReadyClick={handleReadyClick}
+            />
+
+            {isHandOpen && (
+              <Hand
+                room={room}
+                players={players}
+                participants={participants}
+                userId={userId}
+                user={localPlayer}
+                className="gameGSAP"
+                localPlayer={localPlayer}
+                localParticipant={room?.localParticipant}
+                mockHand="I dare you"
+                token={token}
+                handleReadyClick={handleReadyClick}
+              />
+            )}
+          </LobbyContainer>
+        </>
       )}
-      {isGameStarted && <Game />}
     </>
   );
 };

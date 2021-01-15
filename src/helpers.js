@@ -17,3 +17,7 @@ export const checkIfReady = (players) => {
 export const getRandomInt = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 };
+
+export const generateRandomNumber = () => {
+  return Math.floor(Math.random() * 10);
+};

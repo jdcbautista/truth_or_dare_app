@@ -13,7 +13,11 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
-export const db = firebase.firestore();
+const db = firebase.firestore();
+
+export const GAMEROOM = "game3";
+export const HANDLIMIT = 6;
+export const FIELDLIMIT = 3;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -33,7 +37,7 @@ export const getGame = async (gameId) => {
  * @description getGames
  * Queries all rooms and returns an array of all game documents
  */
-export const getAllGames = async () => {
+export const getlGames = async () => {
   const snapshot = await db.collection("rooms").get();
   return snapshot.docs.map((doc) => doc.data());
 };
@@ -55,7 +59,10 @@ export const addPlayer = async (newPlayer, gameId) => {
       id: userId,
       username: username,
       ready: false,
+      video: false,
+      audio: false,
       score: 0,
+      hotseat: 0,
     });
   return snapshot;
 };
@@ -66,13 +73,68 @@ export const addPlayer = async (newPlayer, gameId) => {
  * @params gameId - {string} - the id of the targeted game
  */
 export const getPlayers = async (gameId) => {
-  const snapshot = await db
-    .collection("rooms")
-    .doc(gameId)
-    .collection("players");
+  const snapshot = db.collection("rooms").doc(gameId).collection("players");
 
   return snapshot;
-  // return snapshot.docs.map(doc => doc.data())
+};
+
+/**
+ * @description getPlayerObject
+ * Queries all players and returns data object for selected playerID
+ * @params gameId - {string} - the id of the targeted game
+ * @params playerId - {string} - the id of the targeted player
+ */
+
+export const getPlayerObject = async (playerID, gameID) => {
+  const player = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("players")
+    .where("id", "==", playerID);
+  const fetchPlayer = await player.get();
+  const playerData = fetchPlayer.docs[0].data();
+  return playerData;
+};
+
+/**
+ * @description trackHotseatPlayer
+ * Sets the identified player as the Hotseat player for the identified game
+ * @params gameId - {string} - the id of the targeted game
+ * @params playerId - {string} - the id of the targeted player
+ */
+
+export const trackHotseatPlayer = async (playerID, gameID) => {
+  const setHotseatPlayer = await db.collection("rooms").doc(gameID).update({
+    hotseatPlayer: playerID,
+  });
+  return setHotseatPlayer;
+};
+
+/**
+ * @description videoToggle
+ * toggles player video status
+ * (note: assumes the front end call of this function can pass the current video on/off status (to reduce db reads); can be refactored to query db for this status if needed)
+ * @params userID - {string} - the player object id
+ * @params gameId - {string} - the id of the targeted game
+ * @params currentVideoStatus - {bool} - true/false value of video status
+ */
+export const videoToggle = async (userId, gameId, currentVideoStatus) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameId)
+    .collection("players")
+    .doc(userId);
+
+  if (currentVideoStatus) {
+    await snapshot.update({
+      video: false,
+    });
+  } else {
+    await snapshot.update({
+      video: true,
+    });
+  }
+  return snapshot;
 };
 
 /**
@@ -95,80 +157,313 @@ export const readyPlayer = async (userId, gameId) => {
   return snapshot;
 };
 
-// export const editPlayer = (updatedPlayer) => {
-//   setLoading();
-//   ref
-//     .doc(updatedPlayer.id)
-//     .update(updatedPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
+/**
+ * @description addCardsToAllPlayers
+ * Collects list of all players in game, calls dealCard to move N cards from game deck to each player
+ * @params gameID - {string} - the id of the game where all player will be dealt card(s)
+ * @params numCardsToAdd - {integer} - number of cards to deal to each player from gameDeck
+ *
+ * @description dealCard
+ * Takes N cards from game deck, copies to indicated player's hand, deletes card(s) from game deck
+ * @params gameID - {string} - the id of the game where the player will be dealt card(s)
+ * @params playerId - {string} - the id of the player to receive a card
+ * @params numCardsToAdd - {integer} - number of cards to deal to player from gameDeck
+ */
 
-// export const addPlayer = (newPlayer) => {
-//   ref
-//     .doc(newPlayer.id)
-//     .set(newPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
+export const dealCard = async (gameID, playerID, numCardsToAdd) => {
+  const playerCards = await getHand(playerID, gameID);
+  const remCapacity = HANDLIMIT - playerCards.length;
+  const cardsToDeal =
+    remCapacity >= numCardsToAdd ? numCardsToAdd : remCapacity;
+  if (playerCards.length < HANDLIMIT) {
+    const allCards = db.collection("rooms").doc(gameID).collection("gameDeck");
+    const startingHands = await allCards.limit(cardsToDeal).get();
+    for (let startingCard of startingHands.docs) {
+      console.log(startingCard.id);
+      // eslint-disable-next-line
+      let playerCards = await db
+        .collection("rooms")
+        .doc(gameID)
+        .collection("players")
+        .doc(playerID)
+        .collection("cards")
+        .doc(`${startingCard.id}`)
+        .set({
+          hashId: startingCard.id,
+          id: startingCard.data().id,
+          text: startingCard.data().text,
+          type: startingCard.data().type,
+          points: startingCard.data().points,
+          playedBy: playerID,
+        });
+      // eslint-disable-next-line
+      let deleteCard = await startingCard.ref.delete();
+    }
+    return "success";
+  } else {
+    return "player hand full";
+  }
+};
 
-// export const deletePlayer = (Player) => {
-//   ref
-//     .doc(Player.id)
-//     .delete()
-//     .catch((err) => {
-//       console.log(err);
-//     });
-//   setDisabled(false);
-// };
+export const addCardsToAllPlayers = async (gameID, numCardsToAdd) => {
+  const players = db.collection("rooms").doc(gameID).collection("players");
+  const playerList = await players.get();
 
-// export const editPlayer = (updatedPlayer) => {
-//   setLoading();
-//   ref
-//     .doc(updatedPlayer.id)
-//     .update(updatedPlayer)
-//     .catch((err) => {
-//       console.error(err);
-//     });
-// };
+  for (let player of playerList.docs) {
+    await dealCard(gameID, player.data().id, numCardsToAdd);
+  }
+  return "success";
+};
 
 /**
- * @description dealCard
- * Takes 1 card from relevant card stack, copies to indicated player's hand, deletes card from stack
- * Rev 0: in game1, sends 1 card from dareStack to players.playerID.cards
- * @params playerId - {string} - the id of the player to receive a card
+ * @description loadDeckFromResources
+ * Use to transfer deck from resources into gameDeck collection in the gamestate
+ * @params none
+ *
+ * @description loadGameDeck
+ * Called in getTruthDeck async/await func. Takes deck loaded from resources and adds it to gameDeck collection * in firestore
+ * @params deck - {array of Firestore document.data() objects} - array that contains the data of the cards in resources collection that will be copied to game collection
+ *
  */
-export const dealCard = async (playerId) => {
-  const cardSnapshot = await db
+
+const loadGameDeck = async (deck) => {
+  const gameDeck = db.collection("rooms").doc(GAMEROOM).collection("gameDeck");
+  const checkEmpty = await gameDeck.limit(1).get();
+  console.log(checkEmpty.docs.length);
+  if (!checkEmpty.docs.length) {
+    console.log("loading deck");
+    await deck.forEach(async (card) => {
+      await gameDeck.add({
+        id: card.id,
+        text: card.text,
+        type: card.type,
+        points: card.points,
+      });
+    });
+    return deck;
+  } else {
+    console.log("did not load deck");
+  }
+};
+
+export const loadDeckFromResources = async () => {
+  let deckArr = [];
+  const loadDeck = db.collection("resources").doc("Deck1").collection("cards");
+  let deck = await loadDeck.get();
+  for (let card of deck.docs) {
+    deckArr.push(card.data());
+  }
+  await loadGameDeck(deckArr);
+  return "success";
+};
+
+/**
+ * @description getHand
+ * returns target players hand
+ * @params playerID - player id (auto-generated hash in firestore collection)
+ * @params gameID - the game id
+ */
+export const getHand = async (playerId, gameID) => {
+  let handArr = [];
+  const loadDeck = db
     .collection("rooms")
-    .doc("game1")
-    .collection("dareStack")
-    .get();
-  const cards = await cardSnapshot.docs.map(async (card) => card.data());
-  let cardToSet = await cards[0];
-  const cardSetSnapshot = await db
-    .collection("rooms")
-    .doc("game1")
+    .doc(gameID)
     .collection("players")
     .doc(playerId)
-    .collection("cards")
-    .doc(`${cardToSet.id}`)
-    .set({
-      id: cardToSet.id,
-      text: cardToSet.text,
-    });
-  await console.log("card set");
-  const cardDeleteSnapshot = await db
-    .collection("rooms")
-    .doc("game1")
-    .collection("dareStack")
-    .where("id", "==", cardToSet.id)
+    .collection("cards");
+  let deck = await loadDeck.get();
+  for (let card of deck.docs) {
+    let cardToPush = card.data();
+    //add automated document title hash value to object with key 'hashId'
+    cardToPush["hashId"] = card.id;
+    handArr.push(cardToPush);
+    console.log("card doc id", card.id);
+  }
+  return handArr;
+};
+
+/**
+ * @description readFieldCard
+ * Returns simple object containing data from player's first card currently in game's Field
+ * @params playerID - player id (auto-generated hash in firestore collection)
+ * @params gameID - the game id
+ */
+export const readFieldCard = async (playerID, gameID) => {
+  const loadField = db.collection("rooms").doc(gameID).collection("field");
+
+  let loadCard = await loadField
+    .where("playedBy", "==", playerID)
+    .limit(1)
     .get();
-  const cardDelete = await cardDeleteSnapshot.docs.map(async (doc) => {
-    await doc.ref.delete();
-    await console.log("card deleted");
-  });
-  return cardDelete;
+
+  const selectedCard = loadCard.docs[0].data();
+  //add automated document title hash value to object with key 'hashId'
+  selectedCard["hashId"] = loadCard.docs[0].id;
+
+  console.log(selectedCard);
+  return selectedCard;
+};
+
+/**
+ * @description getAllFieldCards
+ * TODO
+ * @params TODO
+ * @params TODO
+ */
+export const getAllFieldCards = async (gameID) => {
+  const allCards = [];
+
+  const loadField = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field");
+  return loadField;
+  // let fieldCards = await loadField.get();
+  // for (let card of fieldCards.docs) {
+  //   let cardToPush = card.data();
+  //   allCards.push(cardToPush);
+  // }
+  // return allCards;
+};
+
+/**
+ * @description toBool
+ * changes string input into boolean output
+ * @params string - string to be converted to bool
+ */
+export function toBool(string) {
+  if (string === "true") {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+/**
+ * @description advancePhase
+ * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
+ * @params gameID - the game id
+ */
+export const advancePhase = async (gameID) => {
+  const snapshot = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+  const snapshotDoc = await snapshot.get();
+  const currentPhase = await snapshotDoc.data().phase;
+
+  const phases = [
+    "setup",
+    "playCard",
+    "completeDare",
+    "voteCompleteDare",
+    "cleanup",
+  ];
+  let phaseIndex = phases.indexOf(currentPhase);
+  // console.log(phaseIndex)
+  if (phaseIndex === phases.length - 1) {
+    await snapshot.update({
+      phase: phases[0],
+    });
+  } else {
+    await snapshot.update({
+      phase: phases[phaseIndex + 1],
+    });
+  }
+  return phaseIndex;
+};
+
+/**
+ *
+ * @description playCard
+ * takes card from players hand and moves it to the field
+ *
+ * (note: maybe we don't need to pull the card out of a hand with an ID depending on if we only have hash or if we have the whole object)
+ * @params gameID - {string} - the id of the game where the player will be dealt card(s)
+ * @params playerId - {string} - the id of the player to receive a card
+ * @params cardID - {} - the id of the being card played
+ */
+
+export const playCard = async (gameID, playerID, cardID) => {
+  console.log(gameID, playerID, cardID);
+  const fieldCards = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field")
+    .get();
+  console.log(fieldCards);
+  const remCapacity = FIELDLIMIT - fieldCards.docs.length;
+  if (remCapacity > 0) {
+    const cardInHand = await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("players")
+      .doc(playerID)
+      .collection("cards")
+      .doc(cardID);
+    const cardToPlay = await cardInHand.get();
+    const cardData = cardToPlay.data();
+    // eslint-disable-next-line
+    let playerCards = await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("field")
+      .doc(cardID)
+      .set({
+        hashId: cardData.hashId,
+        id: cardData.id,
+        text: cardData.text,
+        type: cardData.type,
+        points: cardData.points,
+        playedBy: playerID,
+      });
+    // eslint-disable-next-line
+    let deleteCard = await cardInHand.delete();
+    // console.log('card played')
+    return "success";
+  } else {
+    return "field is full";
+  }
+};
+
+export const unsetHotseatPlayer = async (gameID) => {
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  for (let i = 0; i < players.docs.length; i++) {
+    const player = players.docs[i];
+    const hotseat = player.data().hotseat;
+    if (hotseat) {
+      console.log("pass hotseat check");
+      // unset hotseat player and
+      // return i
+      await playerCollection.doc(player.data().id).update({
+        hotseat: !hotseat,
+      });
+      if (i === players.docs.length - 1) {
+        return -1;
+      } else {
+        return i;
+      }
+    }
+  }
+  return -1;
+};
+
+export const setHotseatPlayer = async (gameID) => {
+  const previousHotseatIndex = await unsetHotseatPlayer(gameID);
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  for (let i = 0; i < players.docs.length; i++) {
+    const player = players.docs[i];
+    if (i == previousHotseatIndex + 1) {
+      console.log(player.data());
+      // unset hotseat player and
+      // return i
+      await playerCollection.doc(player.data().id).update({
+        hotseat: true,
+      });
+      return player.data().id;
+    }
+  }
 };
