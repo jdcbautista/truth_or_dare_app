@@ -138,7 +138,8 @@ export const GamePlayingCardText = styled.h2`
   color: ${(props) => {
     if (props.type === "truth") return "#64c0fa";
     else if (props.type == "dare") return "#FB5156";
-    return "#ffffff";
+    else if (props.type == "wild") return "#FFFFFF";
+    return "#000000";
   }};
   justify-content: center;
   align-items: center;
