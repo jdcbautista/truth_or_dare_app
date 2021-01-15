@@ -91,6 +91,11 @@ const Game = ({
     const setCards = setPlayerCards(snapshot);
   };
 
+  const handleSelectCard = async (cardID)=>{
+   await FirestoreService.cardSelectByHotseat(FirestoreService.GAMEROOM, cardID, userId)
+   console.log("card selected")
+  }
+
   return (
     <GameContainer className="gameContainerFadeIn">
       <StyledFlex>
@@ -104,7 +109,7 @@ const Game = ({
                 // selected={isSelected}
                 text={card?.text}
                 points={card?.points}
-                // onClick={() => setIsSelected(!isSelected)}
+                onClick={() => handleSelectCard(card?.hashId)}
               />
             </PlayerCard>
           </Box>

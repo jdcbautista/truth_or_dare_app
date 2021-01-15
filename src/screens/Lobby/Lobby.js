@@ -162,6 +162,7 @@ const Lobby = () => {
 
   const handleStartGame = async () => {
     await FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM);
+    await FirestoreService.deleteField(FirestoreService.GAMEROOM);
     console.log("starting game");
     setIsGameStarted(true);
 
@@ -191,6 +192,21 @@ const Lobby = () => {
     console.log("loading deck");
   };
 
+  const handleDeleteField = async (e) => {
+    await FirestoreService.deleteField(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    console.log("deleting field");
+  };
+
+  const handleAdvancePhase = async (e) => {
+    await FirestoreService.advancePhase(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    console.log("advancing phase");
+  };
+
+  const handleAddPoints = async (e) => {
+    await FirestoreService.addPointsToPlayer(FirestoreService.GAMEROOM).catch(err => console.log(err))
+    console.log("advancing phase");
+  };
+
   return (
     <>
       {loading ? (
@@ -207,6 +223,9 @@ const Lobby = () => {
             showHand={handleViewHand}
             startGame={handleStartGame}
             loadDeck={handleLoadDeck}
+            deleteField={handleDeleteField}
+            advancePhase={handleAdvancePhase}
+            addPoints={handleAddPoints}
           />
 
           <LobbyContainer className="LobbyToNav">
