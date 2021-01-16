@@ -234,6 +234,12 @@ const Lobby = () => {
     );
   };
 
+  const handleTaskComplete = async () => {
+    await FirestoreService.completeTask(FirestoreService.GAMEROOM).catch((err) =>
+    setError(err)
+  );
+  }
+
   return (
     <>
       {loading ? (
@@ -251,7 +257,7 @@ const Lobby = () => {
             startGame={handleStartGame}
             loadDeck={handleLoadDeck}
             deleteField={handleDeleteField}
-            advancePhase={handleAdvancePhase}
+            completeTask={handleTaskComplete}
             advanceHotseat={handleAdvanceHotseat}
             addPoints={handleAddPoints}
           />

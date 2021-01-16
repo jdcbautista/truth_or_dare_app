@@ -18,6 +18,7 @@ const db = firebase.firestore();
 export const GAMEROOM = "game2";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
+export const WINNINGPOINTS = 5;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -491,9 +492,14 @@ export const addPointsToPlayer = async (gameID) => {
   const cardData = await getSelectedFieldCard(gameID);
   const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
   const playerCollection = await getPlayers(gameID);
+  const newScore = parseInt(cardData.points) + playerPoints;
   await playerCollection.doc(cardData.selectedBy).update({
-    score: parseInt(cardData.points) + playerPoints,
+    score: newScore,
   });
+  if (newScore >= WINNINGPOINTS) {
+    return "gameOver"
+  }
+  return newScore
 };
 
 export const getSelectedFieldCard = async (gameID) => {
@@ -525,3 +531,73 @@ export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
       });
   }
 };
+
+/**
+ * @description autoAdvancePhase
+ * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
+ * @params gameID - the game id
+ */
+export const autoAdvancePhase = async (gameID, cards) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+  console.log(cards)
+  const selectCheck = cards.map(card => card.selected)
+  const snapshotCheck = await snapshot.get();
+  const taskCompleteCheck = await snapshotCheck.data().taskComplete;
+  console.log(taskCompleteCheck)
+  // const taskSuccessCheck = await snapshotCheck.data().taskSuccess;
+  
+  
+  if (cards.length < 3) {
+    await snapshot.update({
+      phase: "playCard"
+    })
+  } else if (selectCheck.some(x => x)) {
+    if (!taskCompleteCheck) {
+      await snapshot.update({
+        phase: "completeDare"
+      })
+    } else {
+      await snapshot.update({
+        phase: "cleanUp",
+        taskComplete: false
+      })
+      const pointAdd = await addPointsToPlayer(GAMEROOM)
+      if (pointAdd == "gameOver") {
+        await snapshot.update({
+          phase: "gameOver"
+        })
+        return "game over"
+      }
+      await deleteField(GAMEROOM)
+      await setHotseatPlayer(GAMEROOM)
+    }
+  }
+  return "phase changed";
+};
+
+export const completeTask = async (gameID) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+
+  await snapshot.update({
+      taskComplete: true
+    })
+  
+  const fieldCards = await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("field")
+      .get()
+  
+  const firstFieldCard = await fieldCards.docs[0]
+  await firstFieldCard.ref.update({
+    trigger: "add field to trigger field onSnapshot"
+  })
+}
