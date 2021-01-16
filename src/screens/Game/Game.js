@@ -37,10 +37,12 @@ const Game = ({
       FirestoreService.GAMEROOM
     )
       .then((response) =>
-        response.onSnapshot((gotCards) => {
+        response.onSnapshot(async (gotCards) => {
           console.log("getting field cards");
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
+          console.log('snapshot going')
+          await FirestoreService.autoAdvancePhase(FirestoreService.GAMEROOM, cards)
         })
       )
       .catch((error) => console.log(error));

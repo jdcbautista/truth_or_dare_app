@@ -14,7 +14,7 @@ function Navbar({
   loadDeck,
   deleteField,
   advanceHotseat,
-  advancePhase,
+  completeTask,
   addPoints,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,7 +30,7 @@ function Navbar({
         </Text>
         <DebugButton onClick={showHand}>Show Hand</DebugButton>
         <DebugButton onClick={startGame}>Start Round</DebugButton>
-        <DebugButton onClick={advancePhase}>Advance Phase</DebugButton>
+        <DebugButton onClick={completeTask}>Complete Task</DebugButton>
         <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
         <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
         <DebugButton onClick={deleteField}>Delete Field</DebugButton>
