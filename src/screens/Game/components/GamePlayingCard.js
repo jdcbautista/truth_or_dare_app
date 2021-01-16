@@ -7,11 +7,25 @@ import {
   WildPlayingCardContainer,
 } from "../GameStyles.js";
 
-const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
+const GamePlayingCard = ({
+  id,
+  type,
+  gamePhase,
+  currentlySelectedCard,
+  text,
+  points,
+  onClick,
+  selected,
+}) => {
   return (
     <>
       {type === "wild" ? (
-        <WildPlayingCardContainer onClick={onClick} selected={selected}>
+        <WildPlayingCardContainer
+          onClick={onClick}
+          selected={selected}
+          gamePhase={gamePhase}
+          currentlySelectedCard={currentlySelectedCard}
+        >
           <GamePlayingCardText type={type} bold={600}>
             {type}
           </GamePlayingCardText>
@@ -26,6 +40,8 @@ const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
       ) : (
         <StandardPlayingCardContainer
           type={type}
+          gamePhase={gamePhase}
+          currentlySelectedCard={currentlySelectedCard}
           onClick={onClick}
           selected={selected}
         >

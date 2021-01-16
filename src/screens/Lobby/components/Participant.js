@@ -20,6 +20,7 @@ const Participant = ({
   participant,
   userId,
   user,
+  gamePhase,
   defaultParticipant,
   videoWidth,
   videoHeight,
@@ -32,9 +33,7 @@ const Participant = ({
   const videoRef = useRef();
   const audioRef = useRef();
 
-  if (user) {
-    console.log("in the game screen", { user, userId, participant });
-  }
+  console.log({ gamePhase });
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
@@ -87,17 +86,6 @@ const Participant = ({
     }
   }, [videoTracks]);
 
-  // useEffect(() => {
-  //   if (!defaultParticipant) {
-  //     const videoTrack = videoTracks[0];
-  //     if (isVideoOn) {
-  //       videoTrack?.disable();
-  //     } else {
-  //       videoTrack?.enable();
-  //     }
-  //   }
-  // }, [isVideoOn]);
-
   useEffect(() => {
     if (!defaultParticipant) {
       const audioTrack = audioTracks[0];
@@ -109,15 +97,6 @@ const Participant = ({
       }
     }
   }, [audioTracks]);
-
-  // useEffect(() => {
-  //   if (userId) {
-  //     FirestoreService.getVideoToggleStatus(userId, FirestoreService.GAMEROOM).then((player) =>
-  //       setIsVideoOn(player?.video)
-  //     );
-  //   }
-  // }, [isVideoOn]);
-  // // isVideoOn might work?
 
   const handleToggleVideo = async () => {
     await FirestoreService.videoToggle(
@@ -133,6 +112,7 @@ const Participant = ({
       <>
         <StyledVideoBox
           displayoff={user?.video}
+          gamePhase={gamePhase?.phase}
           videoHeight={videoHeight}
           ready={user?.ready}
           hotseat={user?.hotseat}
@@ -140,40 +120,25 @@ const Participant = ({
           <StyledVideo ref={videoRef} autoPlay={true} />
         </StyledVideoBox>
         <StyledAvatar
+          ready={user?.ready}
+          hotseat={user?.hotseat}
+          gamePhase={gamePhase?.phase}
           displayoff={!user?.video}
           src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
         />
       </>
-      {/* {isGameVideo ? (
-        <StyledGameVideoBox displayoff={user?.video} videoHeight={videoHeight}>
-          <StyledGameVideo ref={videoRef} autoPlay={true} />
-        </StyledGameVideoBox>
-      ) : (
-        <>
-          <StyledVideoBox displayoff={user?.video} videoHeight={videoHeight}>
-            <StyledVideo ref={videoRef} autoPlay={true} />
-          </StyledVideoBox>
-          <StyledAvatar
-            displayoff={!user?.video}
-            src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
-            sx={{
-              height: "100%",
-            }}
-          />
-        </>
-      )} */}
+
       <>
-        {/* {participant?.identity === userId && ( */}
-        <Box>
-          <StyledAudioIconButton onClick={() => setMuted(!muted)}>
-            {muted ? <StyledAudioOffIcon /> : <StyledAudioOnIcon />}
-          </StyledAudioIconButton>
-          <StyledVideoIconButton onClick={handleToggleVideo}>
-            {/* <StyledVideoIconButton onClick={() => setIsVideoOn(!isVideoOn)}> */}
-            {user?.video ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
-          </StyledVideoIconButton>
-        </Box>
-        {/* )} */}
+        {participant?.identity === userId && (
+          <Box>
+            <StyledAudioIconButton onClick={() => setMuted(!muted)}>
+              {muted ? <StyledAudioOffIcon /> : <StyledAudioOnIcon />}
+            </StyledAudioIconButton>
+            <StyledVideoIconButton onClick={handleToggleVideo}>
+              {user?.video ? <StyledVideoOffIcon /> : <StyledVideoOnIcon />}{" "}
+            </StyledVideoIconButton>
+          </Box>
+        )}
         <audio ref={audioRef} muted={muted} />
       </>
     </div>

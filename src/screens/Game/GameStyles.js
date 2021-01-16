@@ -1,5 +1,4 @@
 import { Card, Image, Flex, Box, Button } from "rebass";
-
 import styled, { keyframes, css } from "styled-components";
 import { fadeIn, bounce } from "react-animations";
 
@@ -63,14 +62,19 @@ export const StandardPlayingCardContainer = styled(Card)`
   background: white;
   font-family: "Open Sans", sans-serif;
   font-size: 1.25em;
+  opacity: ${(props) => {
+    if (!props.currentlySelectedCard && !props.selected) return "0.3";
+    return "1";
+  }};
   display: block;
   overflow: hidden;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.type === "truth") return "#64c0fa";
-      return "#FB5156";
+      if (props.selected) return "gold";
+      else if (props.type === "dare") return "#FB5156";
+      else if (props.type === "truth") return "#64c0fa";
     }};
   text-align: left;
   justify-content: center;
@@ -86,11 +90,20 @@ export const WildPlayingCardContainer = styled(Card)`
   position: relative;
   z-index: 0;
   height: 320px;
+  opacity: ${(props) => {
+    if (!props.currentlySelectedCard && !props.selected) return "0.3";
+    return "1";
+  }};
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
   border-radius: 10px;
   border: 8px solid black;
   color: white;
+  border: 8px solid
+    ${(props) => {
+      if (props.selected) return "gold";
+      return "#FB5156";
+    }};
   padding: 30px 20px;
   border-radius: 25px;
   overflow: hidden;
@@ -138,7 +151,8 @@ export const GamePlayingCardText = styled.h2`
   color: ${(props) => {
     if (props.type === "truth") return "#64c0fa";
     else if (props.type == "dare") return "#FB5156";
-    return "#ffffff";
+    else if (props.type == "wild") return "#FFFFFF";
+    return "#000000";
   }};
   justify-content: center;
   align-items: center;

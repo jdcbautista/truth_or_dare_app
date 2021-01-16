@@ -15,7 +15,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game3";
+export const GAMEROOM = "game2";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 
@@ -62,7 +62,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       video: false,
       audio: false,
       score: 0,
-      hotseat: 0,
+      hotseat: false,
     });
   return snapshot;
 };
@@ -195,6 +195,7 @@ export const dealCard = async (gameID, playerID, numCardsToAdd) => {
           type: startingCard.data().type,
           points: startingCard.data().points,
           playedBy: playerID,
+          selected: false,
         });
       // eslint-disable-next-line
       let deleteCard = await startingCard.ref.delete();
@@ -338,6 +339,16 @@ export function toBool(string) {
     return false;
   }
 }
+/**
+ * @description getGamePhase
+ * Finds the phase collection in a given game and returns the collection
+ * @params gameId - {string} - the id of the targeted game
+ */
+export const getGamePhase = async (gameId) => {
+  const snapshot = db.collection("rooms").doc(gameId).collection("gamePhase");
+
+  return snapshot;
+};
 
 /**
  * @description advancePhase
@@ -357,8 +368,8 @@ export const advancePhase = async (gameID) => {
     "setup",
     "playCard",
     "completeDare",
-    "voteCompleteDare",
-    "cleanup",
+    // "voteCompleteDare",
+    // "cleanup",
   ];
   let phaseIndex = phases.indexOf(currentPhase);
   // console.log(phaseIndex)
@@ -417,6 +428,7 @@ export const playCard = async (gameID, playerID, cardID) => {
         type: cardData.type,
         points: cardData.points,
         playedBy: playerID,
+        selected: false,
       });
     // eslint-disable-next-line
     let deleteCard = await cardInHand.delete();
@@ -465,5 +477,51 @@ export const setHotseatPlayer = async (gameID) => {
       });
       return player.data().id;
     }
+  }
+};
+
+export const getPlayerScore = async (gameID, playerID) => {
+  const playerObj = await getPlayerObject(playerID, gameID);
+  const playerPoints = playerObj.score;
+  console.log(playerPoints);
+  return playerPoints;
+};
+
+export const addPointsToPlayer = async (gameID) => {
+  const cardData = await getSelectedFieldCard(gameID);
+  const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
+  const playerCollection = await getPlayers(gameID);
+  await playerCollection.doc(cardData.selectedBy).update({
+    score: parseInt(cardData.points) + playerPoints,
+  });
+};
+
+export const getSelectedFieldCard = async (gameID) => {
+  const fieldCardsRef = db.collection("rooms").doc(gameID).collection("field");
+  const fieldCards = await fieldCardsRef.where("selected", "==", true).get();
+  return fieldCards.docs[0].data();
+};
+
+export const deleteField = async (gameID) => {
+  const fieldDelete = db.collection("rooms").doc(gameID).collection("field");
+
+  const deletedField = await fieldDelete.get();
+  deletedField.docs.forEach(async (card) => {
+    await card.ref.delete();
+  });
+};
+
+export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
+  const player = await getPlayerObject(playerID, gameID);
+  if (player.hotseat) {
+    await db
+      .collection("rooms")
+      .doc(gameID)
+      .collection("field")
+      .doc(cardID)
+      .update({
+        selected: true,
+        selectedBy: playerID,
+      });
   }
 };

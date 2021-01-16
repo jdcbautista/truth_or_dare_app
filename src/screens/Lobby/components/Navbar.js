@@ -8,7 +8,15 @@ import {
   StyledModalText,
 } from "../../../components/NavbarStyles";
 
-function Navbar({ showHand, startGame, loadDeck }) {
+function Navbar({
+  showHand,
+  startGame,
+  loadDeck,
+  deleteField,
+  advanceHotseat,
+  advancePhase,
+  addPoints,
+}) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const toggleModal = () => {
@@ -21,8 +29,12 @@ function Navbar({ showHand, startGame, loadDeck }) {
           Debug
         </Text>
         <DebugButton onClick={showHand}>Show Hand</DebugButton>
-        <DebugButton onClick={startGame}>Start Game</DebugButton>
+        <DebugButton onClick={startGame}>Start Round</DebugButton>
+        <DebugButton onClick={advancePhase}>Advance Phase</DebugButton>
+        <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
         <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
+        <DebugButton onClick={deleteField}>Delete Field</DebugButton>
+        <DebugButton onClick={addPoints}>Add Points</DebugButton>
         <Box mx="auto" />
         <NavbarText>
           <AiOutlineInfoCircle onClick={toggleModal} />
