@@ -111,6 +111,7 @@ const Game = ({
                 type={card?.type}
                 // selected={isSelected}
                 text={card?.text}
+                username={card?.username}
                 points={card?.points}
                 onClick={() => handleSelectCard(card?.hashId)}
               />

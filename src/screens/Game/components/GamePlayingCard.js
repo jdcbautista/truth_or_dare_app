@@ -5,9 +5,11 @@ import {
   StandardPlayingCardContainer,
   GamePlayingCardText,
   WildPlayingCardContainer,
+  PlayedBy
 } from "../GameStyles.js";
+import {StyledBadge, StyledScoreContainer} from '../../Lobby/LobbyStyles.js'
 
-const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
+const GamePlayingCard = ({ id, type, text, points, onClick, selected, username }) => {
   return (
     <>
       {type === "wild" ? (
@@ -19,7 +21,7 @@ const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
           <GamePlayingCardText>
             <input></input>
           </GamePlayingCardText>
-          <GamePlayingCardText type={type}>
+          <GamePlayingCardText type={text}>
             {Math.floor(Math.random() * 10)} pts
           </GamePlayingCardText>
         </WildPlayingCardContainer>
@@ -29,12 +31,14 @@ const GamePlayingCard = ({ id, type, text, points, onClick, selected }) => {
           onClick={onClick}
           selected={selected}
         >
+          <PlayedBy>Played By: {username}</PlayedBy>
           <GamePlayingCardText type={type} bold={600}>
             {type}
           </GamePlayingCardText>
           <br></br>
-          <GamePlayingCardText>{text}</GamePlayingCardText>
+          <GamePlayingCardText>{text}</GamePlayingCardText>          
           <GamePlayingCardText type={type}>{points}</GamePlayingCardText>
+          
         </StandardPlayingCardContainer>
       )}
     </>

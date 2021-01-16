@@ -398,6 +398,9 @@ export const advancePhase = async (gameID) => {
 
 export const playCard = async (gameID, playerID, cardID) => {
   console.log(gameID, playerID, cardID);
+  const playerObj = await getPlayerObject(playerID, gameID);
+  const playerName = playerObj.username
+  console.log(playerName)
   const fieldCards = await db
     .collection("rooms")
     .doc(gameID)
@@ -429,6 +432,7 @@ export const playCard = async (gameID, playerID, cardID) => {
         points: cardData.points,
         playedBy: playerID,
         selected: false,
+        username: playerName
       });
     // eslint-disable-next-line
     let deleteCard = await cardInHand.delete();
