@@ -31,14 +31,16 @@ const Hand = ({
   useEffect(() => {
     (async () => {
       if (userId) {
-        await handleGetHand(); 
-        console.log(playerCards)
+        await handleGetHand();
+        console.log(playerCards);
         if (playerCards.length < FirestoreService.HANDLIMIT) {
           console.log("dealing if max hand not reached");
-          await handleSingleDeal(FirestoreService.HANDLIMIT - playerCards.length);
+          await handleSingleDeal(
+            FirestoreService.HANDLIMIT - playerCards.length
+          );
           await handleGetHand();
         }
-        console.log('getting hand with useEffect')
+        console.log("getting hand with useEffect");
       }
     })();
   }, []);
@@ -162,7 +164,7 @@ const Hand = ({
                 id={card?.id}
                 // selected={isSelected}
                 type={card?.type}
-                selected={isSelected}
+                selected={card?.selected}
                 text={card?.text}
                 points={card?.points}
                 onClick={() => handlePlayCard(card?.hashId)}

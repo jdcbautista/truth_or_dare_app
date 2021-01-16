@@ -69,6 +69,7 @@ export const StandardPlayingCardContainer = styled(Card)`
   border: 8px solid
     ${(props) => {
       if (props.type === "truth") return "#64c0fa";
+      if (props.selected) return "gold";
       return "#FB5156";
     }};
   text-align: left;
@@ -93,6 +94,10 @@ export const WildPlayingCardContainer = styled(Card)`
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
   padding: 30px 20px;
+  border: ${(props) => {
+    if (props.selected) return "8px solid gold";
+    return "none";
+  }};
   border-radius: 25px;
   overflow: hidden;
   &:hover {

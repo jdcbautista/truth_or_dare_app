@@ -19,12 +19,12 @@ import GamePlayingCard from "./components/GamePlayingCard";
 const Game = ({
   players,
   participants,
+  gamePhase,
   userId,
   localPlayer,
   room,
   localParticipant,
 }) => {
-  const [selectedCards, setSelectedCards] = useState({});
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
 
@@ -96,23 +96,33 @@ const Game = ({
       cardID,
       userId
     );
+
     console.log("card selected");
+  };
+
+  const isCurrentlySelectedCard = () => {
+    return fieldCards.every((card) => !card?.selected);
   };
 
   return (
     <GameContainer className="gameContainerFadeIn">
       <StyledFlex>
         {fieldCards.map((card) => (
-          <Box p={3} width={1 / 4} color="white" bg="primary">
+          <Box key={card?.id} p={3} width={1 / 4} color="white" bg="primary">
             <PlayerCard>
               <GamePlayingCard
                 id={card?.id}
-                // selected={isSelected}
+                gamePhase={gamePhase}
+                selected={card?.selected}
+                currentlySelectedCard={isCurrentlySelectedCard()}
                 type={card?.type}
-                // selected={isSelected}
                 text={card?.text}
                 points={card?.points}
-                onClick={() => handleSelectCard(card?.hashId)}
+                onClick={
+                  isCurrentlySelectedCard
+                    ? () => handleSelectCard(card?.hashId)
+                    : null
+                }
               />
             </PlayerCard>
           </Box>
