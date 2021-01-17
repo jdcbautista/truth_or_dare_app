@@ -51,11 +51,11 @@ const Game = ({
   }, []);
 
   /**
-    * This effect tries to load a deck from resources if there is none and deals cards
-    * which will replenish automatically. It aso calls handleGetHand which will keep the players
-    * hand up to date with what is in the DB
-    */
-   useEffect(() => {
+  * This effect tries to load a deck from resources if there is none and deals cards
+  * which will replenish automatically. It aso calls handleGetHand which will keep the players
+  * hand up to date with what is in the DB
+  */
+  useEffect(() => {
     (async () => {
       // Load a deck
       await FirestoreService.loadDeckFromResources();
@@ -92,7 +92,7 @@ const Game = ({
     console.log("getting hand");
     const setCards = setPlayerCards(snapshot);
   };
-  
+
   const handleSelectCard = async (cardID) => {
     await FirestoreService.cardSelectByHotseat(
       FirestoreService.GAMEROOM,
