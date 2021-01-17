@@ -15,7 +15,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game2";
+export const GAMEROOM = "game1";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
@@ -64,6 +64,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       audio: false,
       score: 0,
       hotseat: false,
+      winner: false
     });
   return snapshot;
 };
@@ -313,19 +314,12 @@ export const readFieldCard = async (playerID, gameID) => {
  * @params TODO
  */
 export const getAllFieldCards = async (gameID) => {
-  const allCards = [];
 
   const loadField = await db
     .collection("rooms")
     .doc(gameID)
     .collection("field");
   return loadField;
-  // let fieldCards = await loadField.get();
-  // for (let card of fieldCards.docs) {
-  //   let cardToPush = card.data();
-  //   allCards.push(cardToPush);
-  // }
-  // return allCards;
 };
 
 /**
@@ -368,8 +362,8 @@ export const advancePhase = async (gameID) => {
   const phases = [
     "setup",
     "playCard",
-    "completeDare",
-    // "voteCompleteDare",
+    "completeTask",
+    // "voteCompleteTask",
     // "cleanup",
   ];
   let phaseIndex = phases.indexOf(currentPhase);
@@ -469,7 +463,7 @@ export const setHotseatPlayer = async (gameID) => {
   const players = await playerCollection.get();
   for (let i = 0; i < players.docs.length; i++) {
     const player = players.docs[i];
-    if (i == previousHotseatIndex + 1) {
+    if (i === previousHotseatIndex + 1) {
       console.log(player.data());
       // unset hotseat player and
       // return i
@@ -493,14 +487,32 @@ export const addPointsToPlayer = async (gameID) => {
   const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
   const playerCollection = await getPlayers(gameID);
   const newScore = parseInt(cardData.points) + playerPoints;
-  await playerCollection.doc(cardData.selectedBy).update({
-    score: newScore,
-  });
-  if (newScore >= WINNINGPOINTS) {
+  if (newScore >= WINNINGPOINTS){
+    await playerCollection.doc(cardData.selectedBy).update({
+      score: newScore,
+      winner: true
+    });
     return "gameOver"
+  } else {
+    await playerCollection.doc(cardData.selectedBy).update({
+      score: newScore,
+    });
   }
-  return newScore
+  return "score added"
 };
+
+export const clearPlayerPoints = async (gameID) => {
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  for (let player of players.docs) {
+    await player.ref.update({
+      score: 0,
+      winner: false
+    });
+  }
+  return "Score cleared!"
+};
+
 
 export const getSelectedFieldCard = async (gameID) => {
   const fieldCardsRef = db.collection("rooms").doc(gameID).collection("field");
@@ -548,6 +560,7 @@ export const autoAdvancePhase = async (gameID, cards) => {
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
   console.log(taskCompleteCheck)
+  
   // const taskSuccessCheck = await snapshotCheck.data().taskSuccess;
   
   
@@ -558,15 +571,16 @@ export const autoAdvancePhase = async (gameID, cards) => {
   } else if (selectCheck.some(x => x)) {
     if (!taskCompleteCheck) {
       await snapshot.update({
-        phase: "completeDare"
+        phase: "completeTask"
       })
     } else {
       await snapshot.update({
         phase: "cleanUp",
         taskComplete: false
       })
+      console.log('adding points')
       const pointAdd = await addPointsToPlayer(GAMEROOM)
-      if (pointAdd == "gameOver") {
+      if (pointAdd === "gameOver") {
         await snapshot.update({
           phase: "gameOver"
         })

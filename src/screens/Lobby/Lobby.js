@@ -6,6 +6,7 @@ import Video from "twilio-video";
 import LobbyCard from "./components/LobbyCard";
 import Game from "../Game/Game";
 import Hand from "../Hand/Hand";
+import GameOver from "../GameOver/GameOver";
 import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
@@ -178,6 +179,7 @@ const Lobby = () => {
   const handleStartGame = async () => {
     await FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM);
     await FirestoreService.deleteField(FirestoreService.GAMEROOM);
+    await FirestoreService.clearPlayerPoints(FirestoreService.GAMEROOM);
     console.log("starting game");
     setIsGameStarted(true);
 
@@ -234,11 +236,7 @@ const Lobby = () => {
     );
   };
 
-  const handleTaskComplete = async () => {
-    await FirestoreService.completeTask(FirestoreService.GAMEROOM).catch((err) =>
-    setError(err)
-  );
-  }
+  
 
   return (
     <>
@@ -257,12 +255,12 @@ const Lobby = () => {
             startGame={handleStartGame}
             loadDeck={handleLoadDeck}
             deleteField={handleDeleteField}
-            completeTask={handleTaskComplete}
+            // completeTask={handleTaskComplete}
             advanceHotseat={handleAdvanceHotseat}
             addPoints={handleAddPoints}
           />
 
-          <LobbyContainer className="LobbyToNav">
+          <LobbyContainer onClick={() => isHandOpen?handleViewHand():''} className="LobbyToNav">
             {!localPlayer && (
               <LobbyInput
                 handleChange={handleChange}
@@ -313,6 +311,7 @@ const Lobby = () => {
               players={players}
               participants={participants}
               userId={userId}
+              gamePhase={gamePhase.phase}
               user={localPlayer}
               className="gameGSAP"
               localPlayer={localPlayer}
@@ -337,6 +336,16 @@ const Lobby = () => {
                 handleReadyClick={handleReadyClick}
               />
             )}
+
+            {(gamePhase.phase === "gameOver") && (
+              <GameOver
+                startGame={handleStartGame}
+              />
+            )}
+
+            {!isHandOpen &&
+              <DebugButton onClick={handleViewHand}>Show Hand</DebugButton>
+            }
           </LobbyContainer>
         </>
       )}

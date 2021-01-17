@@ -116,6 +116,7 @@ const Participant = ({
           videoHeight={videoHeight}
           ready={user?.ready}
           hotseat={user?.hotseat}
+          winner={user?.winner}
         >
           <StyledVideo ref={videoRef} autoPlay={true} />
         </StyledVideoBox>

@@ -40,6 +40,8 @@ export const StyledVideoBox = styled(Box)`
     if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
     if (!props.ready && props.gamePhase === "setup")
       return "10px solid #FB5156";
+    if (props.winner && props.gamePhase === "gameOver")
+      return "20px solid #000000";
     return "none";
   }};
   padding-right: 100px;
