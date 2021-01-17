@@ -50,6 +50,49 @@ const Game = ({
     return () => unsubscribe;
   }, []);
 
+  /**
+    * This effect tries to load a deck from resources if there is none and deals cards
+    * which will replenish automatically. It aso calls handleGetHand which will keep the players
+    * hand up to date with what is in the DB
+    */
+   useEffect(() => {
+    (async () => {
+      // Load a deck
+      await FirestoreService.loadDeckFromResources();
+      if (userId) {
+        handleGetHand();
+        console.log("seeing if player has a current hand ");
+      }
+
+      if (playerCards.length < 5 && userId) {
+        console.log("running handle deal cards");
+        handleSingleDeal(8);
+        handleGetHand();
+      }
+    })();
+  }, []);
+
+  //deal single card from gameDeck to user in db only
+  const handleSingleDeal = async (numOfCards) => {
+    // await e.preventDefault();
+    await FirestoreService.dealCard(
+      FirestoreService.GAMEROOM,
+      userId,
+      numOfCards
+    );
+    console.log("deal single card");
+    console.log(userId);
+  };
+
+  const handleGetHand = async () => {
+    const snapshot = await FirestoreService.getHand(
+      userId,
+      FirestoreService.GAMEROOM
+    );
+    console.log("getting hand");
+    const setCards = setPlayerCards(snapshot);
+  };
+  
   const handleSelectCard = async (cardID) => {
     await FirestoreService.cardSelectByHotseat(
       FirestoreService.GAMEROOM,
