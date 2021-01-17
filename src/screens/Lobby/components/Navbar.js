@@ -28,13 +28,10 @@ function Navbar({
         <Text p={2} fontWeight="bold">
           Debug
         </Text>
-        <DebugButton onClick={showHand}>Show Hand</DebugButton>
-        <DebugButton onClick={startGame}>Start Round</DebugButton>
-        <DebugButton onClick={completeTask}>Complete Task</DebugButton>
+        <DebugButton onClick={startGame}>Start Game</DebugButton>
         <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
-        <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
-        <DebugButton onClick={deleteField}>Delete Field</DebugButton>
-        <DebugButton onClick={addPoints}>Add Points</DebugButton>
+        {/* <DebugButton onClick={loadDeck}>Load Deck</DebugButton> */}
+        {/* <DebugButton onClick={deleteField}>Delete Field</DebugButton> */}
         <Box mx="auto" />
         <NavbarText>
           <AiOutlineInfoCircle onClick={toggleModal} />

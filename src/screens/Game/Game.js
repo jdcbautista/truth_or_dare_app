@@ -12,7 +12,7 @@ import {
   GameHotseatVideoBox,
   Rotate,
 } from "./GameStyles";
-import { StyledFlex } from "../Lobby/LobbyStyles";
+import { StyledFlex, DebugButton } from "../Lobby/LobbyStyles";
 import * as FirestoreService from "../../firebase";
 import GamePlayingCard from "./components/GamePlayingCard";
 
@@ -27,6 +27,7 @@ const Game = ({
 }) => {
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
+  const [error, setError] = useState(null);
 
   /**
    * This effect subscribes us to the field of the game so that all
@@ -106,6 +107,12 @@ const Game = ({
     return fieldCards.every((card) => !card?.selected);
   };
 
+  const handleTaskComplete = async () => {
+    await FirestoreService.completeTask(FirestoreService.GAMEROOM).catch((err) =>
+    setError(err)
+  );
+  }
+
   return (
     <GameContainer className="gameContainerFadeIn">
       <StyledFlex>
@@ -129,6 +136,9 @@ const Game = ({
             </PlayerCard>
           </Box>
         ))}
+        {(gamePhase === "completeTask") &&
+          <DebugButton onClick={() => handleTaskComplete()}>Complete Task</DebugButton>
+        }
       </StyledFlex>
     </GameContainer>
   );
