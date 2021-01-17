@@ -203,6 +203,7 @@ const Lobby = () => {
         }
       );
   };
+
   const handleLoadDeck = async (e) => {
     e.preventDefault();
     await FirestoreService.loadDeckFromResources();
@@ -214,13 +215,6 @@ const Lobby = () => {
       console.log(err)
     );
     console.log("deleting field");
-  };
-
-  const handleAdvancePhase = async (e) => {
-    await FirestoreService.advancePhase(
-      FirestoreService.GAMEROOM
-    ).catch((err) => console.log(err));
-    console.log("advancing phase");
   };
 
   const handleAddPoints = async (e) => {
@@ -235,8 +229,6 @@ const Lobby = () => {
       setError(err)
     );
   };
-
-  
 
   return (
     <>

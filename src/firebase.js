@@ -25,25 +25,6 @@ export const authenticateAnonymously = () => {
 };
 
 /**
- * @description getGame
- * Returns a single game object based on gameId
- * @params gameId - {string} - the id of the targeted game
- */
-export const getGame = async (gameId) => {
-  const snapshot = await db.collection("game").doc(gameId).get();
-  return snapshot;
-};
-
-/**
- * @description getGames
- * Queries all rooms and returns an array of all game documents
- */
-export const getlGames = async () => {
-  const snapshot = await db.collection("rooms").get();
-  return snapshot.docs.map((doc) => doc.data());
-};
-
-/**
  * @description addPlayer
  * Adds a  new player to the targeted game
  * @params userName - {string} - the id of the targeted user
@@ -96,20 +77,6 @@ export const getPlayerObject = async (playerID, gameID) => {
   const fetchPlayer = await player.get();
   const playerData = fetchPlayer.docs[0].data();
   return playerData;
-};
-
-/**
- * @description trackHotseatPlayer
- * Sets the identified player as the Hotseat player for the identified game
- * @params gameId - {string} - the id of the targeted game
- * @params playerId - {string} - the id of the targeted player
- */
-
-export const trackHotseatPlayer = async (playerID, gameID) => {
-  const setHotseatPlayer = await db.collection("rooms").doc(gameID).update({
-    hotseatPlayer: playerID,
-  });
-  return setHotseatPlayer;
 };
 
 /**
@@ -268,14 +235,14 @@ export const loadDeckFromResources = async () => {
  */
 export const getHand = async (playerId, gameID) => {
   let handArr = [];
-  const loadDeck = db
+  const playerHand = db
     .collection("rooms")
     .doc(gameID)
     .collection("players")
     .doc(playerId)
     .collection("cards");
-  let deck = await loadDeck.get();
-  for (let card of deck.docs) {
+  let hand = await playerHand.get();
+  for (let card of hand.docs) {
     let cardToPush = card.data();
     //add automated document title hash value to object with key 'hashId'
     cardToPush["hashId"] = card.id;
@@ -286,28 +253,6 @@ export const getHand = async (playerId, gameID) => {
 };
 
 /**
- * @description readFieldCard
- * Returns simple object containing data from player's first card currently in game's Field
- * @params playerID - player id (auto-generated hash in firestore collection)
- * @params gameID - the game id
- */
-export const readFieldCard = async (playerID, gameID) => {
-  const loadField = db.collection("rooms").doc(gameID).collection("field");
-
-  let loadCard = await loadField
-    .where("playedBy", "==", playerID)
-    .limit(1)
-    .get();
-
-  const selectedCard = loadCard.docs[0].data();
-  //add automated document title hash value to object with key 'hashId'
-  selectedCard["hashId"] = loadCard.docs[0].id;
-
-  console.log(selectedCard);
-  return selectedCard;
-};
-
-/**
  * @description getAllFieldCards
  * TODO
  * @params TODO
@@ -315,25 +260,13 @@ export const readFieldCard = async (playerID, gameID) => {
  */
 export const getAllFieldCards = async (gameID) => {
 
-  const loadField = await db
+  const loadField = db
     .collection("rooms")
     .doc(gameID)
     .collection("field");
   return loadField;
 };
 
-/**
- * @description toBool
- * changes string input into boolean output
- * @params string - string to be converted to bool
- */
-export function toBool(string) {
-  if (string === "true") {
-    return true;
-  } else {
-    return false;
-  }
-}
 /**
  * @description getGamePhase
  * Finds the phase collection in a given game and returns the collection
@@ -346,42 +279,6 @@ export const getGamePhase = async (gameId) => {
 };
 
 /**
- * @description advancePhase
- * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
- * @params gameID - the game id
- */
-export const advancePhase = async (gameID) => {
-  const snapshot = await db
-    .collection("rooms")
-    .doc(gameID)
-    .collection("gamePhase")
-    .doc("phase");
-  const snapshotDoc = await snapshot.get();
-  const currentPhase = await snapshotDoc.data().phase;
-
-  const phases = [
-    "setup",
-    "playCard",
-    "completeTask",
-    // "voteCompleteTask",
-    // "cleanup",
-  ];
-  let phaseIndex = phases.indexOf(currentPhase);
-  // console.log(phaseIndex)
-  if (phaseIndex === phases.length - 1) {
-    await snapshot.update({
-      phase: phases[0],
-    });
-  } else {
-    await snapshot.update({
-      phase: phases[phaseIndex + 1],
-    });
-  }
-  return phaseIndex;
-};
-
-/**
- *
  * @description playCard
  * takes card from players hand and moves it to the field
  *
@@ -401,7 +298,7 @@ export const playCard = async (gameID, playerID, cardID) => {
   console.log(fieldCards);
   const remCapacity = FIELDLIMIT - fieldCards.docs.length;
   if (remCapacity > 0) {
-    const cardInHand = await db
+    const cardInHand = db
       .collection("rooms")
       .doc(gameID)
       .collection("players")
@@ -411,7 +308,7 @@ export const playCard = async (gameID, playerID, cardID) => {
     const cardToPlay = await cardInHand.get();
     const cardData = cardToPlay.data();
     // eslint-disable-next-line
-    let playerCards = await db
+    let cardToField = await db
       .collection("rooms")
       .doc(gameID)
       .collection("field")
@@ -513,7 +410,6 @@ export const clearPlayerPoints = async (gameID) => {
   return "Score cleared!"
 };
 
-
 export const getSelectedFieldCard = async (gameID) => {
   const fieldCardsRef = db.collection("rooms").doc(gameID).collection("field");
   const fieldCards = await fieldCardsRef.where("selected", "==", true).get();
@@ -559,10 +455,7 @@ export const autoAdvancePhase = async (gameID, cards) => {
   const selectCheck = cards.map(card => card.selected)
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
-  console.log(taskCompleteCheck)
-  
   // const taskSuccessCheck = await snapshotCheck.data().taskSuccess;
-  
   
   if (cards.length < 3) {
     await snapshot.update({
@@ -610,7 +503,7 @@ export const completeTask = async (gameID) => {
       .collection("field")
       .get()
   
-  const firstFieldCard = await fieldCards.docs[0]
+  const firstFieldCard = fieldCards.docs[0]
   await firstFieldCard.ref.update({
     trigger: "add field to trigger field onSnapshot"
   })
