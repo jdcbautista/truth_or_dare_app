@@ -440,6 +440,26 @@ export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
   }
 };
 
+export const advanceRoundCounter = async (gameID) => {
+  const snapshot = db.collection("rooms").doc(gameID).collection("gamePhase").doc("phase");
+
+  const roundObject = await snapshot.get().catch(err => console.log(err));
+  const roundData = roundObject.data();
+  const round = roundData.round;
+
+  const incrementRound = await snapshot.update({
+    round: round+1
+  }).catch(err => console.log(err));
+}
+
+export const resetRoundCounter = async (gameID) => {
+  const snapshot = db.collection("rooms").doc(gameID).collection("gamePhase").doc("phase");
+  const resetRound = await snapshot.update({
+    round: 1
+  }).catch(err => console.log(err));
+  return
+}
+
 /**
  * @description autoAdvancePhase
  * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
@@ -471,12 +491,14 @@ export const autoAdvancePhase = async (gameID, cards) => {
         phase: "cleanUp",
         taskComplete: false
       })
+      await advanceRoundCounter(GAMEROOM)
       console.log('adding points')
       const pointAdd = await addPointsToPlayer(GAMEROOM)
       if (pointAdd === "gameOver") {
         await snapshot.update({
           phase: "gameOver"
         })
+        await resetRoundCounter(GAMEROOM)
         return "game over"
       }
       await deleteField(GAMEROOM)
@@ -508,3 +530,16 @@ export const completeTask = async (gameID) => {
     trigger: "add field to trigger field onSnapshot"
   })
 }
+
+export const setWildCardText = async (gameID, playerID, cardID, wildCardText) => {
+  const cardInHand = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("players")
+    .doc(playerID)
+    .collection("cards")
+    .doc(cardID);
+    const cardToEdit = await cardInHand.update({
+      text: wildCardText
+    })
+};
