@@ -62,7 +62,7 @@ export const GameHotseatVideoBox = styled(Box)`
 export const SelectCardStyles = css`
   content: " ";
   position: absolute;
-  z-index: 3;
+  z-index: 0;
   top: 5px;
   left: 5px;
   right: 5px;
@@ -72,6 +72,7 @@ export const SelectCardStyles = css`
 `;
 
 export const StandardPlayingCardContainer = styled(Card)`
+  position: relative;
   background: white;
   font-family: "Open Sans", sans-serif;
   font-size: 1.25em;
@@ -244,4 +245,19 @@ export const PageRules = styled.div`
   top: 50vh;
   left: 50vw;
   transform: translate(-50%, -50%);
+`;
+
+export const PlayedBy = styled.div`
+  font-family: sans-serif;
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  background-color: lightgrey;
+  padding: 3px;
+  margin: 3px;
+  border-radius: 5px;
+  display: flex;
+  font-size: 12px;
+  justify-content: center;
+  align-self: center;
 `;
