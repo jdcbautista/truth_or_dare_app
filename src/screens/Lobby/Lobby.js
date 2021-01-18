@@ -230,6 +230,18 @@ const Lobby = () => {
     );
   };
 
+  const handleEndVoting = async () => {
+    await FirestoreService.endVoting(FirestoreService.GAMEROOM).catch((err) =>
+    setError(err)
+  );
+  }
+
+  const handleCleanupStart = async () => {
+    await FirestoreService.cleanupStart(FirestoreService.GAMEROOM).catch((err) =>
+    setError(err)
+    );
+  }
+
   return (
     <>
       {loading ? (
@@ -250,6 +262,8 @@ const Lobby = () => {
             // completeTask={handleTaskComplete}
             advanceHotseat={handleAdvanceHotseat}
             addPoints={handleAddPoints}
+            endVotingTimer={handleEndVoting}
+            endFadeTimer={handleCleanupStart}
           />
 
           <LobbyContainer onClick={() => isHandOpen?handleViewHand():''} className="LobbyToNav">
