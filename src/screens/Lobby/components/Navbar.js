@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Flex, Link, Text, Box } from "rebass";
 import { DebugButton } from "../LobbyStyles";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import Timer from "../../Game/components/Timer.js";
 import {
   NavbarContainer,
   NavbarText,
@@ -22,6 +23,8 @@ function Navbar({
   advanceHotseat,
   completeTask,
   addPoints,
+  endVotingTimer,
+  endFadeTimer,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [debugMode, setDebugMode] = useState(false);

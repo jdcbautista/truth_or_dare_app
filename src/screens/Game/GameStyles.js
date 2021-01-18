@@ -13,7 +13,7 @@ export const GameContainer = styled.div`
   justify-content: center;
   width: 100vw;
   height: 400px;
-  border: 2px solid black;
+  border: 0px solid black;
 `;
 export const PlayerCard = styled.div`
   /* background-color: red; */
@@ -139,6 +139,27 @@ export const WildPlayingCardContainer = styled(Card)`
 `;
 
 export const GamePlayingCardText = styled.h2`
+  font-family: "Open Sans", sans-serif;
+  font-weight: ${(props) => {
+    if (props.bold) return props.bold;
+    return "regular";
+  }};
+  font-size: ${(props) => {
+    if (props.size) return props.size;
+    return "em";
+  }};
+  color: ${(props) => {
+    if (props.type === "truth") return "#64c0fa";
+    else if (props.type == "dare") return "#FB5156";
+    else if (props.type == "wild") return "#FFFFFF";
+    return "#000000";
+  }};
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+`;
+
+export const VotingCardText = styled.h2`
   font-family: "Open Sans", sans-serif;
   font-weight: ${(props) => {
     if (props.bold) return props.bold;

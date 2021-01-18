@@ -15,13 +15,26 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game1";
+export const GAMEROOM = "game8";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
+};
+
+export const gameSetup = async (gameId) => {
+  const snapshot = await db
+    .collection("rooms")
+    .doc(gameId)
+    .collection("gamePhase")
+    .doc("phase")
+    .set({
+      phase: "playCard",
+      taskComplete: false,
+      cleanUpReady: false,
+    });
 };
 
 /**
@@ -47,6 +60,8 @@ export const addPlayer = async (newPlayer, gameId) => {
       hotseat: false,
       winner: false,
     });
+
+  gameSetup(GAMEROOM);
   return snapshot;
 };
 
@@ -339,6 +354,7 @@ export const unsetHotseatPlayer = async (gameID) => {
       // return i
       await playerCollection.doc(player.data().id).update({
         hotseat: !hotseat,
+        vote: "none",
       });
       if (i === players.docs.length - 1) {
         return -1;
@@ -354,6 +370,11 @@ export const setHotseatPlayer = async (gameID) => {
   const previousHotseatIndex = await unsetHotseatPlayer(gameID);
   const playerCollection = await getPlayers(gameID);
   const players = await playerCollection.get();
+  const phase = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
   for (let i = 0; i < players.docs.length; i++) {
     const player = players.docs[i];
     if (i === previousHotseatIndex + 1) {
@@ -362,6 +383,12 @@ export const setHotseatPlayer = async (gameID) => {
       // return i
       await playerCollection.doc(player.data().id).update({
         hotseat: true,
+        vote: "none",
+      });
+      await phase.update({
+        hotseatName: player.data().username,
+        approved: false,
+        cardPoints: 0,
       });
       return player.data().id;
     }
@@ -423,17 +450,75 @@ export const deleteField = async (gameID) => {
 
 export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
   const player = await getPlayerObject(playerID, gameID);
+  const phase = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
   if (player.hotseat) {
-    await db
+    const fieldCollection = await db
       .collection("rooms")
       .doc(gameID)
       .collection("field")
-      .doc(cardID)
-      .update({
-        selected: true,
-        selectedBy: playerID,
-      });
+      .get();
+    let thumbsUpAdd = true;
+    for (let card of fieldCollection.docs) {
+      if (card.id === cardID) {
+        await card.ref.update({
+          selected: true,
+          selectedBy: playerID,
+          yesNoSelected: "selected",
+        });
+        await phase.update({
+          cardPoints: card.data().points,
+        });
+        console.log(card.id, "selected");
+      } else if (thumbsUpAdd) {
+        await card.ref.update({
+          yesNoSelected: "yes",
+        });
+        thumbsUpAdd = false;
+        console.log(card.id, "added yes");
+      } else {
+        await card.ref.update({
+          yesNoSelected: "no",
+        });
+        console.log(card.id, "added no");
+      }
+    }
   }
+};
+
+export const advanceRoundCounter = async (gameID) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+
+  const roundObject = await snapshot.get().catch((err) => console.log(err));
+  const roundData = roundObject.data();
+  const round = roundData.round;
+
+  const incrementRound = await snapshot
+    .update({
+      round: round + 1,
+    })
+    .catch((err) => console.log(err));
+};
+
+export const resetRoundCounter = async (gameID) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+  const resetRound = await snapshot
+    .update({
+      round: 1,
+    })
+    .catch((err) => console.log(err));
+  return;
 };
 
 /**
@@ -451,30 +536,41 @@ export const autoAdvancePhase = async (gameID, cards) => {
   const selectCheck = cards.map((card) => card.selected);
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
-  // const taskSuccessCheck = await snapshotCheck.data().taskSuccess;
+  const cleanUpReadyCheck = await snapshotCheck.data().cleanUpReady;
 
   if (cards.length < 3) {
     await snapshot.update({
       phase: "playCard",
+      taskComplete: false,
+      cleanUpReady: false,
     });
   } else if (selectCheck.some((x) => x)) {
     if (!taskCompleteCheck) {
       await snapshot.update({
-        phase: "completeTask",
+        phase: "voting",
+        voteMargin: 0,
+      });
+    } else if (!cleanUpReadyCheck) {
+      await snapshot.update({
+        phase: "pre-cleanUp",
       });
     } else {
       await snapshot.update({
         phase: "cleanUp",
         taskComplete: false,
+        cleanUpReady: false,
       });
-      console.log("adding points");
-      const pointAdd = await addPointsToPlayer(GAMEROOM);
-      if (pointAdd === "gameOver") {
-        await snapshot.update({
-          phase: "gameOver",
-        });
-        return "game over";
+      if (await snapshotCheck.data().approved) {
+        const pointAdd = await addPointsToPlayer(GAMEROOM);
+        if (pointAdd === "gameOver") {
+          await snapshot.update({
+            phase: "gameOver",
+          });
+          await resetRoundCounter(GAMEROOM);
+          return "game over";
+        }
       }
+      await advanceRoundCounter(GAMEROOM);
       await deleteField(GAMEROOM);
       await setHotseatPlayer(GAMEROOM);
     }
@@ -482,15 +578,30 @@ export const autoAdvancePhase = async (gameID, cards) => {
   return "phase changed";
 };
 
-export const completeTask = async (gameID) => {
+export const endVoting = async (gameID) => {
   const snapshot = db
     .collection("rooms")
     .doc(gameID)
     .collection("gamePhase")
     .doc("phase");
 
+  const playerCollection = await getPlayers(gameID);
+  const players = await playerCollection.get();
+  let thumbsUp = 0;
+  let thumbsDown = 0;
+  for (let player of players.docs) {
+    if (player.data().vote === "yes") {
+      thumbsUp += 1;
+    } else if (player.data().vote === "no") {
+      thumbsDown += 1;
+    }
+  }
+  console.log(thumbsUp, thumbsDown);
+  const isApproved = thumbsUp > thumbsDown;
+
   await snapshot.update({
     taskComplete: true,
+    approved: isApproved,
   });
 
   const fieldCards = await db
@@ -501,6 +612,72 @@ export const completeTask = async (gameID) => {
 
   const firstFieldCard = fieldCards.docs[0];
   await firstFieldCard.ref.update({
-    trigger: "add field to trigger field onSnapshot",
+    trigger: "endVoting trigger",
+  });
+};
+
+export const playerVote = async (gameId, userId, yesNo) => {
+  const player = db
+    .collection("rooms")
+    .doc(gameId)
+    .collection("players")
+    .doc(userId);
+
+  const playerGet = await player.get();
+  const isHotseat = await playerGet.data().hotseat;
+
+  if (!isHotseat) {
+    if (yesNo === "yes") {
+      await player.update({
+        vote: "yes",
+      });
+      console.log(userId, "votes yes");
+    } else if (yesNo === "no") {
+      await player.update({
+        vote: "no",
+      });
+      console.log(userId, "votes no");
+    }
+  }
+};
+
+export const cleanupStart = async (gameID) => {
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
+
+  await snapshot.update({
+    cleanUpReady: true,
+  });
+
+  const fieldCards = await db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field")
+    .get();
+
+  const firstFieldCard = fieldCards.docs[0];
+  await firstFieldCard.ref.update({
+    trigger: "cleanup trigger",
+  });
+};
+
+export const setWildCardText = async (
+  gameID,
+  playerID,
+  cardID,
+  wildCardText
+) => {
+  const cardInHand = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("players")
+    .doc(playerID)
+    .collection("cards")
+    .doc(cardID);
+  const cardToEdit = await cardInHand.update({
+    text: wildCardText,
   });
 };
