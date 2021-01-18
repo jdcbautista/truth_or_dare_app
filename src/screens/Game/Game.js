@@ -25,6 +25,7 @@ const Game = ({
   localPlayer,
   room,
   localParticipant,
+  user
 }) => {
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
@@ -138,15 +139,19 @@ const Game = ({
                 id={card?.id}
                 gamePhase={gamePhase}
                 selected={card?.selected}
+                userID={card?.playedBy}
+                cardID={card?.hashId}
                 currentlySelectedCard={isCurrentlySelectedCard()}
                 type={card?.type}
                 text={card?.text}
+                username={card?.username}
                 points={card?.points}
                 onClick={
                   isCurrentlySelectedCard
                     ? () => handleSelectCard(card?.hashId)
                     : null
                 }
+                user={user}
               />
               }
               

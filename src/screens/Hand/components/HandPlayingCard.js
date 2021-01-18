@@ -17,10 +17,10 @@ const HandPlayingCard = ({ id, type, text, points, onClick, selected }) => {
           </HandPlayingCardText>
           <br></br>
           <HandPlayingCardText>
-            <input></input>
+            Play to field, then click to edit!
           </HandPlayingCardText>
           <HandPlayingCardText type={type}>
-            {Math.floor(Math.random() * 10)} pts
+            6 pts
           </HandPlayingCardText>
         </WildPlayingCardContainer>
       ) : (
