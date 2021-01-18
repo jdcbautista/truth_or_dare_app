@@ -2,46 +2,52 @@ import React, { useState } from "react";
 import { Flex, Link, Text, Box } from "rebass";
 import { DebugButton } from "../LobbyStyles";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import  Timer  from "../../Game/components/Timer.js"
+import Timer from "../../Game/components/Timer.js";
 import {
+  NavbarContainer,
   NavbarText,
   StyledModal,
   StyledModalText,
+  GameName,
+  StyledInfoIcon,
+  RoundCounter,
+  DebugContainer,
 } from "../../../components/NavbarStyles";
 
 function Navbar({
   showHand,
   startGame,
   loadDeck,
+  roundNumber,
   deleteField,
   advanceHotseat,
   completeTask,
   addPoints,
   endVotingTimer,
-  endFadeTimer
+  endFadeTimer,
 }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
 
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
   return (
     <>
-      <Flex px={2} color="black" bg="white" alignItems="center">
-        <Text p={2} fontWeight="bold">
-          Round 'counter'
-        </Text>
-        <DebugButton onClick={startGame}>Start Game</DebugButton>
-        <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
-        <DebugButton onClick={endVotingTimer}>End Voting Phase</DebugButton>
-        <DebugButton onClick={endFadeTimer}>End Fade to Cleanup</DebugButton>
-
-        
-        Truth or Dare
-        <Box mx="auto" />
+      <NavbarContainer>
+        <DebugButton onClick={() => setDebugMode(!debugMode)}>
+          Toggle Debug
+        </DebugButton>
+        <RoundCounter>Round {roundNumber}</RoundCounter>
+        <GameName>truth or dare</GameName>
+        <DebugContainer debugMode={debugMode}>
+          <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
+          <DebugButton onClick={deleteField}>Delete Field</DebugButton>
+          <DebugButton onClick={startGame}>Start Game</DebugButton>
+          <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
+        </DebugContainer>
         <NavbarText>
-  
-          <AiOutlineInfoCircle onClick={toggleModal} />
+          <AiOutlineInfoCircle onClick={toggleModal} color="black" />
         </NavbarText>
         <StyledModal isOpen={modalOpen} onBackgroundClick={toggleModal}>
           <Flex>
@@ -50,7 +56,7 @@ function Navbar({
             </Box>
           </Flex>
         </StyledModal>
-      </Flex>
+      </NavbarContainer>
     </>
   );
 }
