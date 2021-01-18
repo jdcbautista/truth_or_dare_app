@@ -7,6 +7,9 @@ import {
   StyledModal,
   StyledModalText,
 } from "../../../components/NavbarStyles";
+import { GameName } from "../../../components/NavBarS";
+
+
 
 function Navbar({
   showHand,
@@ -24,17 +27,20 @@ function Navbar({
   };
   return (
     <>
-      <Flex px={2} color="white" bg="black" alignItems="center">
+      <Flex px={2} color="white" bg="white" alignItems="center">
         <Text p={2} fontWeight="bold">
           Debug
         </Text>
         <DebugButton onClick={startGame}>Start Game</DebugButton>
         <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
+        <GameName>
+          <div class="text" justify-content='center' >truth or dare </div>
+        </GameName>
         {/* <DebugButton onClick={loadDeck}>Load Deck</DebugButton> */}
         {/* <DebugButton onClick={deleteField}>Delete Field</DebugButton> */}
         <Box mx="auto" />
         <NavbarText>
-          <AiOutlineInfoCircle onClick={toggleModal} />
+          <AiOutlineInfoCircle onClick={toggleModal} color="black"/>
         </NavbarText>
         <StyledModal isOpen={modalOpen} onBackgroundClick={toggleModal}>
           <Flex>
