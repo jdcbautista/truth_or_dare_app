@@ -252,7 +252,8 @@ export const PlayedBy = styled.div`
   position: absolute;
   bottom: 3px;
   right: 3px;
-  background-color: lightgrey;
+  background-color: #00000050;
+  z-index: 3;
   padding: 3px;
   margin: 3px;
   border-radius: 5px;
