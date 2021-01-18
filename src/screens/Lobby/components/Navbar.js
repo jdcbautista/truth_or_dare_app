@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Flex, Link, Text, Box } from "rebass";
 import { DebugButton } from "../LobbyStyles";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import  Timer  from "../../Game/components/Timer.js"
 import {
   NavbarText,
   StyledModal,
@@ -14,8 +15,10 @@ function Navbar({
   loadDeck,
   deleteField,
   advanceHotseat,
-  advancePhase,
+  completeTask,
   addPoints,
+  endVotingTimer,
+  endFadeTimer
 }) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -24,19 +27,20 @@ function Navbar({
   };
   return (
     <>
-      <Flex px={2} color="white" bg="black" alignItems="center">
+      <Flex px={2} color="black" bg="white" alignItems="center">
         <Text p={2} fontWeight="bold">
-          Debug
+          Round 'counter'
         </Text>
-        <DebugButton onClick={showHand}>Show Hand</DebugButton>
-        <DebugButton onClick={startGame}>Start Round</DebugButton>
-        <DebugButton onClick={advancePhase}>Advance Phase</DebugButton>
+        <DebugButton onClick={startGame}>Start Game</DebugButton>
         <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
-        <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
-        <DebugButton onClick={deleteField}>Delete Field</DebugButton>
-        <DebugButton onClick={addPoints}>Add Points</DebugButton>
+        <DebugButton onClick={endVotingTimer}>End Voting Phase</DebugButton>
+        <DebugButton onClick={endFadeTimer}>End Fade to Cleanup</DebugButton>
+
+        
+        Truth or Dare
         <Box mx="auto" />
         <NavbarText>
+  
           <AiOutlineInfoCircle onClick={toggleModal} />
         </NavbarText>
         <StyledModal isOpen={modalOpen} onBackgroundClick={toggleModal}>

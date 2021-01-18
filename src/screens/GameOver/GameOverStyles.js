@@ -8,13 +8,21 @@ export const rotate = keyframes`
 	}
   `;
 
-export const HandContainer = styled.div`
+export const GameOverContainer = styled.div`
   display: flex;
+  color: black;
+  background-color: white;
   justify-content: center;
-  width: 100vw;
-  bottom: -1000;
+  width: 100%;
+  height: 45vh;
+  bottom: 0;
   position: absolute;
 `;
+
+export const GameOverButton = styled.div`
+  color: black;
+`;
+
 export const PlayerCard = styled.div`
   /* background-color: red; */
   border-radius: 50px;

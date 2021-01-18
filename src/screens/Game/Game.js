@@ -12,21 +12,26 @@ import {
   GameHotseatVideoBox,
   Rotate,
 } from "./GameStyles";
-import { StyledFlex } from "../Lobby/LobbyStyles";
+import { StyledFlex, DebugButton } from "../Lobby/LobbyStyles";
 import * as FirestoreService from "../../firebase";
 import GamePlayingCard from "./components/GamePlayingCard";
+import VotingCard from "./components/VotingCard";
 
 const Game = ({
   players,
   participants,
+  gamePhase,
   userId,
   localPlayer,
   room,
   localParticipant,
+  user
 }) => {
-  const [selectedCards, setSelectedCards] = useState({});
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
+  const [error, setError] = useState(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerLength, setTimerLength] = useState(0);
 
   /**
    * This effect subscribes us to the field of the game so that all
@@ -37,10 +42,12 @@ const Game = ({
       FirestoreService.GAMEROOM
     )
       .then((response) =>
-        response.onSnapshot((gotCards) => {
+        response.onSnapshot(async (gotCards) => {
           console.log("getting field cards");
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
+          console.log('snapshot going')
+          await FirestoreService.autoAdvancePhase(FirestoreService.GAMEROOM, cards)
         })
       )
       .catch((error) => console.log(error));
@@ -48,10 +55,10 @@ const Game = ({
   }, []);
 
   /**
-   * This effect tries to load a deck from resources if there is none and deals cards
-   * which will replenish automatically. It aso calls handleGetHand which will keep the players
-   * hand up to date with what is in the DB
-   */
+  * This effect tries to load a deck from resources if there is none and deals cards
+  * which will replenish automatically. It aso calls handleGetHand which will keep the players
+  * hand up to date with what is in the DB
+  */
   useEffect(() => {
     (async () => {
       // Load a deck
@@ -97,24 +104,58 @@ const Game = ({
       userId
     );
     console.log("card selected");
+    // const interval = setInterval(() => FirestoreService.endVoting(FirestoreService.GAMEROOM), 10000);
+    // return () => clearInterval(interval);
   };
+
+  const isCurrentlySelectedCard = () => {
+    return fieldCards.every((card) => !card?.selected);
+  };
+
+  const handleVoteClick = async (yesNo) => {
+    await FirestoreService.playerVote(FirestoreService.GAMEROOM, userId, yesNo).catch((err) =>
+    setError(err)
+  );
+  }
 
   return (
     <GameContainer className="gameContainerFadeIn">
+        {/* <DebugButton onclick={Timer.start}>Start Timer</DebugButton>
+        {Timer.time} {Timer.isOn}
+        <DebugButton onclick={Timer.stop}>PauseTimer</DebugButton>
+        <DebugButton onclick={Timer.reset}>Reset Timer</DebugButton> */}
+        {/* <Timer timerRunning={timerRunning} timerLength={timerLength} /> */}
       <StyledFlex>
         {fieldCards.map((card) => (
-          <Box p={3} width={1 / 4} color="white" bg="primary">
+          <Box key={card?.id} p={3} width={1 / 4} color="white" bg="primary">
             <PlayerCard>
+              {(card?.yesNoSelected === "yes" || card?.yesNoSelected === "no") ?
+                <VotingCard
+                yesNoSelected={card?.yesNoSelected}
+                onClick={() => handleVoteClick(card?.yesNoSelected)}
+                />
+              :
               <GamePlayingCard
                 id={card?.id}
-                // selected={isSelected}
+                gamePhase={gamePhase}
+                selected={card?.selected}
+                userID={card?.playedBy}
+                cardID={card?.hashId}
+                currentlySelectedCard={isCurrentlySelectedCard()}
                 type={card?.type}
-                // selected={isSelected}
                 text={card?.text}
                 username={card?.username}
                 points={card?.points}
-                onClick={() => handleSelectCard(card?.hashId)}
+                onClick={
+                  isCurrentlySelectedCard
+                    ? () => handleSelectCard(card?.hashId)
+                    : null
+                }
+                user={user}
               />
+              }
+              
+              
             </PlayerCard>
           </Box>
         ))}

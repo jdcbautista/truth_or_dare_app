@@ -1,5 +1,4 @@
 import { Card, Image, Flex, Box, Button } from "rebass";
-
 import styled, { keyframes, css } from "styled-components";
 import { fadeIn, bounce } from "react-animations";
 
@@ -14,7 +13,7 @@ export const GameContainer = styled.div`
   justify-content: center;
   width: 100vw;
   height: 400px;
-  border: 2px solid black;
+  border: 0px solid black;
 `;
 export const PlayerCard = styled.div`
   /* background-color: red; */
@@ -64,14 +63,19 @@ export const StandardPlayingCardContainer = styled(Card)`
   background: white;
   font-family: "Open Sans", sans-serif;
   font-size: 1.25em;
+  opacity: ${(props) => {
+    if (!props.currentlySelectedCard && !props.selected) return "0.3";
+    return "1";
+  }};
   display: block;
   overflow: hidden;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.type === "truth") return "#64c0fa";
-      return "#FB5156";
+      if (props.selected) return "gold";
+      else if (props.type === "dare") return "#FB5156";
+      else if (props.type === "truth") return "#64c0fa";
     }};
   text-align: left;
   justify-content: center;
@@ -87,11 +91,20 @@ export const WildPlayingCardContainer = styled(Card)`
   position: relative;
   z-index: 0;
   height: 320px;
+  opacity: ${(props) => {
+    if (!props.currentlySelectedCard && !props.selected) return "0.3";
+    return "1";
+  }};
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
   border-radius: 10px;
   border: 8px solid black;
   color: white;
+  border: 8px solid
+    ${(props) => {
+      if (props.selected) return "gold";
+      return "#FB5156";
+    }};
   padding: 30px 20px;
   border-radius: 25px;
   overflow: hidden;
@@ -127,6 +140,27 @@ export const WildPlayingCardContainer = styled(Card)`
 `;
 
 export const GamePlayingCardText = styled.h2`
+  font-family: "Open Sans", sans-serif;
+  font-weight: ${(props) => {
+    if (props.bold) return props.bold;
+    return "regular";
+  }};
+  font-size: ${(props) => {
+    if (props.size) return props.size;
+    return "em";
+  }};
+  color: ${(props) => {
+    if (props.type === "truth") return "#64c0fa";
+    else if (props.type == "dare") return "#FB5156";
+    else if (props.type == "wild") return "#FFFFFF";
+    return "#000000";
+  }};
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+`;
+
+export const VotingCardText = styled.h2`
   font-family: "Open Sans", sans-serif;
   font-weight: ${(props) => {
     if (props.bold) return props.bold;
