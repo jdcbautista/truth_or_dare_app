@@ -118,7 +118,14 @@ const Participant = ({
           hotseat={user?.hotseat}
           winner={user?.winner}
         >
-          <StyledVideo ref={videoRef} autoPlay={true} />
+          <StyledVideo
+            hotseat={user?.hotseat}
+            gamePhase={gamePhase?.phase}
+            username={user?.username}
+            ready={user?.ready}
+            ref={videoRef}
+            autoPlay={true}
+          />
         </StyledVideoBox>
         <StyledAvatar
           ready={user?.ready}
@@ -127,9 +134,7 @@ const Participant = ({
           displayoff={!user?.video}
           src={`https://robohash.org/${participant?.identity}/size=200x${videoHeight}?`}
         />
-      </>
 
-      <>
         {participant?.identity === userId && (
           <Box>
             <StyledAudioIconButton onClick={() => setMuted(!muted)}>
