@@ -276,7 +276,7 @@ const Lobby = () => {
                   />
                 </Suspense>
               )}
-              {createPlaceholders(players)}
+              {/* {createPlaceholders(players)} */}
 
               {participants &&
                 room &&

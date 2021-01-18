@@ -42,7 +42,7 @@ function LobbyCard({
         //     <StyledBadge sx={{ mx: "auto" }}>Waiting for player...</StyledBadge>
         //   </StyledCard>
         // </Box>
-        <Box p={3} width={1 / 4} color="white" bg="primary">
+        <Box p={3} color="white" bg="primary">
           <StyledCard width={cardWidth}>
             {twilioUserInfo && userId && user && (
               <Participant
