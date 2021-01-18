@@ -23,6 +23,27 @@ export const NavbarContainer = styled(Flex)`
 export const StyledInfoIcon = styled(AiOutlineInfoCircle)`
   color: #663399;
 `;
+
+export const blurIn = keyframes`
+  0% {
+    -webkit-transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+            transform: translateY(-1000px) scaleY(2.5) scaleX(0.2);
+    -webkit-transform-origin: 50% 0%;
+            transform-origin: 50% 0%;
+    -webkit-filter: blur(40px);
+            filter: blur(40px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(0) scaleY(1) scaleX(1);
+            transform: translateY(0) scaleY(1) scaleX(1);
+    -webkit-transform-origin: 50% 50%;
+            transform-origin: 50% 50%;
+    -webkit-filter: blur(0);
+            filter: blur(0);
+    opacity: 1;
+  }
+  `;
 export const StyledModal = Modal.styled`
   width: 50rem;
   color: white;
@@ -33,17 +54,9 @@ export const StyledModal = Modal.styled`
   border-radius: 10px;
   justify-content: center;
   background-color: #212121;
+  animation: ${blurIn} 0.6s cubic-bezier(0.230, 1.000, 0.320, 1.000) both;
 `;
 
-export const StyledModalText = styled.h2`
-  flex-grow: 1;
-  justify-content: center;
-  font-size: ${(props) => {
-    if (props.size === "lg") return "3rem";
-    return "1rem";
-  }};
-  font-family: "Open Sans", sans-serif;
-`;
 export const GameName = styled.p`
   font-family: "Open Sans", sans-serif;
   font-size: 1.5rem;
@@ -74,5 +87,22 @@ export const DebugContainer = styled.div`
     else {
       return "visible";
     }
+  }};
+`;
+
+export const StyledModalText = styled.h2`
+  font-size: ${(props) => {
+    if (props.size === "lg") return "3rem";
+    if (props.size === "md") return "2rem";
+    return "1rem";
+  }};
+  font-family: "Open Sans", sans-serif;
+  margin: 2rem;
+  text-decoration: ${(props) => {
+    if (props.size === "lg") return "underline";
+  }};
+  font-family: "Open Sans", sans-serif;
+  text-align: ${(props) => {
+    if (props.size === "lg") return "center";
   }};
 `;

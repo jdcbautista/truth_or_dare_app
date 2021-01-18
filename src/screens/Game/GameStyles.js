@@ -10,12 +10,13 @@ export const rotate = keyframes`
 
 export const GameContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   width: 100vw;
   height: 400px;
   border: 0px solid black;
 `;
 export const PlayerCard = styled.div`
+  width: 100%;
   /* background-color: red; */
   border-radius: 50px;
   /* box-shadow: 0 0 16px rgba(0, 0, 0, 0.25); */
@@ -58,32 +59,53 @@ export const GameHotseatVideoBox = styled(Box)`
   margin: 20px;
 `;
 
+export const SelectCardStyles = css`
+  content: " ";
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 20px;
+  border: 5px solid #663399;
+`;
+
 export const StandardPlayingCardContainer = styled(Card)`
   position: relative;
   background: white;
   font-family: "Open Sans", sans-serif;
   font-size: 1.25em;
-  opacity: ${(props) => {
+  position: relative;
+  /* opacity: ${(props) => {
     if (!props.currentlySelectedCard && !props.selected) return "0.3";
     return "1";
-  }};
+  }}; */
   display: block;
   overflow: hidden;
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
+  box-shadow: ${(props) => {
+    if (props.selected) return "0 0 32px rgba(0, 0, 0, 0.50)";
+    return "0 0 16px rgba(0, 0, 0, 0.25)";
+  }};
   border-radius: 10px;
   border: 8px solid
     ${(props) => {
-      if (props.selected) return "gold";
-      else if (props.type === "dare") return "#FB5156";
+      if (props.type === "dare") return "#FB5156";
       else if (props.type === "truth") return "#64c0fa";
     }};
   text-align: left;
   justify-content: center;
   align-items: center;
   height: 320px;
+  transition: 150ms all;
   width: 256px;
   padding: 30px 20px;
   border-radius: 25px;
+  &:after {
+    ${(props) => {
+      if (props.selected) return SelectCardStyles;
+    }};
+  }
 `;
 
 /* FOR PLAYING CARD STYLING */
@@ -91,11 +113,14 @@ export const WildPlayingCardContainer = styled(Card)`
   position: relative;
   z-index: 0;
   height: 320px;
-  opacity: ${(props) => {
+  /* opacity: ${(props) => {
     if (!props.currentlySelectedCard && !props.selected) return "0.3";
     return "1";
+  }}; */
+  box-shadow: ${(props) => {
+    if (props.selected) return "0 0 32px rgba(0, 0, 0, 0.50)";
+    return "0 0 16px rgba(0, 0, 0, 0.25)";
   }};
-  box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   width: 256px;
   border-radius: 10px;
   border: 8px solid black;
@@ -133,9 +158,10 @@ export const WildPlayingCardContainer = styled(Card)`
     z-index: -1;
     left: 8px;
     top: 8px;
-    filter: blur(3px);
-    background: black;
     border-radius: 20px;
+    ${(props) => {
+      if (props.selected) return SelectCardStyles;
+    }};
   }
 `;
 
@@ -226,7 +252,8 @@ export const PlayedBy = styled.div`
   position: absolute;
   bottom: 3px;
   right: 3px;
-  background-color: lightgrey;
+  background-color: #00000050;
+  z-index: 3;
   padding: 3px;
   margin: 3px;
   border-radius: 5px;
@@ -234,4 +261,4 @@ export const PlayedBy = styled.div`
   font-size: 12px;
   justify-content: center;
   align-self: center;
-`
+`;

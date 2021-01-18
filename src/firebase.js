@@ -15,7 +15,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game8";
+export const GAMEROOM = "game2";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
