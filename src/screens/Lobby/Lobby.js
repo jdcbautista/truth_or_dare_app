@@ -252,7 +252,10 @@ const Lobby = () => {
             addPoints={handleAddPoints}
           />
 
-          <LobbyContainer onClick={() => isHandOpen?handleViewHand():''} className="LobbyToNav">
+          <LobbyContainer
+            onClick={() => (isHandOpen ? handleViewHand() : "")}
+            className="LobbyToNav"
+          >
             {!localPlayer && (
               <LobbyInput
                 handleChange={handleChange}
@@ -329,15 +332,13 @@ const Lobby = () => {
               />
             )}
 
-            {(gamePhase.phase === "gameOver") && (
-              <GameOver
-                startGame={handleStartGame}
-              />
+            {gamePhase.phase === "gameOver" && (
+              <GameOver startGame={handleStartGame} />
             )}
 
-            {!isHandOpen &&
+            {!isHandOpen && (
               <DebugButton onClick={handleViewHand}>Show Hand</DebugButton>
-            }
+            )}
           </LobbyContainer>
         </>
       )}

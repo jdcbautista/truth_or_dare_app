@@ -45,7 +45,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       audio: false,
       score: 0,
       hotseat: false,
-      winner: false
+      winner: false,
     });
   return snapshot;
 };
@@ -259,11 +259,7 @@ export const getHand = async (playerId, gameID) => {
  * @params TODO
  */
 export const getAllFieldCards = async (gameID) => {
-
-  const loadField = db
-    .collection("rooms")
-    .doc(gameID)
-    .collection("field");
+  const loadField = db.collection("rooms").doc(gameID).collection("field");
   return loadField;
 };
 
@@ -384,18 +380,18 @@ export const addPointsToPlayer = async (gameID) => {
   const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
   const playerCollection = await getPlayers(gameID);
   const newScore = parseInt(cardData.points) + playerPoints;
-  if (newScore >= WINNINGPOINTS){
+  if (newScore >= WINNINGPOINTS) {
     await playerCollection.doc(cardData.selectedBy).update({
       score: newScore,
-      winner: true
+      winner: true,
     });
-    return "gameOver"
+    return "gameOver";
   } else {
     await playerCollection.doc(cardData.selectedBy).update({
       score: newScore,
     });
   }
-  return "score added"
+  return "score added";
 };
 
 export const clearPlayerPoints = async (gameID) => {
@@ -404,10 +400,10 @@ export const clearPlayerPoints = async (gameID) => {
   for (let player of players.docs) {
     await player.ref.update({
       score: 0,
-      winner: false
+      winner: false,
     });
   }
-  return "Score cleared!"
+  return "Score cleared!";
 };
 
 export const getSelectedFieldCard = async (gameID) => {
@@ -451,36 +447,36 @@ export const autoAdvancePhase = async (gameID, cards) => {
     .doc(gameID)
     .collection("gamePhase")
     .doc("phase");
-  console.log(cards)
-  const selectCheck = cards.map(card => card.selected)
+  console.log(cards);
+  const selectCheck = cards.map((card) => card.selected);
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
   // const taskSuccessCheck = await snapshotCheck.data().taskSuccess;
-  
+
   if (cards.length < 3) {
     await snapshot.update({
-      phase: "playCard"
-    })
-  } else if (selectCheck.some(x => x)) {
+      phase: "playCard",
+    });
+  } else if (selectCheck.some((x) => x)) {
     if (!taskCompleteCheck) {
       await snapshot.update({
-        phase: "completeTask"
-      })
+        phase: "completeTask",
+      });
     } else {
       await snapshot.update({
         phase: "cleanUp",
-        taskComplete: false
-      })
-      console.log('adding points')
-      const pointAdd = await addPointsToPlayer(GAMEROOM)
+        taskComplete: false,
+      });
+      console.log("adding points");
+      const pointAdd = await addPointsToPlayer(GAMEROOM);
       if (pointAdd === "gameOver") {
         await snapshot.update({
-          phase: "gameOver"
-        })
-        return "game over"
+          phase: "gameOver",
+        });
+        return "game over";
       }
-      await deleteField(GAMEROOM)
-      await setHotseatPlayer(GAMEROOM)
+      await deleteField(GAMEROOM);
+      await setHotseatPlayer(GAMEROOM);
     }
   }
   return "phase changed";
@@ -494,17 +490,17 @@ export const completeTask = async (gameID) => {
     .doc("phase");
 
   await snapshot.update({
-      taskComplete: true
-    })
-  
+    taskComplete: true,
+  });
+
   const fieldCards = await db
-      .collection("rooms")
-      .doc(gameID)
-      .collection("field")
-      .get()
-  
-  const firstFieldCard = fieldCards.docs[0]
+    .collection("rooms")
+    .doc(gameID)
+    .collection("field")
+    .get();
+
+  const firstFieldCard = fieldCards.docs[0];
   await firstFieldCard.ref.update({
-    trigger: "add field to trigger field onSnapshot"
-  })
-}
+    trigger: "add field to trigger field onSnapshot",
+  });
+};
