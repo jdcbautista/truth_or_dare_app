@@ -120,6 +120,7 @@ const Participant = ({
           <StyledVideo
             hotseat={user?.hotseat}
             gamePhase={gamePhase?.phase}
+            vote={user?.vote}
             username={user?.username}
             ready={user?.ready}
             ref={videoRef}

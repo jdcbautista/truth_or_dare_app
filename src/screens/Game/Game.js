@@ -6,7 +6,9 @@ import { Flex, Box } from "reflexbox";
 import {
   GameContainer,
   TextContainer,
+  SmallTextContainer,
   PlayerCard,
+  TimerTextbox,
   HotseatCard,
   GameVideoBox,
   GameCardBox,
@@ -120,31 +122,20 @@ const Game = ({
 
   return (
     <div>
-      <div>
-      {(gamePhase == 'voting') && (fieldCards.length == 3) && 
-        <Flex flexWrap='wrap'>
-          <Box flex='1' height="80px">
-          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box flex='1' height="80px">
-            
-          <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} />
-          
-          </Box><Box flex='1' height="80px">
-          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
-          </Box>
-          {/* <Box p={3}>
-          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box>
-          <Timer votePhaseEnd={votePhaseEnd} />
-          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
-          </Box> */}
-        </Flex>
-      }
-      </div>
-    <TextContainer className="timerBarDeplete">
+      
+    <TextContainer>
       {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
         `Everyone but ${hotseat} is choosing a card!`
       }
       {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
         `${hotseat} is in the hotseat choosing a card!`
+      }
+      {(gamePhase == 'voting') && (fieldCards.length == 3) &&
+      <TimerTextbox>
+        <SmallTextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</SmallTextContainer>
+        <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} isHotseat={user.hotseat} />
+        <SmallTextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</SmallTextContainer>
+      </TimerTextbox>
       }
       {/* {(gamePhase == 'voting') && (fieldCards.length == 3) && 
         `${hotseat} has chosen a fate!`
@@ -153,7 +144,7 @@ const Game = ({
         `Did ${hotseat} successfully deliver?`
       } */}
       {(gamePhase == 'pre-cleanUp') && (approved) && 
-        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} points!`
+        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} point${cardPoints > 1 ? 's' : ''}!`
       }
       {(gamePhase == 'pre-cleanUp') && (!approved) && 
         `The majority have voted!  ${hotseat} failed!`

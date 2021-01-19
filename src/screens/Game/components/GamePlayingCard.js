@@ -59,7 +59,7 @@ const GamePlayingCard = ({
           <GamePlayingCardText>
             {editCard 
             ? <form><input onChange={(e) => handleCardChange(e)}></input><button onClick={() => handleSaveClick()}>Save</button></form> 
-            : <GamePlayingCardText onClick={user?.id===userID?() => handleEditClick():()=>console.log('unable to edit')}>{cardFinished?text:`Waiting for ${username} to edit...`}</GamePlayingCardText>}
+            : <GamePlayingCardText onClick={user?.id===userID?() => handleEditClick():()=>console.log('unable to edit')}>{text ? text : `Waiting for ${username} to edit...`}</GamePlayingCardText>}
           </GamePlayingCardText>
           <PlayedBy>Played By: {username}</PlayedBy>
           <GamePlayingCardText type={type}>

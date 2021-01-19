@@ -16,11 +16,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game9";
+export const GAMEROOM = "game6";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
-export const WINNINGPOINTS = 100;
+export const WINNINGPOINTS = 5;
 export const VOTETIME = 60000;
+export const CLEANUPWAIT = 3000;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -628,6 +629,12 @@ export const endVoting = async (gameID) => {
   await firstFieldCard.ref.update({
     trigger: "endVoting trigger",
   });
+  
+  const waitToCleanup = x => new Promise(r => setTimeout(r, x))
+  await (async () => {
+    await waitToCleanup(CLEANUPWAIT)
+  })()
+  await cleanupStart(GAMEROOM)
 };
 
 export const playerVote = async (gameId, userId, yesNo) => {
