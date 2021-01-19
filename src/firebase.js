@@ -585,10 +585,10 @@ export const autoAdvancePhase = async (gameID, cards) => {
 };
 
 export const getRound = async (gameID) => {
-  const snapshot = db.collection("rooms").doc(gameID);
+  const snapshot = db.collection("rooms").doc(gameID).collection('gamePhase').doc('phase');
 
   const round = await snapshot.get();
-  console.log(round);
+  console.log(round.data());
   return round;
 };
 

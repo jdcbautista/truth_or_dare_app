@@ -46,7 +46,6 @@ const Lobby = () => {
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
-    FirestoreService.getRound().then((round) => console.log(round));
 
     const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
       .then((response) =>
@@ -121,6 +120,7 @@ const Lobby = () => {
         response.onSnapshot((gotGamePhase) => {
           const gamePhase = gotGamePhase.docs.map((doc) => doc.data())[0];
           setGamePhase(gamePhase);
+          setGameRound(gamePhase?.round)
         })
       )
       .catch((error) => console.log(error));

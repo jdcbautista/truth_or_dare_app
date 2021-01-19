@@ -19,7 +19,6 @@ function Navbar({
   startGame,
   gameRound,
   loadDeck,
-  roundNumber,
   deleteField,
   advanceHotseat,
   completeTask,
