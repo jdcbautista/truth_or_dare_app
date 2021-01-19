@@ -82,7 +82,7 @@ const GamePlayingCard = ({
                     : () => console.log("unable to edit")
                 }
               >
-                {cardFinished ? text : `Waiting for ${username} to edit...`}
+                {text ? text : `Waiting for ${username} to edit...`}
               </GamePlayingCardText>
             )}
           </GamePlayingCardText>

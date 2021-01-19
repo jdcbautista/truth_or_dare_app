@@ -66,7 +66,7 @@ export const GameName = styled.p`
   padding: 10px;
   flex-grow: 1;
   font-weight: lighter;
-  background: linear-gradient(to right, #23b5d3 42%, #858585 54%, #fe5148 20%);
+  background: linear-gradient(to right, #23b5d3 42%, #999999 54%, #fe5148 20%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;

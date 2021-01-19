@@ -6,7 +6,9 @@ import { Flex, Box } from "reflexbox";
 import {
   GameContainer,
   TextContainer,
+  SmallTextContainer,
   PlayerCard,
+  TimerTextbox,
   HotseatCard,
   GameVideoBox,
   GameCardBox,
@@ -49,14 +51,12 @@ const Game = ({
     )
       .then((response) =>
         response.onSnapshot(async (gotCards) => {
-          console.log("getting field cards");
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
-          console.log("snapshot going");
           await FirestoreService.autoAdvancePhase(
             FirestoreService.GAMEROOM,
             cards
-          );
+          ).catch(err => console.log(err));
         })
       )
       .catch((error) => console.log(error));
@@ -71,14 +71,12 @@ const Game = ({
   useEffect(() => {
     (async () => {
       // Load a deck
-      await FirestoreService.loadDeckFromResources();
+      await FirestoreService.loadDeckFromResources().catch(err => console.log(err));
       if (userId) {
         handleGetHand();
-        console.log("seeing if player has a current hand ");
       }
 
       if (playerCards.length < 5 && userId) {
-        console.log("running handle deal cards");
         handleSingleDeal(8);
         handleGetHand();
       }
@@ -87,22 +85,18 @@ const Game = ({
 
   //deal single card from gameDeck to user in db only
   const handleSingleDeal = async (numOfCards) => {
-    // await e.preventDefault();
     await FirestoreService.dealCard(
       FirestoreService.GAMEROOM,
       userId,
       numOfCards
-    );
-    console.log("deal single card");
-    console.log(userId);
+    ).catch(err => console.log(err));
   };
 
   const handleGetHand = async () => {
     const snapshot = await FirestoreService.getHand(
       userId,
       FirestoreService.GAMEROOM
-    );
-    console.log("getting hand");
+    ).catch(err => console.log(err));
     const setCards = setPlayerCards(snapshot);
   };
 
@@ -111,8 +105,7 @@ const Game = ({
       FirestoreService.GAMEROOM,
       cardID,
       userId
-    );
-    console.log("card selected");
+    ).catch(err => console.log(err));
   };
 
   const isCurrentlySelectedCard = () => {
@@ -129,31 +122,20 @@ const Game = ({
 
   return (
     <div>
-      <div>
-      {(gamePhase == 'voting') && (fieldCards.length == 3) && 
-        <Flex flexWrap='wrap'>
-          <Box flex='1' height="80px">
-          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box flex='1' height="80px">
-            
-          <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} />
-          
-          </Box><Box flex='1' height="80px">
-          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
-          </Box>
-          {/* <Box p={3}>
-          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box>
-          <Timer votePhaseEnd={votePhaseEnd} />
-          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
-          </Box> */}
-        </Flex>
-      }
-      </div>
-    <TextContainer className="timerBarDeplete">
+      
+    <TextContainer>
       {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
         `Everyone but ${hotseat} is choosing a card!`
       }
       {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
         `${hotseat} is in the hotseat choosing a card!`
+      }
+      {(gamePhase == 'voting') && (fieldCards.length == 3) &&
+      <TimerTextbox>
+        <SmallTextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</SmallTextContainer>
+        <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} isHotseat={user.hotseat} />
+        <SmallTextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</SmallTextContainer>
+      </TimerTextbox>
       }
       {/* {(gamePhase == 'voting') && (fieldCards.length == 3) && 
         `${hotseat} has chosen a fate!`
@@ -162,7 +144,7 @@ const Game = ({
         `Did ${hotseat} successfully deliver?`
       } */}
       {(gamePhase == 'pre-cleanUp') && (approved) && 
-        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} points!`
+        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} point${cardPoints > 1 ? 's' : ''}!`
       }
       {(gamePhase == 'pre-cleanUp') && (!approved) && 
         `The majority have voted!  ${hotseat} failed!`
