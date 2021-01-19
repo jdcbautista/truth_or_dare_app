@@ -55,7 +55,8 @@ const Game = ({
           setFieldCards(cards);
           await FirestoreService.autoAdvancePhase(
             FirestoreService.GAMEROOM,
-            cards
+            cards,
+            localPlayer.hotseat
           ).catch(err => console.log(err));
         })
       )

@@ -12,7 +12,6 @@ import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex, DebugButton } from "./LobbyStyles";
 import Navbar from "./components/Navbar";
-
 const Lobby = () => {
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
@@ -33,7 +32,6 @@ const Lobby = () => {
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
   const [isGameStarted, setIsGameStarted] = useState(false);
-
   // This effect runs on page load and uses firebase auth
   // to annonymously authenticate a user. It provides a unique
   // id that is associated with the users machine and stores in into
@@ -45,7 +43,6 @@ const Lobby = () => {
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
-
     const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
       .then((response) =>
         response.onSnapshot((gotPlayers) => {
@@ -57,7 +54,6 @@ const Lobby = () => {
       .catch((error) => console.log(error));
     return () => unsubscribe();
   }, []);
-
   // This effect runs when there is both a token and a userId.
   // It fetches a JWT token from our django back end using twilio
   // API and then adds the local player as a participant in that room.
@@ -70,17 +66,14 @@ const Lobby = () => {
         })
         .catch((error) => setError(error));
     }
-
     const participantConnected = (participant) => {
       setParticipants((prevParticipants) => [...prevParticipants, participant]);
     };
-
     const participantDisconnected = (participant) => {
       setParticipants((prevParticipants) =>
         prevParticipants.filter((p) => p !== participant)
       );
     };
-
     if (token) {
       Video.connect(token, {
         name: FirestoreService.GAMEROOM,
@@ -91,7 +84,6 @@ const Lobby = () => {
         room.participants.forEach(participantConnected);
       });
     }
-
     return () => {
       setRoom((currentRoom) => {
         if (currentRoom && currentRoom.localParticipant.state === "connected") {
@@ -139,8 +131,8 @@ const Lobby = () => {
 
       .fromTo(
         ".gameContainerFadeIn",
-        { filter: "blur(10px)" },
-        { filter: "blur(0px)", duration: 1 }
+        { filter: "blur(10px)", opacity: 1 },
+        { filter: "blur(0px)", opacity: 1, duration: 1 }
       )
       //
     }
@@ -196,7 +188,7 @@ const Lobby = () => {
   };
 
   const handleStartGame = async () => {
-    await FirestoreService.startGame(FirestoreService.GAMEROOM).catch(err => console.log(err));
+    await FirestoreService.startGame(FirestoreService.GAMEROOM);
     setIsGameStarted(true);
 
     // await gsap
@@ -266,7 +258,6 @@ const Lobby = () => {
       FirestoreService.GAMEROOM
     ).catch((err) => setError(err));
   };
-
   return (
     <>
       {loading ? (
@@ -375,7 +366,7 @@ const Lobby = () => {
               <GameOver startGame={handleStartGame} />
             )}
 
-            {!isHandOpen && (
+            {!isHandOpen && !localPlayer?.hotseat && (
               <DebugButton onClick={handleViewHand}>Show Hand</DebugButton>
             )}
           </LobbyContainer>
