@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
 import "firebase/auth";
+import { gsap } from "gsap";
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -15,10 +16,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game8";
+export const GAMEROOM = "game7";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
+export const VOTETIME = 13000;
 
 export const authenticateAnonymously = () => {
   return firebase.auth().signInAnonymously();
@@ -406,11 +408,15 @@ export const getPlayerScore = async (gameID, playerID) => {
   return playerPoints;
 };
 
-export const addPointsToPlayer = async (gameID) => {
+export const addPointsToPlayer = async (gameID, lose=false) => {
   const cardData = await getSelectedFieldCard(gameID);
   const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
+  let cardPoints = parseInt(cardData.points)
+  if (lose) {
+    cardPoints = -cardPoints
+  }
   const playerCollection = await getPlayers(gameID);
-  const newScore = parseInt(cardData.points) + playerPoints;
+  const newScore = cardPoints + playerPoints;
   if (newScore >= WINNINGPOINTS){
     await playerCollection.doc(cardData.selectedBy).update({
       score: newScore,
@@ -468,14 +474,15 @@ export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
     let thumbsUpAdd = true
     for (let card of fieldCollection.docs) {
       if (card.id === cardID) {
+        await phase.update({
+          cardPoints: card.data().points,
+          votePhaseEnd: Date.now() + VOTETIME
+        })
         await card.ref.update({
           selected: true,
           selectedBy: playerID,
           yesNoSelected: "selected"
         });
-        await phase.update({
-          cardPoints: card.data().points
-        })
         console.log(card.id, 'selected')
       } else if (thumbsUpAdd) {
         await card.ref.update({
@@ -562,9 +569,7 @@ export const autoAdvancePhase = async (gameID, cards) => {
           return "game over"
         }
       }
-      await advanceRoundCounter(GAMEROOM)
-      await deleteField(GAMEROOM)
-      await setHotseatPlayer(GAMEROOM)
+      await startRound(GAMEROOM)
     }
   }
   return "phase changed";
@@ -588,7 +593,7 @@ export const endVoting = async (gameID) => {
       thumbsDown += 1
     }
   }
-  console.log(thumbsUp, thumbsDown)
+  console.log(thumbsUp, 'yays', thumbsDown, 'nays')
   const isApproved = (thumbsUp > thumbsDown)
 
   await snapshot.update({
@@ -667,4 +672,54 @@ export const setWildCardText = async (gameID, playerID, cardID, wildCardText) =>
     const cardToEdit = await cardInHand.update({
       text: wildCardText
     })
+};
+
+export const startGame = async () => {
+  await setHotseatPlayer(GAMEROOM);
+  await deleteField(GAMEROOM);
+  await clearPlayerPoints(GAMEROOM);
+
+  await gsap
+    .timeline()
+    .fromTo(
+      ".gameContainerFadeIn",
+      { filter: "blur(0px)", opacity: 1 },
+      { filter: "blur(10px)", opacity: 1, duration: 2 }
+    )
+    .fromTo(
+      ".handContainerFadeIn",
+      { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+
+      {
+        opacity: 1,
+        filter: "blur(0px)",
+        transform: "translateY(0px)",
+        duration: 0.8,
+      }
+    );
+};
+
+export const startRound = async () => {
+  await advanceRoundCounter(GAMEROOM);
+  await setHotseatPlayer(GAMEROOM);
+  await deleteField(GAMEROOM);
+
+  await gsap
+    .timeline()
+    .fromTo(
+      ".gameContainerFadeIn",
+      { filter: "blur(0px)", opacity: 1 },
+      { filter: "blur(10px)", opacity: 1, duration: 2 }
+    )
+    .fromTo(
+      ".handContainerFadeIn",
+      { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+
+      {
+        opacity: 1,
+        filter: "blur(0px)",
+        transform: "translateY(0px)",
+        duration: 0.8,
+      }
+    );
 };

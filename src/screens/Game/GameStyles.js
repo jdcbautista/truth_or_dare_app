@@ -15,6 +15,22 @@ export const GameContainer = styled.div`
   height: 400px;
   border: 0px solid black;
 `;
+
+export const TextContainer = styled.div`
+  display: flex;
+  color: #777777;
+  font-size: 2em;
+  font-family: "Open Sans", sans-serif;
+  justify-content: center;
+  width: 100vw;
+  height: 80px;
+  padding: 40px;
+`;
+
+export const TimerBar = styled.div`
+  background-color: red;
+`
+
 export const PlayerCard = styled.div`
   /* background-color: red; */
   border-radius: 50px;
@@ -70,7 +86,7 @@ export const StandardPlayingCardContainer = styled(Card)`
   overflow: hidden;
   box-shadow: 0 0 16px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  border: 8px solid
+  border: 9px solid
     ${(props) => {
       if (props.selected) return "gold";
       else if (props.type === "dare") return "#FB5156";
@@ -170,9 +186,9 @@ export const VotingCardText = styled.h2`
     return "em";
   }};
   color: ${(props) => {
-    if (props.type === "truth") return "#64c0fa";
-    else if (props.type == "dare") return "#FB5156";
-    else if (props.type == "wild") return "#FFFFFF";
+    if (props.yesNoSelected === "yes") return "#64c0fa";
+    else if (props.yesNoSelected == "no") return "#FB5156";
+    else if (props.yesNoSelected == "selected") return "gold";
     return "#000000";
   }};
   justify-content: center;

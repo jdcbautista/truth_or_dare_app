@@ -1,105 +1,42 @@
-// import React, { useEffect, useState } from "react";
-// import ms from "pretty-ms";
+import React, { Component } from 'react';
 
-// export const FTimer = () => {
-//   const [elapsedTime, setElapsedTime] = useState(0)
-//   const [isRunning, setRunning] = useState(false)
-//   const [startTime, setStartTime] = useState(0)
+class Timer extends Component {
+  constructor(props){
+    super(props);
+    this.state = {endTime: parseInt(props.votePhaseEnd), timeDisplay: ''}
+    this.endVoting = props.endVoting.bind(this);
+  }
+  timer() {
+    console.log(this.state.endTime)
+    let remainingTime = this.state.endTime - Date.now()
+    //will always be less than an hour so don't need hours
+    const mins = Math.floor((remainingTime / 60000));
+    const secs = Math.floor((remainingTime % 60000) / 1000);
 
-//   useEffect(() => {
-//     const timer = setInterval(() => setElapsedTime(Date.now() - startTime), 1);
-//     return () => clearInterval(timer);
-//   }, []);
-  
-//   const startTimer = () => {
-//     setRunning(true)
-//     setElapsedTime(elapsedTime)
-//     setStartTime(Date.now() - startTime)
-//   }
+    //display as mm:ss
+    let display = "";
+    display += ("" + mins + ":" + (secs < 10 ? "0" : ""));
+    display += ("" + secs);
 
-//   const stopTimer = () => {
-//     //stop
-//     setRunning(false)
-//     clearInterval(this.timer)
-//   } 
+    this.setState({
+      timeDisplay: display
+    })
+    if(remainingTime < 2) {
+      this.endVoting()
+      clearInterval(this.intervalId);
+    }
+  }
+  componentDidMount() {
+    this.intervalId = setInterval(this.timer.bind(this), 1000);
+  }
+  componentWillUnmount(){
+    clearInterval(this.intervalId);
+  }
+  render() {
+    return(
+      <div>{this.state.timeDisplay}</div>
+    );
+  }
+}
 
-//   const resetTimer = () => {
-//     setElapsedTime(0)
-//     setRunning(false)
-//   }
-
-//   return (
-//     <div>
-//       <p>timer: {ms(elapsedTime)}</p>
-//       <p>timer: {ms(startTime)}</p> 
-//     </div>
-
-//   )
-
-// }
-
-
-// class Timer extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       time: 0,
-//       isOn: this.props.timerRunning,
-//       start: 0,
-//     };
-//     this.startTimer = this.startTimer.bind(this);
-//     this.stopTimer = this.stopTimer.bind(this);
-//     this.resetTimer = this.resetTimer.bind(this);
-//   }
-//   // startTimer() {
-//   //   this.setState({
-//   //     isOn: true,
-//   //     time: this.state.time,
-//   //     start: Date.now() - this.state.time,
-//   //   });
-//   //   this.timer = setInterval(
-//   //     () =>
-//   //       this.setState({
-//   //         time: Date.now() - this.state.start,
-//   //       }),
-//   //     1
-//   //   );
-//   // }
-//   stopTimer() {
-//     this.setState({ isOn: false });
-//     clearInterval(this.timer);
-//   }
-//   resetTimer() {
-//     this.setState({ time: 0, isOn: false });
-//   }
-//   render() {
-//     let start =
-//       this.state.time === 0 ? (
-//         <button onClick={this.startTimer}>start</button>
-//       ) : null;
-//     let stop =
-//       this.state.time === 0 || !this.state.isOn ? null : (
-//         <button onClick={this.stopTimer}>stop</button>
-//       );
-//     let resume =
-//       this.state.time === 0 || this.state.isOn ? null : (
-//         <button onClick={this.startTimer}>resume</button>
-//       );
-//     let reset =
-//       this.state.time === 0 || this.state.isOn ? null : (
-//         <button onClick={this.resetTimer}>reset</button>
-//       );
-//     return (
-//       <div>
-//         <h3>timer: {ms(this.state.time)}</h3>
-//         <h3>start: {ms(this.state.start)}</h3>
-//         {start}
-//         {resume}
-//         {stop}
-//         {reset}
-//       </div>
-//     );
-//   }
-// }
-
-// export default Timer;
+export default Timer;

@@ -40,6 +40,9 @@ export const StyledVideoBox = styled(Box)`
     if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
     if (!props.ready && props.gamePhase === "setup")
       return "10px solid #FB5156";
+    if (props.vote === "yes" && props.gamePhase === "voting") return "10px solid #64c0fa";
+    if (props.vote === "no" && props.gamePhase === "voting")
+      return "10px solid #FB5156";
     if (props.winner && props.gamePhase === "gameOver")
       return "20px solid #000000";
     return "none";
@@ -268,3 +271,5 @@ export const StyledAudioOffIcon = styled(AiOutlineAudioMuted)`
   color: #ec625f;
   width: 50px;
 `;
+
+/* STYLES FOR TITLE BAR & TEXT BAR */

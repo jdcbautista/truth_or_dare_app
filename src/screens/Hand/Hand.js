@@ -100,16 +100,16 @@ const Hand = ({
 
       gsap
         .timeline()
-        .fromTo(
-          ".handContainerFadeIn",
-          { opacity: 0, transform: "translateY(0px)" },
+        // .fromTo(
+        //   ".handContainerFadeIn",
+        //   { opacity: 0, transform: "translateY(100px)" },
 
-          {
-            opacity: 1,
-            transform: "translateY(400px)",
-            duration: 0.5,
-          }
-        )
+        //   {
+        //     opacity: 1,
+        //     transform: "translateY(400px)",
+        //     duration: 0.5,
+        //   }
+        // )
 
         .fromTo(
           ".gameContainerFadeIn",
