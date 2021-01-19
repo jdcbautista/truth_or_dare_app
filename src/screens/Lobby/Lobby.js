@@ -42,7 +42,6 @@ const Lobby = () => {
   useEffect(() => {
     FirestoreService.authenticateAnonymously()
       .then((userCredential) => {
-        console.log("authenticating");
         setUserId(userCredential.user.uid);
       })
       .catch((error) => console.log(error));
@@ -51,7 +50,6 @@ const Lobby = () => {
       .then((response) =>
         response.onSnapshot((gotPlayers) => {
           const players = gotPlayers.docs.map((player) => player.data());
-          console.log("player checking");
           setPlayers(players);
           setLoading(false);
         })
@@ -71,7 +69,6 @@ const Lobby = () => {
           setToken(token);
         })
         .catch((error) => setError(error));
-      console.log({ players, userId });
     }
 
     const participantConnected = (participant) => {
@@ -151,7 +148,6 @@ const Lobby = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("adding player");
     FirestoreService.addPlayer(
       { username, userId },
       FirestoreService.GAMEROOM
@@ -160,7 +156,6 @@ const Lobby = () => {
 
   const handleReadyClick = (e) => {
     e.preventDefault();
-    console.log("player ready");
     FirestoreService.readyPlayer(
       userId,
       FirestoreService.GAMEROOM
@@ -201,8 +196,7 @@ const Lobby = () => {
   };
 
   const handleStartGame = async () => {
-    await FirestoreService.startGame(FirestoreService.GAMEROOM);
-    console.log("starting game");
+    await FirestoreService.startGame(FirestoreService.GAMEROOM).catch(err => console.log(err));
     setIsGameStarted(true);
 
     // await gsap
@@ -227,22 +221,19 @@ const Lobby = () => {
 
   const handleLoadDeck = async (e) => {
     e.preventDefault();
-    await FirestoreService.loadDeckFromResources();
-    console.log("loading deck");
+    await FirestoreService.loadDeckFromResources().catch(err => console.log(err));
   };
 
   const handleDeleteField = async (e) => {
     await FirestoreService.deleteField(FirestoreService.GAMEROOM).catch((err) =>
       console.log(err)
     );
-    console.log("deleting field");
   };
 
   const handleAddPoints = async (e) => {
     await FirestoreService.addPointsToPlayer(
       FirestoreService.GAMEROOM
     ).catch((err) => console.log(err));
-    console.log("advancing phase");
   };
 
   const handleAdvanceHotseat = async () => {
