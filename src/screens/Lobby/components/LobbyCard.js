@@ -54,12 +54,10 @@ function LobbyCard({
               />
             )}
 
-            <StyledHeading>{playerInfo?.username}</StyledHeading>
+            <StyledHeading>{user?.username}</StyledHeading>
 
             {gamePhase.phase !== "setup" && (
-              <StyledScoreContainer>
-                score: {playerInfo?.score}
-              </StyledScoreContainer>
+              <StyledScoreContainer>score: {user?.score}</StyledScoreContainer>
             )}
 
             {twilioUserInfo && !playerInfo?.ready && (

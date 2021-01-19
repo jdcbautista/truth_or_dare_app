@@ -42,6 +42,7 @@ function Navbar({
         <GameName>truth or dare</GameName>
         <DebugContainer debugMode={debugMode}>
           <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
+          <DebugButton onClick={showHand}>Show Hand</DebugButton>
           <DebugButton onClick={deleteField}>Delete Field</DebugButton>
           <DebugButton onClick={startGame}>Start Game</DebugButton>
           <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>

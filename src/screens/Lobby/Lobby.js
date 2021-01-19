@@ -13,7 +13,7 @@ import { LobbyContainer } from "./LobbyStyles";
 import { StyledFlex, DebugButton } from "./LobbyStyles";
 import Navbar from "./components/Navbar";
 
-const Lobby = () => {
+const Lobby = ({ userId }) => {
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
@@ -29,8 +29,6 @@ const Lobby = () => {
   const [isHandOpen, setIsHandOpen] = useState(null);
   const [gamePhase, setGamePhase] = useState({ phase: "setup" });
   const [gameRound, setGameRound] = useState(1);
-  // Auth
-  const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
   const [isGameStarted, setIsGameStarted] = useState(false);
 
@@ -40,13 +38,6 @@ const Lobby = () => {
   // state. It also gets all of our players from a game
   // and sets the local state with those players
   useEffect(() => {
-    FirestoreService.authenticateAnonymously()
-      .then((userCredential) => {
-        console.log("authenticating");
-        setUserId(userCredential.user.uid);
-      })
-      .catch((error) => console.log(error));
-
     const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
       .then((response) =>
         response.onSnapshot((gotPlayers) => {
@@ -120,7 +111,7 @@ const Lobby = () => {
         response.onSnapshot((gotGamePhase) => {
           const gamePhase = gotGamePhase.docs.map((doc) => doc.data())[0];
           setGamePhase(gamePhase);
-          setGameRound(gamePhase?.round)
+          setGameRound(gamePhase?.round);
         })
       )
       .catch((error) => console.log(error));
@@ -138,25 +129,16 @@ const Lobby = () => {
   useEffect(() => {
     if (isHandOpen == false) {
       gsap
-      .timeline()
+        .timeline()
 
-      .fromTo(
-        ".gameContainerFadeIn",
-        { filter: "blur(10px)" },
-        { filter: "blur(0px)", duration: 1 }
-      )
+        .fromTo(
+          ".gameContainerFadeIn",
+          { filter: "blur(10px)" },
+          { filter: "blur(0px)", duration: 1 }
+        );
       //
     }
   }, []);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("adding player");
-    FirestoreService.addPlayer(
-      { username, userId },
-      FirestoreService.GAMEROOM
-    ).catch((error) => setError(error));
-  };
 
   const handleReadyClick = (e) => {
     e.preventDefault();
@@ -165,10 +147,6 @@ const Lobby = () => {
       userId,
       FirestoreService.GAMEROOM
     ).catch((error) => setError(error));
-  };
-
-  const handleChange = (e) => {
-    setUsername(e.target.value);
   };
 
   const createPlaceholders = (numberOfPlayersInGame) => {
@@ -204,25 +182,6 @@ const Lobby = () => {
     await FirestoreService.startGame(FirestoreService.GAMEROOM);
     console.log("starting game");
     setIsGameStarted(true);
-
-    // await gsap
-    //   .timeline()
-    //   .fromTo(
-    //     ".gameContainerFadeIn",
-    //     { filter: "blur(0px)" },
-    //     { filter: "blur(10px)", duration: 2 }
-    //   )
-    //   .fromTo(
-    //     ".handContainerFadeIn",
-    //     { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
-
-    //     {
-    //       opacity: 1,
-    //       filter: "blur(0px)",
-    //       transform: "translateY(0px)",
-    //       duration: 0.8,
-    //     }
-    //   );
   };
 
   const handleLoadDeck = async (e) => {
@@ -253,22 +212,19 @@ const Lobby = () => {
 
   const handleEndVoting = async () => {
     await FirestoreService.endVoting(FirestoreService.GAMEROOM).catch((err) =>
-    setError(err)
-  );
-    await gsap
-    .timeline()
-      .fromTo(
-        ".gameContainerFadeIn",
-        { opacity: 1, filter: "blur(0px)" },
+      setError(err)
+    );
+    await gsap.timeline().fromTo(
+      ".gameContainerFadeIn",
+      { opacity: 1, filter: "blur(0px)" },
 
-        {
-          opacity: 0,
-          filter: "blur(20px)",
-          duration: 3,
-        }
-      );
-  
-  }
+      {
+        opacity: 0,
+        filter: "blur(20px)",
+        duration: 3,
+      }
+    );
+  };
 
   const handleCleanupStart = async () => {
     await FirestoreService.cleanupStart(
@@ -282,7 +238,6 @@ const Lobby = () => {
         <h1>Loading...</h1>
       ) : (
         <>
-          
           <Navbar
             showHand={handleViewHand}
             gameRound={gameRound}
@@ -300,13 +255,6 @@ const Lobby = () => {
             onClick={() => (isHandOpen ? handleViewHand() : "")}
             className="LobbyToNav"
           >
-            {!localPlayer && (
-              <LobbyInput
-                handleChange={handleChange}
-                handleSubmit={handleSubmit}
-              />
-            )}
-                        
             <StyledFlex className="fadeOutVideo">
               {localPlayer && room?.localParticipant && (
                 <Suspense fallback={<div>Loading...</div>}>

@@ -195,3 +195,15 @@ export const PageRules = styled.div`
   left: 50vw;
   transform: translate(-50%, -50%);
 `;
+export const wildCardScoreUpdate = styled.p`
+  padding: 10px;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 90px;
+  right: 20px;
+  text-align: center;
+`;

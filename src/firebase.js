@@ -16,7 +16,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game7";
+export const GAMEROOM = "game3";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
@@ -46,6 +46,7 @@ export const gameSetup = async (gameId) => {
  * @params userId - {string} - the id of the targeted user
  */
 export const addPlayer = async (newPlayer, gameId) => {
+  console.log({ newPlayer });
   const { userId, username } = newPlayer;
   const snapshot = await db
     .collection("rooms")
@@ -408,16 +409,16 @@ export const getPlayerScore = async (gameID, playerID) => {
   return playerPoints;
 };
 
-export const addPointsToPlayer = async (gameID, lose=false) => {
+export const addPointsToPlayer = async (gameID, lose = false) => {
   const cardData = await getSelectedFieldCard(gameID);
   const playerPoints = await getPlayerScore(gameID, cardData.selectedBy);
-  let cardPoints = parseInt(cardData.points)
+  let cardPoints = parseInt(cardData.points);
   if (lose) {
-    cardPoints = -cardPoints
+    cardPoints = -cardPoints;
   }
   const playerCollection = await getPlayers(gameID);
   const newScore = cardPoints + playerPoints;
-  if (newScore >= WINNINGPOINTS){
+  if (newScore >= WINNINGPOINTS) {
     await playerCollection.doc(cardData.selectedBy).update({
       score: newScore,
       winner: true,
@@ -476,14 +477,14 @@ export const cardSelectByHotseat = async (gameID, cardID, playerID) => {
       if (card.id === cardID) {
         await phase.update({
           cardPoints: card.data().points,
-          votePhaseEnd: Date.now() + VOTETIME
-        })
+          votePhaseEnd: Date.now() + VOTETIME,
+        });
         await card.ref.update({
           selected: true,
           selectedBy: playerID,
           yesNoSelected: "selected",
         });
-        console.log(card.id, 'selected')
+        console.log(card.id, "selected");
       } else if (thumbsUpAdd) {
         await card.ref.update({
           yesNoSelected: "yes",
@@ -583,14 +584,18 @@ export const autoAdvancePhase = async (gameID, cards) => {
           return "game over";
         }
       }
-      await startRound(GAMEROOM)
+      await startRound(GAMEROOM);
     }
   }
   return "phase changed";
 };
 
 export const getRound = async (gameID) => {
-  const snapshot = db.collection("rooms").doc(gameID).collection('gamePhase').doc('phase');
+  const snapshot = db
+    .collection("rooms")
+    .doc(gameID)
+    .collection("gamePhase")
+    .doc("phase");
 
   const round = await snapshot.get();
   console.log(round.data());
@@ -615,8 +620,8 @@ export const endVoting = async (gameID) => {
       thumbsDown += 1;
     }
   }
-  console.log(thumbsUp, 'yays', thumbsDown, 'nays')
-  const isApproved = (thumbsUp > thumbsDown)
+  console.log(thumbsUp, "yays", thumbsDown, "nays");
+  const isApproved = thumbsUp > thumbsDown;
 
   await snapshot.update({
     taskComplete: true,
@@ -694,9 +699,9 @@ export const setWildCardText = async (
     .doc(gameID)
     .collection("field")
     .doc(cardID);
-    const cardToEdit = await cardInHand.update({
-      text: wildCardText
-    })
+  const cardToEdit = await cardInHand.update({
+    text: wildCardText,
+  });
 };
 
 export const startGame = async () => {

@@ -19,9 +19,7 @@ const HandPlayingCard = ({ id, type, text, points, onClick, selected }) => {
           <HandPlayingCardText>
             Play to field, then click to edit!
           </HandPlayingCardText>
-          <HandPlayingCardText type={type}>
-            6 pts
-          </HandPlayingCardText>
+          <HandPlayingCardText type={type}>6 pts</HandPlayingCardText>
         </WildPlayingCardContainer>
       ) : (
         <StandardPlayingCardContainer
