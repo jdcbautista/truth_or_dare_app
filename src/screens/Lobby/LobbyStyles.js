@@ -1,5 +1,5 @@
 import { Card, Image, Flex, Box, Button } from "rebass";
-import styled from "@emotion/styled";
+import styled from "@emotion/styled/macro";
 import {
   AiFillCheckCircle,
   AiFillCloseCircle,
@@ -10,30 +10,34 @@ import { FiVideoOff, FiVideo } from "react-icons/fi";
 
 /* STYLES FOR VIDEO CONTAINER */
 
-export const StyledGameVideoBox = styled(Box)`
+// export const StyledGameVideoBox = styled(Box)`
+//   display: ${(props) => {
+//     if (props.displayoff) return "none";
+//     return "block";
+//   }};
+// `;
+
+export const StyledVideoBox = styled(Box)`
+  height: 250px;
+  position: relative;
+  display: flex;
+  min-height: 256px;
+  align-items: center;
+  width: 250px;
+  box-sizing: border-box;
+  overflow: hidden;
+  padding-right: 100px;
+  object-position: left bottom;
+  border-radius: 100%;
   display: ${(props) => {
     if (props.displayoff) return "none";
     return "block";
   }};
-  border: 10px solid red;
 `;
 
-export const StyledGameVideo = styled.video`
-  width: 100%;
+export const StyledVideo = styled.video`
   height: 100%;
-  border: 10px solid red;
-  border-radius: 10px;
-  object-fit: cover;
-  display: inline-block;
-  vertical-align: middle;
-`;
-
-export const StyledVideoBox = styled(Box)`
-  height: ${(props) => {
-    if (props.videoHeight) return props.videoHeight + "px";
-    return "320px";
-  }};
-  overflow: hidden;
+  width: 100%;
   border: ${(props) => {
     if (props.hotseat && props.gamePhase !== "setup")
       return "10px solid #FFF689";
@@ -45,30 +49,35 @@ export const StyledVideoBox = styled(Box)`
       return "10px solid #FB5156";
     if (props.winner && props.gamePhase === "gameOver")
       return "20px solid #000000";
-    return "none";
+    return "10px solid #cccccc50";
   }};
-  padding-right: 100px;
-  object-position: left bottom;
-  border-radius: 5px;
-  display: ${(props) => {
-    if (props.displayoff) return "none";
-    return "block";
-  }};
-`;
-export const StyledVideo = styled.video`
-  height: ${(props) => {
-    if (props.videoHeight) return props.videoHeight + "px";
-    return "320px";
-  }};
+  border-radius: 50%;
+  position: absolute;
   margin: 0 auto;
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg); /* Safari and Chrome */
   -moz-transform: rotateY(180deg);
-  object-position: 90px;
+  object-fit: cover;
   display: ${(props) => {
     if (props.nodisplay) return "none";
     return "block";
   }};
+  &:hover {
+    opacity: 0.5;
+  }
+`;
+
+export const StyledHeading = styled.div`
+  font-family: sans-serif;
+  position: absolute;
+  top: 30px;
+  right: 110px;
+  background-color: #00000050;
+  padding: 3px;
+  border-radius: 5px;
+  font-size: 15px;
+  justify-content: center;
+  align-self: center;
 `;
 
 /* STYLES FOR INPUT */
@@ -102,10 +111,11 @@ export const Message = styled.label`
 `;
 
 /* STYLE FOR DEBUG BUTTON */
-export const DebugButton = styled(Button)`
+export const DebugButton = styled.button`
   opacity: 0.5;
   color: white;
   margin: 10px;
+  font-size: 10px;
   background-color: red;
   &:hover {
     opacity: 1;
@@ -126,8 +136,9 @@ export const LobbyContainer = styled.div`
 
 export const StyledCard = styled(Card)`
   color: white;
+
   font-family: Arial, Helvetica, sans-serif;
-  height: 320px;
+  height: 100%;
   position: relative;
   margin: 0 auto;
   text-align: center;
@@ -141,39 +152,28 @@ export const StyledAvatar = styled.img`
     if (props.displayoff) return "none";
     return "block";
   }};
+  min-height: 256px;
   border: ${(props) => {
     if (props.hotseat && props.gamePhase !== "setup")
       return "10px solid #FFF689";
-    if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
+    if (props.ready && props.gamePhase === "setup") return "10px solid #4BB543";
     if (!props.ready && props.gamePhase === "setup")
       return "10px solid #FB5156";
-    return "none";
+    return "10px solid #cccccc50";
   }};
   background-position: center;
   background-color: #fff;
-  height: 320px;
+  height: 100%;
+  border-radius: 100%;
   width: 100%;
   background-size: 100px;
-`;
-export const StyledHeading = styled.div`
-  font-family: sans-serif;
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  background-color: #00000050;
-  padding: 3px;
-  border-radius: 5px;
-  display: flex;
-  font-size: 12px;
-  justify-content: center;
-  align-self: center;
 `;
 
 export const StyledScoreContainer = styled.div`
   font-family: sans-serif;
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 0px;
+  left: 3px;
   background-color: #00000050;
   padding: 3px;
   border-radius: 5px;
@@ -217,12 +217,12 @@ export const StyledVideoIconButton = styled.div`
   justify-content: space-evenly;
   flex-direction: row;
   position: absolute;
-  bottom: 15px;
+  bottom: -10px;
   align-self: center;
   align-items: center;
   width: 30px;
   height: 30px;
-  left: 12px;
+  left: 0px;
   &:hover {
     background-color: #313131;
     border-radius: 100%;
@@ -236,12 +236,12 @@ export const StyledAudioIconButton = styled.div`
   justify-content: space-evenly;
   flex-direction: row;
   position: absolute;
-  bottom: 15px;
+  bottom: -10px;
   align-self: center;
   align-items: center;
   width: 30px;
   height: 30px;
-  left: 45px;
+  left: 35px;
   &:hover {
     background-color: #313131;
     border-radius: 100%;

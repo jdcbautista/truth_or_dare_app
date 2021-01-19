@@ -14,17 +14,6 @@ import { StyledFlex, DebugButton } from "./LobbyStyles";
 import Navbar from "./components/Navbar";
 
 const Lobby = () => {
-  // Jarrett & Emma
-  //What the current screen is that is displayed
-  const [screenID, setScreenID] = useState("title");
-  //The identity and room name of the current user
-  const [identity, setIdentity] = useState("");
-  const [roomName, setRoomName] = useState("");
-  //
-  const [ready, setReady] = useState(false);
-  const [inputDisabled, setInputDisabled] = useState(false);
-
-  // Michael
   // The twilio state for token, room, and participants in the room
   const [token, setToken] = useState(null);
   const [room, setRoom] = useState(null);
@@ -39,6 +28,7 @@ const Lobby = () => {
   // For game states
   const [isHandOpen, setIsHandOpen] = useState(null);
   const [gamePhase, setGamePhase] = useState({ phase: "setup" });
+  const [gameRound, setGameRound] = useState(1);
   // Auth
   const [userId, setUserId] = useState(null);
   // Start the game when all players are ready and start button is clicked
@@ -130,6 +120,7 @@ const Lobby = () => {
         response.onSnapshot((gotGamePhase) => {
           const gamePhase = gotGamePhase.docs.map((doc) => doc.data())[0];
           setGamePhase(gamePhase);
+          setGameRound(gamePhase?.round)
         })
       )
       .catch((error) => console.log(error));
@@ -280,10 +271,10 @@ const Lobby = () => {
   }
 
   const handleCleanupStart = async () => {
-    await FirestoreService.cleanupStart(FirestoreService.GAMEROOM).catch((err) =>
-    setError(err)
-    );
-  }
+    await FirestoreService.cleanupStart(
+      FirestoreService.GAMEROOM
+    ).catch((err) => setError(err));
+  };
 
   return (
     <>
@@ -294,6 +285,7 @@ const Lobby = () => {
           
           <Navbar
             showHand={handleViewHand}
+            gameRound={gameRound}
             startGame={handleStartGame}
             loadDeck={handleLoadDeck}
             deleteField={handleDeleteField}
@@ -304,7 +296,10 @@ const Lobby = () => {
             endFadeTimer={handleCleanupStart}
           />
 
-          <LobbyContainer onClick={() => isHandOpen?handleViewHand():''} className="LobbyToNav">
+          <LobbyContainer
+            onClick={() => (isHandOpen ? handleViewHand() : "")}
+            className="LobbyToNav"
+          >
             {!localPlayer && (
               <LobbyInput
                 handleChange={handleChange}
@@ -324,7 +319,7 @@ const Lobby = () => {
                   />
                 </Suspense>
               )}
-              {createPlaceholders(players)}
+              {/* {createPlaceholders(players)} */}
 
               {participants &&
                 room &&
@@ -385,15 +380,13 @@ const Lobby = () => {
               />
             )}
 
-            {(gamePhase.phase === "gameOver") && (
-              <GameOver
-                startGame={handleStartGame}
-              />
+            {gamePhase.phase === "gameOver" && (
+              <GameOver startGame={handleStartGame} />
             )}
 
-            {!isHandOpen &&
+            {!isHandOpen && (
               <DebugButton onClick={handleViewHand}>Show Hand</DebugButton>
-            }
+            )}
           </LobbyContainer>
         </>
       )}

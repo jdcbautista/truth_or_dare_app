@@ -30,7 +30,8 @@ const Game = ({
   localPlayer,
   room,
   localParticipant,
-  endVoting
+  endVoting,
+  user,
 }) => {
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
@@ -51,8 +52,11 @@ const Game = ({
           console.log("getting field cards");
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
-          console.log('snapshot going')
-          await FirestoreService.autoAdvancePhase(FirestoreService.GAMEROOM, cards)
+          console.log("snapshot going");
+          await FirestoreService.autoAdvancePhase(
+            FirestoreService.GAMEROOM,
+            cards
+          );
         })
       )
       .catch((error) => console.log(error));
@@ -60,10 +64,10 @@ const Game = ({
   }, []);
 
   /**
-  * This effect tries to load a deck from resources if there is none and deals cards
-  * which will replenish automatically. It aso calls handleGetHand which will keep the players
-  * hand up to date with what is in the DB
-  */
+   * This effect tries to load a deck from resources if there is none and deals cards
+   * which will replenish automatically. It aso calls handleGetHand which will keep the players
+   * hand up to date with what is in the DB
+   */
   useEffect(() => {
     (async () => {
       // Load a deck
@@ -116,10 +120,12 @@ const Game = ({
   };
 
   const handleVoteClick = async (yesNo) => {
-    await FirestoreService.playerVote(FirestoreService.GAMEROOM, userId, yesNo).catch((err) =>
-    setError(err)
-  );
-  }
+    await FirestoreService.playerVote(
+      FirestoreService.GAMEROOM,
+      userId,
+      yesNo
+    ).catch((err) => setError(err));
+  };
 
   return (
     <div>
@@ -168,31 +174,33 @@ const Game = ({
       
       <StyledFlex>
         {fieldCards.map((card) => (
-          <Box key={card?.id} p={3} width={1 / 4} color="white" bg="primary">
+          <Box key={card?.id} p={3} color="white" bg="primary">
             <PlayerCard>
-              {(card?.yesNoSelected === "yes" || card?.yesNoSelected === "no") ?
+              {card?.yesNoSelected === "yes" || card?.yesNoSelected === "no" ? (
                 <VotingCard
-                yesNoSelected={card?.yesNoSelected}
-                onClick={() => handleVoteClick(card?.yesNoSelected)}
+                  yesNoSelected={card?.yesNoSelected}
+                  onClick={() => handleVoteClick(card?.yesNoSelected)}
                 />
-              :
-              <GamePlayingCard
-                id={card?.id}
-                gamePhase={gamePhase}
-                selected={card?.selected}
-                currentlySelectedCard={isCurrentlySelectedCard()}
-                type={card?.type}
-                text={card?.text}
-                points={card?.points}
-                onClick={
-                  isCurrentlySelectedCard
-                    ? () => handleSelectCard(card?.hashId)
-                    : null
-                }
-              />
-              }
-              
-              
+              ) : (
+                <GamePlayingCard
+                  id={card?.id}
+                  gamePhase={gamePhase}
+                  selected={card?.selected}
+                  userID={card?.playedBy}
+                  cardID={card?.hashId}
+                  currentlySelectedCard={isCurrentlySelectedCard()}
+                  type={card?.type}
+                  text={card?.text}
+                  username={card?.username}
+                  points={card?.points}
+                  onClick={
+                    isCurrentlySelectedCard
+                      ? () => handleSelectCard(card?.hashId)
+                      : null
+                  }
+                  user={user}
+                />
+              )}
             </PlayerCard>
           </Box>
         ))}

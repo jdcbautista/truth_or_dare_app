@@ -27,34 +27,23 @@ function LobbyCard({
   return (
     <>
       {defaultCard ? (
-        <Box p={3} width={1 / 4} color="white" bg="primary">
-          <StyledCard
-            width={cardWidth}
-            sx={{
-              borderRadius: 8,
-              boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
-            }}
-          >
-            <StyledAvatar
-              displayoff={false}
-              src={`https://robohash.org/${Math.random() * 2000}/size=200x300`}
-              sx={{
-                height: cardHeight,
-              }}
-            />
-
-            <StyledBadge sx={{ mx: "auto" }}>Waiting for player...</StyledBadge>
-          </StyledCard>
-        </Box>
+        <></>
       ) : (
-        <Box p={3} width={1 / 4} color="white" bg="primary">
-          <StyledCard
-            width={cardWidth}
-            sx={{
-              borderRadius: 8,
-              boxShadow: "0 0 16px rgba(0, 0, 0, .25)",
-            }}
-          >
+        // <Box p={3} width={1 / 4} color="white" bg="primary">
+        //   <StyledCard width={cardWidth}>
+        //     <StyledAvatar
+        //       displayoff={false}
+        //       src={`https://robohash.org/${Math.random() * 2000}/`}
+        //       sx={{
+        //         height: cardHeight,
+        //       }}
+        //     />
+
+        //     <StyledBadge sx={{ mx: "auto" }}>Waiting for player...</StyledBadge>
+        //   </StyledCard>
+        // </Box>
+        <Box p={3} color="white" bg="primary">
+          <StyledCard width={cardWidth}>
             {twilioUserInfo && userId && user && (
               <Participant
                 key={twilioUserInfo?.sid}
