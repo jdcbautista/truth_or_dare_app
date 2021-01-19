@@ -5,6 +5,7 @@ import { gsap } from "gsap";
 import { Flex, Box } from "reflexbox";
 import {
   GameContainer,
+  TextContainer,
   PlayerCard,
   HotseatCard,
   GameVideoBox,
@@ -21,10 +22,15 @@ const Game = ({
   players,
   participants,
   gamePhase,
+  approved,
+  votePhaseEnd,
+  hotseat,
+  cardPoints,
   userId,
   localPlayer,
   room,
   localParticipant,
+  endVoting,
   user,
 }) => {
   const [playerCards, setPlayerCards] = useState([]);
@@ -107,8 +113,6 @@ const Game = ({
       userId
     );
     console.log("card selected");
-    // const interval = setInterval(() => FirestoreService.endVoting(FirestoreService.GAMEROOM), 10000);
-    // return () => clearInterval(interval);
   };
 
   const isCurrentlySelectedCard = () => {
@@ -124,12 +128,50 @@ const Game = ({
   };
 
   return (
+    <div>
+      <div>
+      {(gamePhase == 'voting') && (fieldCards.length == 3) && 
+        <Flex flexWrap='wrap'>
+          <Box flex='1' height="80px">
+          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box flex='1' height="80px">
+            
+          <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} />
+          
+          </Box><Box flex='1' height="80px">
+          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
+          </Box>
+          {/* <Box p={3}>
+          <TextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</TextContainer></Box><Box>
+          <Timer votePhaseEnd={votePhaseEnd} />
+          <TextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</TextContainer>
+          </Box> */}
+        </Flex>
+      }
+      </div>
+    <TextContainer className="timerBarDeplete">
+      {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
+        `Everyone but ${hotseat} is choosing a card!`
+      }
+      {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
+        `${hotseat} is in the hotseat choosing a card!`
+      }
+      {/* {(gamePhase == 'voting') && (fieldCards.length == 3) && 
+        `${hotseat} has chosen a fate!`
+      }
+      {(gamePhase == 'voting') && (fieldCards.length == 3) && 
+        `Did ${hotseat} successfully deliver?`
+      } */}
+      {(gamePhase == 'pre-cleanUp') && (approved) && 
+        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} points!`
+      }
+      {(gamePhase == 'pre-cleanUp') && (!approved) && 
+        `The majority have voted!  ${hotseat} failed!`
+      }
+      {(gamePhase == 'gameOver') &&
+        `${hotseat} wins!`}
+    </TextContainer>
     <GameContainer className="gameContainerFadeIn">
-      {/* <DebugButton onclick={Timer.start}>Start Timer</DebugButton>
-        {Timer.time} {Timer.isOn}
-        <DebugButton onclick={Timer.stop}>PauseTimer</DebugButton>
-        <DebugButton onclick={Timer.reset}>Reset Timer</DebugButton> */}
-      {/* <Timer timerRunning={timerRunning} timerLength={timerLength} /> */}
+      
       <StyledFlex>
         {fieldCards.map((card) => (
           <Box key={card?.id} p={3} color="white" bg="primary">
@@ -164,6 +206,7 @@ const Game = ({
         ))}
       </StyledFlex>
     </GameContainer>
+    </div>
   );
 };
 export default Game;

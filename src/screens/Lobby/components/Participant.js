@@ -117,6 +117,7 @@ const Participant = ({
           ready={user?.ready}
           hotseat={user?.hotseat}
           winner={user?.winner}
+          vote={user?.vote}
         >
           <StyledVideo
             hotseat={user?.hotseat}

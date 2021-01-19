@@ -84,8 +84,7 @@ const GamePlayingCard = ({
           <br></br>
           <GamePlayingCardText>{text}</GamePlayingCardText>          
           <GamePlayingCardText type={type}>{points}</GamePlayingCardText>
-          
-        </StandardPlayingCardContainer>
+          </StandardPlayingCardContainer>
       )}
     </>
   );

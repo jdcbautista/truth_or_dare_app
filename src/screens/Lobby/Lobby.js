@@ -135,6 +135,20 @@ const Lobby = () => {
     }
   }, [players, userId]);
 
+  useEffect(() => {
+    if (isHandOpen == false) {
+      gsap
+      .timeline()
+
+      .fromTo(
+        ".gameContainerFadeIn",
+        { filter: "blur(10px)" },
+        { filter: "blur(0px)", duration: 1 }
+      )
+      //
+    }
+  }, []);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("adding player");
@@ -165,34 +179,17 @@ const Lobby = () => {
 
   const handleViewHand = () => {
     setIsHandOpen(!isHandOpen);
-  };
-
-  // const handleAdvanceRound = async () => {
-  //   FirestoreService.advanceRoundCounter(FirestoreService.GAMEROOM).then(
-  //     (response) => {
-  //       console.log(response);
-  //     }
-  //   );
-  // };
-
-  const handleStartGame = async () => {
-    await FirestoreService.setHotseatPlayer(FirestoreService.GAMEROOM);
-    await FirestoreService.deleteField(FirestoreService.GAMEROOM);
-    await FirestoreService.clearPlayerPoints(FirestoreService.GAMEROOM);
-    console.log("starting game");
-    setIsGameStarted(true);
-
-    await gsap
+    gsap
       .timeline()
 
       .fromTo(
         ".gameContainerFadeIn",
         { filter: "blur(0px)" },
-        { filter: "blur(10px)", duration: 2 }
+        { filter: "blur(10px)", duration: 1 }
       )
       .fromTo(
         ".handContainerFadeIn",
-        { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+        { opacity: 0, filter: "blur(40px)", transform: "translateY(-400px)" },
 
         {
           opacity: 1,
@@ -201,6 +198,31 @@ const Lobby = () => {
           duration: 0.8,
         }
       );
+  };
+
+  const handleStartGame = async () => {
+    await FirestoreService.startGame(FirestoreService.GAMEROOM);
+    console.log("starting game");
+    setIsGameStarted(true);
+
+    // await gsap
+    //   .timeline()
+    //   .fromTo(
+    //     ".gameContainerFadeIn",
+    //     { filter: "blur(0px)" },
+    //     { filter: "blur(10px)", duration: 2 }
+    //   )
+    //   .fromTo(
+    //     ".handContainerFadeIn",
+    //     { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
+
+    //     {
+    //       opacity: 1,
+    //       filter: "blur(0px)",
+    //       transform: "translateY(0px)",
+    //       duration: 0.8,
+    //     }
+    //   );
   };
 
   const handleLoadDeck = async (e) => {
@@ -231,9 +253,22 @@ const Lobby = () => {
 
   const handleEndVoting = async () => {
     await FirestoreService.endVoting(FirestoreService.GAMEROOM).catch((err) =>
-      setError(err)
-    );
-  };
+    setError(err)
+  );
+    await gsap
+    .timeline()
+      .fromTo(
+        ".gameContainerFadeIn",
+        { opacity: 1, filter: "blur(0px)" },
+
+        {
+          opacity: 0,
+          filter: "blur(20px)",
+          duration: 3,
+        }
+      );
+  
+  }
 
   const handleCleanupStart = async () => {
     await FirestoreService.cleanupStart(
@@ -247,12 +282,7 @@ const Lobby = () => {
         <h1>Loading...</h1>
       ) : (
         <>
-          {/* {checkIfReady(players) && (
-            <div>
-              <button onClick={handleStartGame}>Start Game</button>
-              <button onclick={(e) => handleLoadDeck()}>Load</button>
-            </div>
-          )} */}
+          
           <Navbar
             showHand={handleViewHand}
             gameRound={gameRound}
@@ -276,12 +306,11 @@ const Lobby = () => {
                 handleSubmit={handleSubmit}
               />
             )}
-
+                        
             <StyledFlex className="fadeOutVideo">
               {localPlayer && room?.localParticipant && (
                 <Suspense fallback={<div>Loading...</div>}>
                   <LobbyCard
-                    playerInfo={localPlayer}
                     gamePhase={gamePhase}
                     twilioUserInfo={room?.localParticipant}
                     userId={userId}
@@ -321,6 +350,10 @@ const Lobby = () => {
               participants={participants}
               userId={userId}
               gamePhase={gamePhase.phase}
+              approved={gamePhase.approved}
+              votePhaseEnd={gamePhase.votePhaseEnd}
+              hotseat={gamePhase.hotseatName}
+              cardPoints={gamePhase.cardPoints}
               user={localPlayer}
               className="gameGSAP"
               localPlayer={localPlayer}
@@ -328,6 +361,7 @@ const Lobby = () => {
               mockHand="I dare you"
               token={token}
               handleReadyClick={handleReadyClick}
+              endVoting={handleEndVoting}
             />
 
             {isHandOpen && (

@@ -45,6 +45,8 @@ function Navbar({
           <DebugButton onClick={deleteField}>Delete Field</DebugButton>
           <DebugButton onClick={startGame}>Start Game</DebugButton>
           <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
+          <DebugButton onClick={endVotingTimer}>End Voting Phase</DebugButton>
+          <DebugButton onClick={endFadeTimer}>End Fade to Cleanup</DebugButton>
         </DebugContainer>
         <NavbarText>
           <AiOutlineInfoCircle onClick={toggleModal} color="black" />
