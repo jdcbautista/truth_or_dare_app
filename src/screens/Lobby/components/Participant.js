@@ -33,7 +33,6 @@ const Participant = ({
   const videoRef = useRef();
   const audioRef = useRef();
 
-  console.log({ gamePhase });
   const trackpubsToTracks = (trackMap) =>
     Array.from(trackMap.values())
       .map((publication) => publication.track)
@@ -103,8 +102,7 @@ const Participant = ({
       userId,
       FirestoreService.GAMEROOM,
       user.video
-    );
-    console.log(user.video);
+    ).catch(err => console.log(err));
   };
 
   return (

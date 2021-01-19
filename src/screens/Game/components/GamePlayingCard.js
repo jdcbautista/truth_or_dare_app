@@ -9,7 +9,6 @@ import {
 } from "../GameStyles.js";
 import * as FirestoreService from '../../../firebase.js'
 import {StyledBadge, StyledScoreContainer} from '../../Lobby/LobbyStyles.js'
-
 const GamePlayingCard = ({
   id,
   type,
@@ -32,11 +31,9 @@ const GamePlayingCard = ({
 
   const handleEditClick = async () => {
     setEditCard(!editCard)
-    console.log('edit click')
   }
 
   const handleCardChange = async (e) => {
-    console.log(e.target.value)
     setCardText(e.target.value)
   }
 

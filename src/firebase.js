@@ -131,7 +131,7 @@ export const videoToggle = async (userId, gameId, currentVideoStatus) => {
  * @params gameId - {string} - the id of the targeted game
  */
 export const readyPlayer = async (userId, gameId) => {
-  console.log(userId);
+  //console.log(userId);
   // const {userId} = updatedPlayer
   const snapshot = await db
     .collection("rooms")
@@ -166,7 +166,7 @@ export const dealCard = async (gameID, playerID, numCardsToAdd) => {
     const allCards = db.collection("rooms").doc(gameID).collection("gameDeck");
     const startingHands = await allCards.limit(cardsToDeal).get();
     for (let startingCard of startingHands.docs) {
-      console.log(startingCard.id);
+      //console.log(startingCard.id);
       // eslint-disable-next-line
       let playerCards = await db
         .collection("rooms")
@@ -217,9 +217,9 @@ export const addCardsToAllPlayers = async (gameID, numCardsToAdd) => {
 const loadGameDeck = async (deck) => {
   const gameDeck = db.collection("rooms").doc(GAMEROOM).collection("gameDeck");
   const checkEmpty = await gameDeck.limit(1).get();
-  console.log(checkEmpty.docs.length);
+  //console.log(checkEmpty.docs.length);
   if (!checkEmpty.docs.length) {
-    console.log("loading deck");
+    //console.log("loading deck");
     await deck.forEach(async (card) => {
       await gameDeck.add({
         id: card.id,
@@ -229,8 +229,6 @@ const loadGameDeck = async (deck) => {
       });
     });
     return deck;
-  } else {
-    console.log("did not load deck");
   }
 };
 
@@ -265,7 +263,7 @@ export const getHand = async (playerId, gameID) => {
     //add automated document title hash value to object with key 'hashId'
     cardToPush["hashId"] = card.id;
     handArr.push(cardToPush);
-    console.log("card doc id", card.id);
+    //console.log("card doc id", card.id);
   }
   return handArr;
 };
@@ -303,16 +301,16 @@ export const getGamePhase = async (gameId) => {
  */
 
 export const playCard = async (gameID, playerID, cardID) => {
-  console.log(gameID, playerID, cardID);
+  //console.log(gameID, playerID, cardID);
   const playerObj = await getPlayerObject(playerID, gameID);
   const playerName = playerObj.username;
-  console.log(playerName);
+  //console.log(playerName);
   const fieldCards = await db
     .collection("rooms")
     .doc(gameID)
     .collection("field")
     .get();
-  console.log(fieldCards);
+  //console.log(fieldCards);
   const remCapacity = FIELDLIMIT - fieldCards.docs.length;
   if (remCapacity > 0) {
     const cardInHand = db
@@ -356,7 +354,7 @@ export const unsetHotseatPlayer = async (gameID) => {
     const player = players.docs[i];
     const hotseat = player.data().hotseat;
     if (hotseat) {
-      console.log("pass hotseat check");
+      //console.log("pass hotseat check");
       // unset hotseat player and
       // return i
       await playerCollection.doc(player.data().id).update({
@@ -385,7 +383,7 @@ export const setHotseatPlayer = async (gameID) => {
   for (let i = 0; i < players.docs.length; i++) {
     const player = players.docs[i];
     if (i === previousHotseatIndex + 1) {
-      console.log(player.data());
+      //console.log(player.data());
       // unset hotseat player and
       // return i
       await playerCollection.doc(player.data().id).update({
@@ -405,7 +403,6 @@ export const setHotseatPlayer = async (gameID) => {
 export const getPlayerScore = async (gameID, playerID) => {
   const playerObj = await getPlayerObject(playerID, gameID);
   const playerPoints = playerObj.score;
-  console.log(playerPoints);
   return playerPoints;
 };
 
@@ -546,7 +543,6 @@ export const autoAdvancePhase = async (gameID, cards) => {
     .doc(gameID)
     .collection("gamePhase")
     .doc("phase");
-  console.log(cards);
   const selectCheck = cards.map((card) => card.selected);
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
@@ -594,7 +590,6 @@ export const getRound = async (gameID) => {
   const snapshot = db.collection("rooms").doc(gameID).collection('gamePhase').doc('phase');
 
   const round = await snapshot.get();
-  console.log(round.data());
   return round;
 };
 
@@ -703,13 +698,13 @@ export const setWildCardText = async (
     .doc(cardID);
     const cardToEdit = await cardInHand.update({
       text: wildCardText
-    })
+    }).catch(err => console.log(err))
 };
 
 export const startGame = async () => {
-  await setHotseatPlayer(GAMEROOM);
-  await deleteField(GAMEROOM);
-  await clearPlayerPoints(GAMEROOM);
+  await setHotseatPlayer(GAMEROOM).catch(err => console.log(err));
+  await deleteField(GAMEROOM).catch(err => console.log(err));
+  await clearPlayerPoints(GAMEROOM).catch(err => console.log(err));
 
   await gsap
     .timeline()
@@ -717,7 +712,7 @@ export const startGame = async () => {
       ".gameContainerFadeIn",
       { filter: "blur(0px)", opacity: 1 },
       { filter: "blur(10px)", opacity: 1, duration: 2 }
-    )
+    ).catch(err => console.log(err))
     .fromTo(
       ".handContainerFadeIn",
       { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
@@ -728,21 +723,21 @@ export const startGame = async () => {
         transform: "translateY(0px)",
         duration: 0.8,
       }
-    );
+    ).catch(err => console.log(err));
 };
 
 export const startRound = async () => {
-  await advanceRoundCounter(GAMEROOM);
-  await setHotseatPlayer(GAMEROOM);
-  await deleteField(GAMEROOM);
+  await advanceRoundCounter(GAMEROOM).catch(err => console.log(err));
+  await setHotseatPlayer(GAMEROOM).catch(err => console.log(err));
+  await deleteField(GAMEROOM).catch(err => console.log(err));
 
   await gsap
-    .timeline()
+    .timeline().catch(err => console.log(err))
     .fromTo(
       ".gameContainerFadeIn",
       { filter: "blur(0px)", opacity: 1 },
       { filter: "blur(10px)", opacity: 1, duration: 2 }
-    )
+    ).catch(err => console.log(err))
     .fromTo(
       ".handContainerFadeIn",
       { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
@@ -753,5 +748,5 @@ export const startRound = async () => {
         transform: "translateY(0px)",
         duration: 0.8,
       }
-    );
+    ).catch(err => console.log(err));
 };
