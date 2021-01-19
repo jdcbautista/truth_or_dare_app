@@ -250,9 +250,9 @@ export const PageRules = styled.div`
 export const PlayedBy = styled.div`
   font-family: sans-serif;
   position: absolute;
-  bottom: 3px;
-  right: 3px;
-  background-color: #00000050;
+  bottom: 13px;
+  left: 13px;
+  background-color: grey;
   z-index: 3;
   padding: 3px;
   margin: 3px;

@@ -17,6 +17,7 @@ import {
 function Navbar({
   showHand,
   startGame,
+  gameRound,
   loadDeck,
   roundNumber,
   deleteField,
@@ -38,7 +39,7 @@ function Navbar({
         <DebugButton onClick={() => setDebugMode(!debugMode)}>
           Toggle Debug
         </DebugButton>
-        <RoundCounter>Round {roundNumber}</RoundCounter>
+        <RoundCounter>Round {gameRound}</RoundCounter>
         <GameName>truth or dare</GameName>
         <DebugContainer debugMode={debugMode}>
           <DebugButton onClick={loadDeck}>Load Deck</DebugButton>

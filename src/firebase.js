@@ -302,8 +302,8 @@ export const getGamePhase = async (gameId) => {
 export const playCard = async (gameID, playerID, cardID) => {
   console.log(gameID, playerID, cardID);
   const playerObj = await getPlayerObject(playerID, gameID);
-  const playerName = playerObj.username
-  console.log(playerName)
+  const playerName = playerObj.username;
+  console.log(playerName);
   const fieldCards = await db
     .collection("rooms")
     .doc(gameID)
@@ -335,7 +335,7 @@ export const playCard = async (gameID, playerID, cardID) => {
         points: cardData.points,
         playedBy: playerID,
         selected: false,
-        username: playerName
+        username: playerName,
       });
     // eslint-disable-next-line
     let deleteCard = await cardInHand.delete();
@@ -509,6 +509,8 @@ export const advanceRoundCounter = async (gameID) => {
       round: round + 1,
     })
     .catch((err) => console.log(err));
+
+  return await getRound(GAMEROOM).doc("round");
 };
 
 export const resetRoundCounter = async (gameID) => {
@@ -580,6 +582,14 @@ export const autoAdvancePhase = async (gameID, cards) => {
     }
   }
   return "phase changed";
+};
+
+export const getRound = async (gameID) => {
+  const snapshot = db.collection("rooms").doc(gameID);
+
+  const round = await snapshot.get();
+  console.log(round);
+  return round;
 };
 
 export const endVoting = async (gameID) => {
@@ -678,8 +688,8 @@ export const setWildCardText = async (
     .collection("rooms")
     .doc(gameID)
     .collection("field")
-    .doc(cardID)
-    const cardToEdit = await cardInHand.update({
-      text: wildCardText
-    })
+    .doc(cardID);
+  const cardToEdit = await cardInHand.update({
+    text: wildCardText,
+  });
 };
