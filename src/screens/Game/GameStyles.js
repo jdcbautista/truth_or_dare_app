@@ -311,10 +311,3 @@ export const WildCardScoreContainer = styled.p`
   right: 20px;
   text-align: center;
 `;
-
-// justify-content: center;
-//   align-items: center;
-//   padding-top: 20px;
-//   top: 37px;
-//   right: 20px;
-//   text-align: right;
