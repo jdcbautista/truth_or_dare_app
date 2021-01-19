@@ -7,7 +7,6 @@ class Timer extends Component {
     this.endVoting = props.endVoting.bind(this);
   }
   timer() {
-    console.log(this.state.endTime)
     let remainingTime = this.state.endTime - Date.now()
     //will always be less than an hour so don't need hours
     const mins = Math.floor((remainingTime / 60000));
