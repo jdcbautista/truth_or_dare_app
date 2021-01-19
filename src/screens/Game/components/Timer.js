@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+import { SmallTimerContainer } from '../GameStyles';
 
 class Timer extends Component {
   constructor(props){
     super(props);
-    this.state = {endTime: parseInt(props.votePhaseEnd), timeDisplay: ''}
+    this.state = {
+      endTime: parseInt(props.votePhaseEnd),
+      timeDisplay: '',
+      isHotseat: props.isHotseat}
     this.endVoting = props.endVoting.bind(this);
   }
   timer() {
@@ -21,8 +25,10 @@ class Timer extends Component {
     this.setState({
       timeDisplay: display
     })
-    if(remainingTime < 2) {
-      this.endVoting()
+    if(remainingTime < 1000) {
+      if (this.state.isHotseat) {
+        this.endVoting()
+      }
       clearInterval(this.intervalId);
     }
   }
@@ -34,7 +40,7 @@ class Timer extends Component {
   }
   render() {
     return(
-      <div>{this.state.timeDisplay}</div>
+      <SmallTimerContainer>&nbsp; {this.state.timeDisplay} &nbsp; </SmallTimerContainer>
     );
   }
 }

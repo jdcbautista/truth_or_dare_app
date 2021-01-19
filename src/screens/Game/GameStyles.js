@@ -24,12 +24,28 @@ export const TextContainer = styled.div`
   justify-content: center;
   width: 100vw;
   height: 80px;
+  margin: 40px, 0, 20px;
   padding: 40px;
 `;
 
-export const TimerBar = styled.div`
-  background-color: red;
-`
+export const SmallTextContainer = styled.div`
+  color: #777777;
+  font-size: 1em;
+  font-family: "Open Sans", sans-serif;
+  margin: 40 30 0 30;
+`;
+
+export const SmallTimerContainer = styled.div`
+  color: #d0fa66;
+  font-size: 1em;
+  font-weight: bold;
+  font-family: "Open Sans", sans-serif;
+  margin: 40 30 0 30;
+`;
+
+// export const TimerBar = styled.div`
+//   background-color: red;
+// `
 
 export const PlayerCard = styled.div`
   width: 100%;
@@ -278,3 +294,8 @@ export const PlayedBy = styled.div`
   justify-content: center;
   align-self: center;
 `;
+
+export const TimerTextbox = styled.div`
+  display: flex;
+  font-size: 1em;
+  `;
