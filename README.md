@@ -2,6 +2,8 @@ Truth or Dare API doc (updated 13 Jan 2021) https://docs.google.com/document/d/1
 
 Game Logic Pseudocode: https://bit.ly/3ifMxlk
 
+Timer Logic Pseudocode: https://docs.google.com/document/d/1U63JpHNxPEnJuxIN-29LLT_yTFT7NNc4HS8EY1I2_LE/edit
+
 # truth_or_dare_frontend
 
 changelog
