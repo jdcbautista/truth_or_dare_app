@@ -22,6 +22,35 @@ const theme = {
 function App() {
   const [userId, setUserId] = useState(null);
   const [username, setUsername] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [localPlayer, setLocalPlayer] = useState(null)
+  const [players, setPlayers] = useState([]);
+
+  // This effect runs on page load and uses firebase auth
+  // to annonymously authenticate a user. It provides a unique
+  // id that is associated with the users machine and stores in into
+  // state. It also gets all of our players from a game
+  // and sets the local state with those players
+  useEffect(() => {
+    const unsubscribe = FirestoreService.getPlayers(FirestoreService.GAMEROOM)
+      .then((response) =>
+        response.onSnapshot((gotPlayers) => {
+          const players = gotPlayers.docs.map((player) => player.data());
+          setPlayers(players);
+          setLoading(false);
+        })
+      )
+      .catch((error) => console.log(error));
+    return () => unsubscribe();
+  }, []);
+
+   // This effect runs when there is both an authenticated user
+  // and players and compares ids to find and set local player
+  useEffect(() => {
+    if (userId && players) {
+      setLocalPlayer(players.filter((player) => player?.id === userId)[0]);
+    }
+  }, [players, userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +76,7 @@ function App() {
         ></LandingPage>
       ) : (
         <ModalProvider>
-          <Lobby userId={userId} />
+          {players && localPlayer && userId && <Lobby userId={userId} players={players} localPlayer={localPlayer} loading={loading} />}
         </ModalProvider>
       )}
     </ThemeProvider>

@@ -31,13 +31,16 @@ const Hand = ({
   useEffect(() => {
     (async () => {
       if (userId) {
-        await handleGetHand().catch(err => console.log(err));
+        await handleGetHand();
+        console.log(playerCards);
         if (playerCards.length < FirestoreService.HANDLIMIT) {
+          console.log("dealing if max hand not reached");
           await handleSingleDeal(
             FirestoreService.HANDLIMIT - playerCards.length
-          ).catch(err => console.log(err));
-          await handleGetHand().catch(err => console.log(err));
+          );
+          await handleGetHand();
         }
+        console.log("getting hand with useEffect");
       }
     })();
   }, []);
@@ -63,7 +66,8 @@ const Hand = ({
         FirestoreService.GAMEROOM,
         userId,
         numOfCards
-      ).catch(err => console.log(err));
+      );
+      console.log("dealing cards");
     } catch (error) {
       console.log(error);
     }
@@ -74,7 +78,8 @@ const Hand = ({
       const snapshot = await FirestoreService.getHand(
         userId,
         FirestoreService.GAMEROOM
-      ).catch(err => console.log(err));
+      );
+      console.log("getting hand");
       await setPlayerCards(snapshot);
     } catch (error) {
       console.log(error);
@@ -82,14 +87,15 @@ const Hand = ({
   };
 
   const handlePlayCard = async (cardID) => {
-    //console.log(cardID);
-    //console.log(userId);
+    console.log(cardID);
+    console.log(userId);
     try {
       const playCard = await FirestoreService.playCard(
         FirestoreService.GAMEROOM,
         userId,
         cardID
-      ).catch(err => console.log(err));
+      );
+      console.log("playing card");
       const handUpdate = handleGetHand();
 
       gsap

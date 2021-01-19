@@ -53,9 +53,11 @@ const Game = ({
         response.onSnapshot(async (gotCards) => {
           const cards = gotCards.docs.map((card) => card.data());
           setFieldCards(cards);
+          console.log('localplayer hotseat in game', localPlayer.hotseat)
           await FirestoreService.autoAdvancePhase(
             FirestoreService.GAMEROOM,
-            cards
+            cards,
+            localPlayer.hotseat
           ).catch(err => console.log(err));
         })
       )
@@ -123,35 +125,31 @@ const Game = ({
   return (
     <div>
       
-    <TextContainer>
-      {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
-        `Everyone but ${hotseat} is choosing a card!`
-      }
-      {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
-        `${hotseat} is in the hotseat choosing a card!`
-      }
-      {(gamePhase == 'voting') && (fieldCards.length == 3) &&
-      <TimerTextbox>
-        <SmallTextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</SmallTextContainer>
-        <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} isHotseat={user.hotseat} />
-        <SmallTextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</SmallTextContainer>
-      </TimerTextbox>
-      }
-      {/* {(gamePhase == 'voting') && (fieldCards.length == 3) && 
-        `${hotseat} has chosen a fate!`
-      }
-      {(gamePhase == 'voting') && (fieldCards.length == 3) && 
-        `Did ${hotseat} successfully deliver?`
-      } */}
-      {(gamePhase == 'pre-cleanUp') && (approved) && 
-        `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} point${cardPoints > 1 ? 's' : ''}!`
-      }
-      {(gamePhase == 'pre-cleanUp') && (!approved) && 
-        `The majority have voted!  ${hotseat} failed!`
-      }
-      {(gamePhase == 'gameOver') &&
-        `${hotseat} wins!`}
-    </TextContainer>
+    {hotseat && 
+      <TextContainer>
+        {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
+          `Everyone but ${hotseat} is choosing a card!`
+        }
+        {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
+          `${hotseat} is in the hotseat choosing a card!`
+        }
+        {(gamePhase == 'voting') && (fieldCards.length == 3) &&
+        <TimerTextbox>
+          <SmallTextContainer className="timerBarDeplete">{`${hotseat} has chosen a fate!`}</SmallTextContainer>
+          <Timer votePhaseEnd={votePhaseEnd} endVoting={endVoting} isHotseat={user.hotseat} />
+          <SmallTextContainer className="timerBarDeplete">{`Did ${hotseat} successfully deliver?`}</SmallTextContainer>
+        </TimerTextbox>
+        }
+        {(gamePhase == 'pre-cleanUp') && (approved) && 
+          `The majority have voted!  ${hotseat} succeeded and gained ${cardPoints} point${cardPoints > 1 ? 's' : ''}!`
+        }
+        {(gamePhase == 'pre-cleanUp') && (!approved) && 
+          `The majority have voted!  ${hotseat} failed!`
+        }
+        {(gamePhase == 'gameOver') &&
+          `${hotseat} wins!`}
+      </TextContainer>
+    }
     <GameContainer className="gameContainerFadeIn">
       
       <StyledFlex>

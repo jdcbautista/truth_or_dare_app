@@ -34,9 +34,10 @@ export const gameSetup = async (gameId) => {
     .collection("gamePhase")
     .doc("phase")
     .set({
-      phase: "playCard",
+      phase: "setup",
       taskComplete: false,
       cleanUpReady: false,
+      round: 1,
     });
 };
 
@@ -65,7 +66,6 @@ export const addPlayer = async (newPlayer, gameId) => {
       winner: false,
     });
 
-  gameSetup(GAMEROOM);
   return snapshot;
 };
 
@@ -538,7 +538,9 @@ export const resetRoundCounter = async (gameID) => {
  * upon running function phase is advanced to next phase, if on cleanup restarts phase order when run
  * @params gameID - the game id
  */
-export const autoAdvancePhase = async (gameID, cards) => {
+export const autoAdvancePhase = async (gameID, cards, isHotseat) => {
+  console.log('running auto advance phase')
+  console.log('hotseat is', isHotseat)
   const snapshot = db
     .collection("rooms")
     .doc(gameID)
@@ -548,44 +550,58 @@ export const autoAdvancePhase = async (gameID, cards) => {
   const snapshotCheck = await snapshot.get();
   const taskCompleteCheck = await snapshotCheck.data().taskComplete;
   const cleanUpReadyCheck = await snapshotCheck.data().cleanUpReady;
+  if (cards.length === 3){
+    gsap
+      .timeline()
 
-  if (cards.length < 3) {
-    await snapshot.update({
-      phase: "playCard",
-      taskComplete: false,
-      cleanUpReady: false,
-    });
-  } else if (selectCheck.some((x) => x)) {
-    if (!taskCompleteCheck) {
+      .fromTo(
+        ".gameContainerFadeIn",
+        { filter: "blur(10px)" },
+        { filter: "blur(0px)", duration: 1 }
+      )
+  }
+  if (isHotseat){
+    console.log('passes hotseat check')
+    if (cards.length < 3) {
       await snapshot.update({
-        phase: "voting",
-        voteMargin: 0,
-      });
-    } else if (!cleanUpReadyCheck) {
-      await snapshot.update({
-        phase: "pre-cleanUp",
-      });
-    } else {
-      await snapshot.update({
-        phase: "cleanUp",
+        phase: "playCard",
         taskComplete: false,
         cleanUpReady: false,
       });
-      if (await snapshotCheck.data().approved) {
-        const pointAdd = await addPointsToPlayer(GAMEROOM);
-        if (pointAdd === "gameOver") {
-          await snapshot.update({
-            phase: "gameOver",
-          });
-          await resetRoundCounter(GAMEROOM);
-          return "game over";
+    } else if (selectCheck.some((x) => x)) {
+      console.log('passes selectCheck')
+      if (!taskCompleteCheck) {
+        console.log('passes completeCheck')
+        await snapshot.update({
+          phase: "voting",
+          voteMargin: 0,
+        });
+      } else if (!cleanUpReadyCheck) {
+        await snapshot.update({
+          phase: "pre-cleanUp",
+        });
+      } else {
+        await snapshot.update({
+          phase: "cleanUp",
+          taskComplete: false,
+          cleanUpReady: false,
+        });
+        if (await snapshotCheck.data().approved) {
+          const pointAdd = await addPointsToPlayer(GAMEROOM);
+          if (pointAdd === "gameOver") {
+            await snapshot.update({
+              phase: "gameOver",
+            });
+            await resetRoundCounter(GAMEROOM);
+            return "game over";
+          }
         }
+        await startRound(GAMEROOM)
       }
-      await startRound(GAMEROOM);
     }
-  }
-  return "phase changed";
-};
+    return "phase changed";
+  };
+}
 
 export const getRound = async (gameID) => {
   const snapshot = db
@@ -709,6 +725,7 @@ export const setWildCardText = async (
 };
 
 export const startGame = async () => {
+  await gameSetup(GAMEROOM).catch((err) => console.log(err));
   await setHotseatPlayer(GAMEROOM).catch((err) => console.log(err));
   await deleteField(GAMEROOM).catch((err) => console.log(err));
   await clearPlayerPoints(GAMEROOM).catch((err) => console.log(err));
@@ -720,7 +737,6 @@ export const startGame = async () => {
       { filter: "blur(0px)", opacity: 1 },
       { filter: "blur(10px)", opacity: 1, duration: 2 }
     )
-    .catch((err) => console.log(err))
     .fromTo(
       ".handContainerFadeIn",
       { opacity: 0, filter: "blur(40px)", transform: "translateY(400px)" },
@@ -731,8 +747,7 @@ export const startGame = async () => {
         transform: "translateY(0px)",
         duration: 0.8,
       }
-    )
-    .catch((err) => console.log(err));
+    );
 };
 
 export const startRound = async () => {
