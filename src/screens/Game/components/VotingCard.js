@@ -6,27 +6,31 @@ import {
   VotingCardText,
   WildPlayingCardContainer,
 } from "../GameStyles.js";
-import { FiThumbsUp, FiThumbsDown } from 'react-icons/fi';
-const VotingCard = ({
-  yesNoSelected,
-  onClick,
-  type,
-}) => {
+import { FiThumbsUp, FiThumbsDown } from "react-icons/fi";
+
+const VotingCard = ({ yesNoSelected, onClick, type }) => {
   return (
     <>
       {yesNoSelected === "yes" ? (
-        <StandardPlayingCardContainer onClick={onClick} type={"truth"} currentlySelectedCard={true}>
+        <StandardPlayingCardContainer
+          onClick={onClick}
+          type={"truth"}
+          currentlySelectedCard={true}
+        >
           <VotingCardText yesNoSelected={yesNoSelected} bold={600}>
-            <FiThumbsUp size={160}/>
+            <FiThumbsUp size={160} />
           </VotingCardText>
-          
         </StandardPlayingCardContainer>
       ) : (
-        <StandardPlayingCardContainer onClick={onClick}type={"dare"} text-align="center" currentlySelectedCard={true}>
-          <VotingCardText yesNoSelected={yesNoSelected} bold={600}> 
-            <FiThumbsDown  size={160}/>
+        <StandardPlayingCardContainer
+          onClick={onClick}
+          type={"dare"}
+          text-align="center"
+          currentlySelectedCard={true}
+        >
+          <VotingCardText yesNoSelected={yesNoSelected} bold={600}>
+            <FiThumbsDown size={160} />
           </VotingCardText>
-    
         </StandardPlayingCardContainer>
       )}
     </>

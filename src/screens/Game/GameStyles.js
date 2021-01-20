@@ -13,7 +13,7 @@ export const GameContainer = styled.div`
   justify-content: space-evenly;
   width: 100vw;
   height: 400px;
-  border: 0px solid black;
+  border: 0px osolid black;
 `;
 
 export const TextContainer = styled.div`
@@ -213,9 +213,6 @@ export const GamePlayingCardText = styled.h2`
     else if (props.type == "wild") return "#FFFFFF";
     return "#000000";
   }};
-  justify-content: center;
-  align-items: center;
-  padding-top: 20px;
 `;
 
 export const VotingCardText = styled.h2`
@@ -234,9 +231,13 @@ export const VotingCardText = styled.h2`
     else if (props.yesNoSelected == "selected") return "gold";
     return "#000000";
   }};
+  display: block;
+  text-align: left;
   justify-content: center;
   align-items: center;
-  padding-top: 20px;
+  height: 100px;
+  width: 100px;
+  padding: 30px 20px;
 `;
 
 /* FOR PAGE TRANSITION ANIMATIONS */
@@ -295,7 +296,38 @@ export const PlayedBy = styled.div`
   align-self: center;
 `;
 
+export const CardScoreContainer = styled.p`
+  background-color: ${(props) => {
+    if (props.type === "dare") return "#FB5156";
+    else if (props.type === "truth") return "#64c0fa";
+  }};
+  padding: 10px;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  text-align: center;
+`;
+export const WildCardScoreContainer = styled.p`
+  background-color: #ffffff;
+  padding: 10px;
+  font-family: "Open Sans", sans-serif;
+  color: #000000;
+  font-size: 1.45rem;
+  font-weight: 600;
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  text-align: center;
+`;
 export const TimerTextbox = styled.div`
   display: flex;
   font-size: 1em;
-  `;
+`;

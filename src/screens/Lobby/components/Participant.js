@@ -22,14 +22,12 @@ const Participant = ({
   user,
   gamePhase,
   defaultParticipant,
-  videoWidth,
   videoHeight,
-  isGameVideo = false,
 }) => {
   const [videoTracks, setVideoTracks] = useState([]);
   const [audioTracks, setAudioTracks] = useState([]);
   const [muted, setMuted] = useState(true);
-  const [isVideoOn, setIsVideoOn] = useState(false);
+
   const videoRef = useRef();
   const audioRef = useRef();
 

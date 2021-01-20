@@ -4,11 +4,14 @@ import { db } from "../../../firebase";
 import {
   StandardPlayingCardContainer,
   GamePlayingCardText,
+  CardScoreContainer,
+  WildCardScoreContainer,
   WildPlayingCardContainer,
-  PlayedBy
+  PlayedBy,
 } from "../GameStyles.js";
-import * as FirestoreService from '../../../firebase.js'
-import {StyledBadge, StyledScoreContainer} from '../../Lobby/LobbyStyles.js'
+import * as FirestoreService from "../../../firebase.js";
+import { StyledBadge, StyledScoreContainer } from "../../Lobby/LobbyStyles.js";
+
 const GamePlayingCard = ({
   id,
   type,
@@ -22,26 +25,33 @@ const GamePlayingCard = ({
   cardID,
   //user=localuserID
   user,
-  username
+  username,
+  wildCardScoreUpdate,
 }) => {
-
-  const [editCard, setEditCard] = useState(false)
-  const [cardText, setCardText] = useState(undefined)
-  const [cardFinished, setCardFinished] = useState(false)
+  const [editCard, setEditCard] = useState(false);
+  const [cardText, setCardText] = useState(undefined);
+  const [cardFinished, setCardFinished] = useState(false);
 
   const handleEditClick = async () => {
-    setEditCard(!editCard)
-  }
+    setEditCard(!editCard);
+    console.log("edit click");
+  };
 
   const handleCardChange = async (e) => {
-    setCardText(e.target.value)
-  }
+    console.log(e.target.value);
+    setCardText(e.target.value);
+  };
 
   const handleSaveClick = async () => {
-    setEditCard(!editCard)
-    setCardFinished(true)
-    await FirestoreService.setWildCardText(FirestoreService.GAMEROOM, userID, cardID, cardText).catch(err => console.log(err))
-  }
+    setEditCard(!editCard);
+    setCardFinished(true);
+    await FirestoreService.setWildCardText(
+      FirestoreService.GAMEROOM,
+      userID,
+      cardID,
+      cardText
+    ).catch((err) => console.log(err));
+  };
 
   return (
     <>
@@ -51,20 +61,32 @@ const GamePlayingCard = ({
           selected={selected}
           gamePhase={gamePhase}
           currentlySelectedCard={currentlySelectedCard}
+          wildCardScoreUpdate={wildCardScoreUpdate}
         >
+          <WildCardScoreContainer type={type}>{points}</WildCardScoreContainer>
           <GamePlayingCardText type={type} bold={600}>
             {type}
           </GamePlayingCardText>
           <br></br>
           <GamePlayingCardText>
-            {editCard 
-            ? <form><input onChange={(e) => handleCardChange(e)}></input><button onClick={() => handleSaveClick()}>Save</button></form> 
-            : <GamePlayingCardText onClick={user?.id===userID?() => handleEditClick():()=>console.log('unable to edit')}>{text ? text : `Waiting for ${username} to edit...`}</GamePlayingCardText>}
+            {editCard ? (
+              <form>
+                <input onChange={(e) => handleCardChange(e)}></input>
+                <button onClick={() => handleSaveClick()}>Save</button>
+              </form>
+            ) : (
+              <GamePlayingCardText
+                onClick={
+                  user?.id === userID
+                    ? () => handleEditClick()
+                    : () => console.log("unable to edit")
+                }
+              >
+                {text ? text : `Waiting for ${username} to edit...`}
+              </GamePlayingCardText>
+            )}
           </GamePlayingCardText>
           <PlayedBy>Played By: {username}</PlayedBy>
-          <GamePlayingCardText type={type}>
-            6 pts
-          </GamePlayingCardText>
         </WildPlayingCardContainer>
       ) : (
         <StandardPlayingCardContainer
@@ -75,13 +97,13 @@ const GamePlayingCard = ({
           selected={selected}
         >
           <PlayedBy>Played By: {username}</PlayedBy>
+          <CardScoreContainer type={type}>{points}</CardScoreContainer>
           <GamePlayingCardText type={type} bold={600}>
             {type}
           </GamePlayingCardText>
           <br></br>
-          <GamePlayingCardText>{text}</GamePlayingCardText>          
-          <GamePlayingCardText type={type}>{points}</GamePlayingCardText>
-          </StandardPlayingCardContainer>
+          <GamePlayingCardText>{text}</GamePlayingCardText>
+        </StandardPlayingCardContainer>
       )}
     </>
   );

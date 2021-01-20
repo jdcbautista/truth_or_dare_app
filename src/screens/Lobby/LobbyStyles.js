@@ -10,13 +10,6 @@ import { FiVideoOff, FiVideo } from "react-icons/fi";
 
 /* STYLES FOR VIDEO CONTAINER */
 
-// export const StyledGameVideoBox = styled(Box)`
-//   display: ${(props) => {
-//     if (props.displayoff) return "none";
-//     return "block";
-//   }};
-// `;
-
 export const StyledVideoBox = styled(Box)`
   height: 250px;
   position: relative;
@@ -44,7 +37,8 @@ export const StyledVideo = styled.video`
     if (props.ready && props.gamePhase === "setup") return "10px solid #52AA5E";
     if (!props.ready && props.gamePhase === "setup")
       return "10px solid #FB5156";
-    if (props.vote === "yes" && props.gamePhase === "voting") return "10px solid #64c0fa";
+    if (props.vote === "yes" && props.gamePhase === "voting")
+      return "10px solid #64c0fa";
     if (props.vote === "no" && props.gamePhase === "voting")
       return "10px solid #FB5156";
     if (props.winner && props.gamePhase === "gameOver")
@@ -84,27 +78,41 @@ export const StyledHeading = styled.div`
 export const FormGroup = styled.div`
   color: palevioletred;
   display: block;
-  width: 300px;
+
   margin: 50px auto;
 `;
 
 export const StyledLabel = styled.label`
+  font-family: "Open Sans", sans-serif;
   margin-bottom: 0.5em;
   color: palevioletred;
   display: block;
 `;
 
+export const StyledButtonFlex = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 export const StyledInput = styled.input`
-  padding: 0.5em;
-  color: palevioletred;
-  background: papayawhip;
-  border: none;
+  font-family: "Open Sans", sans-serif;
+  background-color: #cccccc50;
+  padding: 10px;
   border-radius: 3px;
-  width: 100%;
-  margin-bottom: 0.5em;
+  border: 0;
+  outline: none;
+  width: 600px;
+  font-size: 1.5em;
+  transition: padding 0.3s 0.2s ease;
+  border-bottom: 2px solid #aaa;
+  transition: 500ms all;
+
+  &:focus {
+    border-bottom: 2px solid red;
+  }
 `;
 
 export const Message = styled.label`
+  font-family: "Open Sans", sans-serif;
   margin-bottom: 0.5em;
   color: palevioletred;
   display: block;
