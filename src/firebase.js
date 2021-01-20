@@ -16,7 +16,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-export const GAMEROOM = "game3";
+export const GAMEROOM = "game1";
 export const HANDLIMIT = 6;
 export const FIELDLIMIT = 3;
 export const WINNINGPOINTS = 5;
@@ -35,6 +35,20 @@ export const gameSetup = async (gameId) => {
     .doc("phase")
     .set({
       phase: "setup",
+      taskComplete: false,
+      cleanUpReady: false,
+      round: 1,
+    });
+};
+
+export const gameStart = async (gameId) => {
+  const snapshot = await db
+    .collection("rooms")
+    .doc(gameId)
+    .collection("gamePhase")
+    .doc("phase")
+    .set({
+      phase: "playCard",
       taskComplete: false,
       cleanUpReady: false,
       round: 1,
@@ -65,6 +79,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       hotseat: false,
       winner: false,
     });
+  await gameSetup(GAMEROOM).catch((err) => console.log(err));
 
   return snapshot;
 };
@@ -725,10 +740,11 @@ export const setWildCardText = async (
 };
 
 export const startGame = async () => {
-  await gameSetup(GAMEROOM).catch((err) => console.log(err));
+  
   await setHotseatPlayer(GAMEROOM).catch((err) => console.log(err));
   await deleteField(GAMEROOM).catch((err) => console.log(err));
   await clearPlayerPoints(GAMEROOM).catch((err) => console.log(err));
+  // await gameStart(GAMEROOM).catch(err => console.log(err));
 
   await gsap
     .timeline()

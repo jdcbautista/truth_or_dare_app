@@ -125,10 +125,10 @@ const Game = ({
   return (
     <div>
       
-    {hotseat && 
+    {gamePhase.phase !== 'setup' && 
       <TextContainer>
         {(gamePhase == 'playCard') && (fieldCards.length < 3) && 
-          `Everyone but ${hotseat} is choosing a card!`
+          hotseat ? `Choose a card for ${hotseat}!` : ''
         }
         {(gamePhase == 'playCard') && (fieldCards.length == 3) && 
           `${hotseat} is in the hotseat choosing a card!`
