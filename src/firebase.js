@@ -79,7 +79,7 @@ export const addPlayer = async (newPlayer, gameId) => {
       hotseat: false,
       winner: false,
     });
-  await gameSetup(GAMEROOM).catch((err) => console.log(err));
+  // await gameSetup(GAMEROOM).catch((err) => console.log(err));
 
   return snapshot;
 };
@@ -402,15 +402,19 @@ export const setHotseatPlayer = async (gameID) => {
       //console.log(player.data());
       // unset hotseat player and
       // return i
+      console.log('updating hotseat')
+      if (player.data().username) {
+        await phase.update({
+          hotseatName: player.data().username,
+          approved: false,
+          cardPoints: 0,
+        });
+      }
       await playerCollection.doc(player.data().id).update({
         hotseat: true,
         vote: "none",
       });
-      await phase.update({
-        hotseatName: player.data().username,
-        approved: false,
-        cardPoints: 0,
-      });
+      
       return player.data().id;
     }
   }
@@ -741,10 +745,11 @@ export const setWildCardText = async (
 
 export const startGame = async () => {
   
-  await setHotseatPlayer(GAMEROOM).catch((err) => console.log(err));
+  await gameSetup(GAMEROOM).catch((err) => console.log(err))
   await deleteField(GAMEROOM).catch((err) => console.log(err));
   await clearPlayerPoints(GAMEROOM).catch((err) => console.log(err));
-  // await gameStart(GAMEROOM).catch(err => console.log(err));
+  await gameStart(GAMEROOM).catch(err => console.log(err));
+  await setHotseatPlayer(GAMEROOM).catch((err) => console.log(err));
 
   await gsap
     .timeline()

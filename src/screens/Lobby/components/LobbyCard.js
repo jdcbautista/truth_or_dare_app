@@ -23,6 +23,7 @@ function LobbyCard({
   cardWidth = 256,
   cardHeight = 310,
   defaultCard,
+  readyClicked,
 }) {
   return (
     <>
@@ -60,7 +61,7 @@ function LobbyCard({
               <StyledScoreContainer>score: {user?.score}</StyledScoreContainer>
             )}
 
-            {twilioUserInfo && !playerInfo?.ready && (
+            {twilioUserInfo && !playerInfo?.ready && !user.ready &&(
               <StyledReadyButton onClick={handleReadyClick}>
                 I'm Ready!
               </StyledReadyButton>
