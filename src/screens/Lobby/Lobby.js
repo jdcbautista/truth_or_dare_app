@@ -6,7 +6,6 @@ import Video from "twilio-video";
 import LobbyCard from "./components/LobbyCard";
 import Game from "../Game/Game";
 import Hand from "../Hand/Hand";
-import GameOver from "../GameOver/GameOver";
 import LobbyInput from "./components/LobbyInput";
 import { checkIfReady } from "../../helpers";
 import { LobbyContainer } from "./LobbyStyles";
@@ -297,6 +296,7 @@ const Lobby = ({ userId, localPlayer, players, loading }) => {
               token={token}
               handleReadyClick={handleReadyClick}
               endVoting={handleEndVoting}
+              handleStartGame={handleStartGame}
             />
 
             {isHandOpen && (
@@ -315,12 +315,13 @@ const Lobby = ({ userId, localPlayer, players, loading }) => {
               />
             )}
 
-            {gamePhase.phase === "gameOver" && (
-              <GameOver startGame={handleStartGame} />
-            )}
+            
 
-            {!isHandOpen && !localPlayer?.hotseat && (
+            {!isHandOpen && !localPlayer?.hotseat && gamePhase.phase !== 'gameOver' && (
               <DebugButton onClick={handleViewHand}>Show Hand</DebugButton>
+            )}
+            {localPlayer?.hotseat && gamePhase.phase === 'voting' && (
+              <DebugButton onClick={handleEndVoting}>Skip Voting Phase</DebugButton>
             )}
           </LobbyContainer>
         </>

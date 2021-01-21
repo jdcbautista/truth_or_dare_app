@@ -1,4 +1,5 @@
 import React, { useEffect, useState, Suspense } from "react";
+import GameOver from "../GameOver/GameOver";
 import Timer from "./components/Timer";
 import Participant from "../Lobby/components/Participant";
 import { gsap } from "gsap";
@@ -34,6 +35,7 @@ const Game = ({
   localParticipant,
   endVoting,
   user,
+  handleStartGame
 }) => {
   const [playerCards, setPlayerCards] = useState([]);
   const [fieldCards, setFieldCards] = useState([]);
@@ -146,8 +148,13 @@ const Game = ({
         {(gamePhase == 'pre-cleanUp') && (!approved) && 
           `The majority have voted!  ${hotseat} failed!`
         }
-        {(gamePhase == 'gameOver') &&
-          `${hotseat} wins!`}
+        {(gamePhase == 'gameOver') && (
+        <div style={{flexDirection:'column', display:'flex'}}>
+          {hotseat} wins!
+          <button onClick={() => handleStartGame()} style={{marginTop:'20px'}}>Play again?</button>
+          {/* <GameOver startGame={handleStartGame} /> */}
+        </div>
+        )}
       </TextContainer>
     }
     <GameContainer className="gameContainerFadeIn">

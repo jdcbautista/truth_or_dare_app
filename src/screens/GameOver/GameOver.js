@@ -18,8 +18,7 @@ const GameOver = ({
 
   return (
     <GameOverContainer className="gameOverContainerFadeIn">
-        <p>GAME OVER!</p><br></br>
-        <GameOverButton onClick={startGame}>Start over</GameOverButton>
+      <GameOverButton onClick={startGame}>Play again?</GameOverButton>
     </GameOverContainer>
   );
 };
