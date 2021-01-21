@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Flex, Link, Text, Box } from "rebass";
-import { DebugButton } from "../LobbyStyles";
+import { DebugButton, ToggleDebugButton } from "../LobbyStyles";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import Timer from "../../Game/components/Timer.js";
 import {
@@ -35,20 +35,13 @@ function Navbar({
   return (
     <>
       <NavbarContainer>
-        <DebugButton onClick={() => setDebugMode(!debugMode)}>
-          Toggle Debug
-        </DebugButton>
         <RoundCounter>Round {gameRound}</RoundCounter>
+        
+        <ToggleDebugButton onClick={() => setDebugMode(!debugMode)}>
+          Toggle Debug
+        </ToggleDebugButton>
         <GameName>truth or dare</GameName>
-        <DebugContainer debugMode={debugMode}>
-          <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
-          <DebugButton onClick={showHand}>Show Hand</DebugButton>
-          <DebugButton onClick={deleteField}>Delete Field</DebugButton>
-          <DebugButton onClick={startGame}>Start Game</DebugButton>
-          <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
-          <DebugButton onClick={endVotingTimer}>End Voting Phase</DebugButton>
-          <DebugButton onClick={endFadeTimer}>End Fade to Cleanup</DebugButton>
-        </DebugContainer>
+        
         <NavbarText>
           <AiOutlineInfoCircle onClick={toggleModal} color="black" />
         </NavbarText>
@@ -86,6 +79,15 @@ function Navbar({
           </Flex>
         </StyledModal>
       </NavbarContainer>
+      <DebugContainer debugMode={debugMode}>
+          <DebugButton onClick={loadDeck}>Load Deck</DebugButton>
+          <DebugButton onClick={showHand}>Show Hand</DebugButton>
+          <DebugButton onClick={deleteField}>Delete Field</DebugButton>
+          <DebugButton onClick={startGame}>Start Game</DebugButton>
+          <DebugButton onClick={advanceHotseat}>Advance Hotseat</DebugButton>
+          <DebugButton onClick={endVotingTimer}>End Voting Phase</DebugButton>
+          <DebugButton onClick={endFadeTimer}>End Fade to Cleanup</DebugButton>
+        </DebugContainer>
     </>
   );
 }

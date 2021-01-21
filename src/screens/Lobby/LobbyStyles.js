@@ -130,6 +130,19 @@ export const DebugButton = styled.button`
   }
 `;
 
+export const ToggleDebugButton = styled.button`
+  opacity: 0;
+  color: white;
+  margin: 10px;
+  font-size: 10px;
+  background-color: red;
+  &:hover {
+    opacity: 1;
+  }
+  position: absolute
+`;
+
+
 /* STYLES FOR LOBBY */
 
 export const LobbyContainer = styled.div`

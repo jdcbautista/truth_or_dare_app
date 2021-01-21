@@ -19,8 +19,16 @@ export const GameOverContainer = styled.div`
   position: absolute;
 `;
 
-export const GameOverButton = styled.div`
-  color: black;
+export const GameOverButton = styled.button`
+  opacity: 0.5;
+  color: white;
+  margin: 50px;
+  font-size: 10px;
+  background-color: red;
+  &:hover {
+    opacity: 1;
+  }
+  height: 20px
 `;
 
 export const PlayerCard = styled.div`

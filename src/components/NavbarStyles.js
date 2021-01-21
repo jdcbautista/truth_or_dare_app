@@ -18,6 +18,7 @@ export const NavbarContainer = styled(Flex)`
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: whitesmoke;
 `;
 
 export const StyledInfoIcon = styled(AiOutlineInfoCircle)`
