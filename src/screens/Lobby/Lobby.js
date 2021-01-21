@@ -23,6 +23,7 @@ const Lobby = ({ userId, localPlayer, players, loading }) => {
   // const [loading, setLoading] = useState(false);
   // const [players, setPlayers] = useState([]);
   // Keep track of players and current player
+  const [readyClicked, setReadyClicked] = useState(false)
   
   
   const [username, setUsername] = useState(null);
@@ -132,6 +133,8 @@ const Lobby = ({ userId, localPlayer, players, loading }) => {
       userId,
       FirestoreService.GAMEROOM
     ).catch((error) => setError(error));
+    setReadyClicked(!readyClicked)
+    console.log(readyClicked)
   };
 
   const createPlaceholders = (numberOfPlayersInGame) => {
