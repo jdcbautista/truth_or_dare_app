@@ -3,16 +3,6 @@ import "firebase/firestore";
 import "firebase/auth";
 import { gsap } from "gsap";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAnBHQu1jUpzuz-rymVFxtBsbOFVnPuxsA",
-  authDomain: "firestore-project-a4b07.firebaseapp.com",
-  projectId: "firestore-project-a4b07",
-  storageBucket: "firestore-project-a4b07.appspot.com",
-  messagingSenderId: "423972607278",
-  appId: "1:423972607278:web:7457d57f2227c1b5e016bf",
-};
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
